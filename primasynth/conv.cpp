@@ -3,10 +3,6 @@
 
 namespace primasynth {
 
-double centToHeltz(double cent) {
-    return std::exp2(cent / 1200.0);
-}
-
 double centibelToRatio(double cb) {
     return std::pow(10.0, -cb / 100.0);
 }
