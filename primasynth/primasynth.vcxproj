@@ -103,7 +103,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /-Y "$(ProjectDir)portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
+      <Command>copy /B /Y "$(ProjectDir)portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,7 +127,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /-Y "$(ProjectDir)portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
+      <Command>copy /B /Y "$(ProjectDir)portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,7 +155,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /-Y "$(ProjectDir)portaudio_x86.dll" "$(TargetDir)"</Command>
+      <Command>copy /B /Y "$(ProjectDir)portaudio_x86.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,7 +183,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /-Y "$(ProjectDir)portaudio_x86.dll" "$(TargetDir)"</Command>
+      <Command>copy /B /Y "$(ProjectDir)portaudio_x86.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
