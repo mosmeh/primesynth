@@ -260,4 +260,7 @@ paket-files/
 __pycache__/
 *.pyc
 
+*.cppcheck
+*cppcheck-build-dir/
+
 *.sf2
