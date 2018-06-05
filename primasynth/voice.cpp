@@ -139,9 +139,9 @@ void Voice::update() {
     modEnv_.update(deltaPhase_);
 
     deltaPhase_ = FixedPoint(deltaPhaseFactor_ * keyToHeltz(voicePitch_
-        + getModulatedGenerator(SFGenerator::modEnvToPitch) * modEnv_.getValue()
-        + getModulatedGenerator(SFGenerator::vibLfoToPitch) * vibLFO_.getValue()
-        + getModulatedGenerator(SFGenerator::modLfoToPitch) * modLFO_.getValue()));
+        + 0.01 * getModulatedGenerator(SFGenerator::modEnvToPitch) * modEnv_.getValue()
+        + 0.01 * getModulatedGenerator(SFGenerator::vibLfoToPitch) * vibLFO_.getValue()
+        + 0.01 * getModulatedGenerator(SFGenerator::modLfoToPitch) * modLFO_.getValue()));
 }
 
 void Voice::updateSFController(SFGeneralController controller, std::int16_t value) {
@@ -270,7 +270,7 @@ void Voice::updateModulatedParams(SFGenerator destination) {
     case SFGenerator::scaleTuning:
     case SFGenerator::pitch:
         voicePitch_ = sample_.pitch
-            + 1e-4 * modulations_.at(static_cast<size_t>(SFGenerator::pitch))
+            + 0.01 * modulations_.at(static_cast<size_t>(SFGenerator::pitch))
             + 0.01 * getModulatedGenerator(SFGenerator::scaleTuning) * (actualKey_ - sample_.pitch)
             + getModulatedGenerator(SFGenerator::coarseTune)
             + 0.01 * getModulatedGenerator(SFGenerator::fineTune);;
