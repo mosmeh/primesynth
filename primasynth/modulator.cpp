@@ -57,7 +57,7 @@ double map(double value, SFModulator mod) {
             return sign * dir * convex(sign * x);
         }
     }
-    throw;
+    throw std::runtime_error("unknown modulator controller type");
 }
 
 double transform(double value, SFTransform transform) {
@@ -67,7 +67,7 @@ double transform(double value, SFTransform transform) {
     case SFTransform::absoluteValue:
         return std::abs(value);
     }
-    throw;
+    throw std::invalid_argument("unknown transform");
 }
 
 Modulator::Modulator(const sfModList& param) :

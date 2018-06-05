@@ -83,7 +83,7 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint8_t bank, std::ui
             }
         }
     }
-    throw;
+    throw std::runtime_error("preset not found");
 }
 
 }

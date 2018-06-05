@@ -272,12 +272,9 @@ SoundFont::SoundFont(const std::string& filename) {
     std::ifstream ifs(filename, std::ios::binary);
 
     const RIFFHeader riffHeader = readHeader(ifs);
-    if (riffHeader.id != toFourCC("RIFF")) {
-        throw;
-    }
     const std::uint32_t riffType = readFourCC(ifs);
-    if (riffType != toFourCC("sfbk")) {
-        throw;
+    if (riffHeader.id != toFourCC("RIFF") || riffType != toFourCC("sfbk")) {
+        throw std::runtime_error("not a SoundFont file");
     }
 
     for (std::size_t s = 0; s < riffHeader.size - sizeof(riffType);) {
@@ -339,7 +336,7 @@ void SoundFont::readInfoChunk(std::ifstream& ifs, std::size_t size) {
             sfVersionTag ver;
             ifs.read(reinterpret_cast<char*>(&ver), subchunkHeader.size);
             if (ver.wMajor > 2 || ver.wMinor > 4) {
-                throw;
+                throw std::runtime_error("SoundFont later than 2.04 not supported");
             }
             break;
         }
@@ -379,7 +376,7 @@ std::string achToString(const char ach[20]) {
 template <typename T>
 void readPdtaList(std::ifstream& ifs, std::vector<T>& list, std::uint32_t totalSize, std::size_t structSize) {
     if (totalSize % structSize != 0) {
-        throw;
+        throw std::runtime_error("invalid chunk size");
     }
     list.resize(totalSize / structSize);
     for (std::size_t i = 0; i < totalSize / structSize; ++i) {
@@ -401,7 +398,7 @@ void readModulator(std::ifstream& ifs, SFModulator& mod) {
 void readModList(std::ifstream& ifs, std::vector<sfModList>& list, std::uint32_t totalSize) {
     static const size_t STRUCT_SIZE = 10;
     if (totalSize % STRUCT_SIZE != 0) {
-        throw;
+        throw std::runtime_error("invalid chunk size");
     }
     list.reserve(totalSize / STRUCT_SIZE);
     for (std::size_t i = 0; i < totalSize / STRUCT_SIZE; ++i) {

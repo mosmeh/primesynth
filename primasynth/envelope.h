@@ -31,7 +31,7 @@ public:
         } else if (section < Section::Finished) {
             params_.at(static_cast<int>(section)) = outputRate_ * timecentToSecond(param);
         } else {
-            throw;
+            throw std::invalid_argument("unknown section");
         }
     }
 

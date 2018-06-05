@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     RingBuffer buffer(1 << 12);
     Synthesizer synth(sampleRate, 16);
     if (argc < 2) {
-        throw;
+        throw std::runtime_error("SoundFont file required");
     }
     synth.loadSoundFont(argv[1]);
     synth.setVolume(1.0);
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
         TCHAR msg[MAXERRORLENGTH];
         midiInGetErrorText(res, msg, sizeof(msg));
         std::wcerr << "MIDI: " << msg << std::endl;
-        return EXIT_FAILURE;
+        throw std::runtime_error("failed to get device capabilities");
     }
     std::wcout << "MIDI: opening " << caps.szPname << std::endl;
     midiInOpen(&hmi, 0,
