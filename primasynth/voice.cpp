@@ -112,7 +112,7 @@ void Voice::update() {
         }
         break;
     case SampleMode::Looped:
-        if (phase_.getIntegerPart() > sample_.endLoop - 2) {
+        if (phase_.getIntegerPart() > sample_.endLoop - 1) {
             if (released_) {
                 volEnv_.finish();
                 return;
@@ -127,7 +127,7 @@ void Voice::update() {
                 volEnv_.finish();
                 return;
             }
-        } else if (phase_.getIntegerPart() > sample_.endLoop - 2) {
+        } else if (phase_.getIntegerPart() > sample_.endLoop - 1) {
             phase_ -= FixedPoint(sample_.endLoop - sample_.startLoop);
         }
         break;
