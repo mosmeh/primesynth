@@ -21,7 +21,7 @@ public:
         outputRate_(outputRate),
         params_{},
         section_(Section::Delay),
-        periodPhase_(0U),
+        periodSteps_(0),
         atten_(1.0),
         value_(1.0) {}
 
@@ -29,7 +29,7 @@ public:
         if (section == Section::Sustain) {
             params_.at(static_cast<int>(Section::Sustain)) = 0.001 * param;
         } else if (section < Section::Finished) {
-            params_.at(static_cast<int>(section)) = timecentToSecond(param);
+            params_.at(static_cast<int>(section)) = outputRate_ * timecentToSecond(param);
         } else {
             throw;
         }
@@ -45,34 +45,33 @@ public:
         changeSection(Section::Finished);
     }
 
-    void update(const FixedPoint& deltaPhase) {
+    void update() {
         if (section_ == Section::Finished) {
             return;
         }
 
-        periodPhase_ += deltaPhase;
+        ++periodSteps_;
 
         auto i = static_cast<int>(section_);
-        if (section_ != Section::Sustain && periodPhase_.getReal() >= outputRate_ * params_.at(i)) {
+        if (section_ != Section::Sustain && periodSteps_ >= params_.at(i)) {
             ++i;
             changeSection(static_cast<Section>(i));
         }
 
-        const double timeSec = periodPhase_.getReal() / outputRate_;
-        const double sustain = params_.at(static_cast<int>(Section::Sustain));
+        const double& sustain = params_.at(static_cast<int>(Section::Sustain));
         switch (section_) {
         case Section::Delay:
         case Section::Finished:
             atten_ = 1.0;
             break;
         case Section::Attack:
-            atten_ = timeSec / params_.at(i);
+            atten_ = periodSteps_ / params_.at(i);
             break;
         case Section::Hold:
             atten_ = 0;
             break;
         case Section::Decay:
-            atten_ = timeSec / params_.at(i);
+            atten_ = periodSteps_ / params_.at(i);
             if (atten_ > sustain) {
                 changeSection(Section::Sustain);
             }
@@ -81,7 +80,7 @@ public:
             atten_ = sustain;
             break;
         case Section::Release:
-            atten_ += deltaPhase.getReal() / (outputRate_ * params_.at(i));
+            atten_ += 1.0 / params_.at(i);
             if (atten_ > 1.0) {
                 changeSection(Section::Finished);
             }
@@ -107,12 +106,12 @@ private:
     const double outputRate_;
     std::array<double, 6> params_;
     Section section_;
-    FixedPoint periodPhase_;
+    unsigned int periodSteps_;
     double atten_, value_;
 
     void changeSection(Section section) {
         section_ = section;
-        periodPhase_ = FixedPoint(0U);
+        periodSteps_ = 0;
     }
 };
 

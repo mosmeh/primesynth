@@ -135,10 +135,10 @@ void Voice::update() {
         break;
     }
 
-    vibLFO_.update(deltaPhase_);
-    modLFO_.update(deltaPhase_);
-    volEnv_.update(deltaPhase_);
-    modEnv_.update(deltaPhase_);
+    vibLFO_.update();
+    modLFO_.update();
+    volEnv_.update();
+    modEnv_.update();
 
     deltaPhase_ = FixedPoint(deltaPhaseFactor_ * keyToHeltz(voicePitch_
         + 0.01 * getModulatedGenerator(SFGenerator::modEnvToPitch) * modEnv_.getValue()
