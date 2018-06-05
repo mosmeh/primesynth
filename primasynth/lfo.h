@@ -35,7 +35,7 @@ public:
             }
         } else {
             value_ -= d;
-            if (value_ < 1.0) {
+            if (value_ < -1.0) {
                 value_ = -2.0 - value_;
                 up_ = true;
             }
