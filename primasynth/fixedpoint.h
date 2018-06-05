@@ -53,7 +53,7 @@ public:
     }
 
     std::uint32_t getRoundedInteger() const {
-        return ((raw_ + INT_MAX) + 1) >> 32;
+        return ((raw_ + INT32_MAX) + 1) >> 32;
     }
 
 private:
