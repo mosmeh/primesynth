@@ -14,6 +14,7 @@ struct Sample {
 
 class GeneratorSet {
 public:
+    GeneratorSet();
     void set(SFGenerator type, std::int16_t amount);
     void merge(const GeneratorSet& b);
     void mergeAndAdd(const GeneratorSet& b);

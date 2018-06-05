@@ -2,6 +2,12 @@
 
 namespace primasynth {
 
+GeneratorSet::GeneratorSet() {
+    for (std::size_t i = 0; i < NUM_GENERATORS; ++i) {
+        generators_.at(i).amount = DEFAULT_GENERATOR_VALUES.at(i);
+    }
+}
+
 void GeneratorSet::set(SFGenerator type, std::int16_t amount) {
     generators_.at(static_cast<std::size_t>(type)) = {true, amount};
 }
@@ -27,12 +33,7 @@ void GeneratorSet::mergeAndAdd(const GeneratorSet& b) {
 }
 
 std::int16_t GeneratorSet::getOrDefault(SFGenerator type) const {
-    const auto i = static_cast<std::size_t>(type);
-    if (generators_.at(i).used) {
-        return generators_.at(i).amount;
-    } else {
-        return DEFAULT_GENERATOR_VALUES.at(i);
-    }
+    return generators_.at(static_cast<std::size_t>(type)).amount;
 }
 
 bool operator==(const SFModulator& a, const SFModulator& b) {

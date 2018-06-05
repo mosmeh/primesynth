@@ -35,7 +35,7 @@ private:
     } sample_;
     std::int16_t key_, velocity_;
     std::vector<Modulator> modulators_;
-    std::array<double, NUM_GENERATORS> modulations_;
+    std::array<double, NUM_GENERATORS> modulated_;
     double deltaPhaseFactor_;
     bool released_;
     double voicePitch_;
