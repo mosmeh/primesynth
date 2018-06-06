@@ -63,7 +63,7 @@ void Synthesizer::processMIDIMessage(DWORD param) {
 }
 
 void Synthesizer::setVolume(double volume) {
-    volume_ = volume;
+    volume_ = std::max(0.0, volume);
 }
 
 StereoValue Synthesizer::render() const {

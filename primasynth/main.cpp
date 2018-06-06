@@ -47,9 +47,9 @@ int main(int argc, char** argv) {
         argparser.set_program_name("primasynth");
         argparser.add<unsigned int>("in", 'i', "input MIDI device ID", false, 0);
         argparser.add<unsigned int>("out", 'o', "output audio device ID", false);
-        argparser.add<double>("volume", 'v', "volume in [0, 1]", false, 1.0);
+        argparser.add<double>("volume", 'v', "volume (1 = 100%)", false, 1.0);
         argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
-        argparser.add<unsigned int>("channels", 'c', "number of channels", false, 16);
+        argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
         argparser.footer("soundfont_filename");
         argparser.parse_check(argc, argv);
         if (argparser.rest().empty()) {
