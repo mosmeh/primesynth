@@ -40,6 +40,8 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
 int main(int argc, char** argv) {
     using namespace primasynth;
 
+    initializeConversionTables();
+
     CHECK_PA(Pa_Initialize());
 
     PaStreamParameters params = {};

@@ -3,6 +3,7 @@
 
 namespace primasynth {
 
+void initializeConversionTables();
 double centibelToRatio(double cb);
 double keyToHeltz(double key);
 double timecentToSecond(double tc);
