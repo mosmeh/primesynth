@@ -1,5 +1,6 @@
 #include "synth.h"
 #include "ringbuffer.h"
+#include "cmdline.h"
 
 static_assert(CHAR_BIT == 8, "char is assumed to be 8 bits");
 
@@ -40,6 +41,16 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
 int main(int argc, char** argv) {
     using namespace primasynth;
 
+    cmdline::parser argparser;
+    argparser.add<double>("volume", 'v', "volume in [0, 1]", false, 1.0);
+    argparser.add<int>("buffer", 'b', "buffer size", false, 1 << 12);
+    argparser.add<int>("channels", 'c', "number of channels", false, 16);
+    argparser.footer("soundfont_filename");
+    argparser.parse_check(argc, argv);
+    if (argparser.rest().empty()) {
+        throw std::runtime_error("SoundFont file required");
+    }
+
     initializeConversionTables();
 
     CHECK_PA(Pa_Initialize());
@@ -52,13 +63,10 @@ int main(int argc, char** argv) {
     params.suggestedLatency = deviceInfo->defaultLowOutputLatency;
     const double sampleRate = deviceInfo->defaultSampleRate;
 
-    RingBuffer buffer(1 << 12);
-    Synthesizer synth(sampleRate, 16);
-    if (argc < 2) {
-        throw std::runtime_error("SoundFont file required");
-    }
-    synth.loadSoundFont(argv[1]);
-    synth.setVolume(1.0);
+    RingBuffer buffer(argparser.get<int>("buffer"));
+    Synthesizer synth(sampleRate, argparser.get<int>("channels"));
+    synth.loadSoundFont(argparser.rest().at(0));
+    synth.setVolume(argparser.get<double>("volume"));
 
     SetConsoleOutputCP(CP_UTF8);
     printf("opening %s\n", deviceInfo->name);
