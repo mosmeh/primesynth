@@ -129,7 +129,9 @@ void Channel::setPreset(const std::shared_ptr<const Preset>& preset) {
 void Channel::update() {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
-        voice->update();
+        if (voice->isSounding()) {
+            voice->update();
+        }
     }
 }
 
@@ -137,7 +139,9 @@ StereoValue Channel::render() {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     StereoValue sum;
     for (const auto& voice : voices_) {
-        sum += voice->render();
+        if (voice->isSounding()) {
+            sum += voice->render();
+        }
     }
     return sum;
 }

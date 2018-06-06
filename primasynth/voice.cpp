@@ -99,10 +99,6 @@ std::int16_t Voice::getExclusiveClass() const {
 }
 
 void Voice::update() {
-    if (volEnv_.isFinished()) {
-        return;
-    }
-
     phase_ += deltaPhase_;
 
     switch (sample_.mode) {
@@ -169,16 +165,12 @@ void Voice::overrideGenerator(SFGenerator generator, std::int16_t value) {
 }
 
 StereoValue Voice::render() const {
-    if (volEnv_.isFinished()) {
-        return {0.0, 0.0};
-    } else {
-        const std::uint32_t i = phase_.getIntegerPart();
-        const double r = phase_.getFractionalPart();
-        const double interpolated = (1.0 - r) * sample_.buffer->at(i) + r * sample_.buffer->at(i + 1);
-        return volEnv_.getValue()
-            * centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
-            * volume_ * (interpolated / INT16_MAX);
-    }
+    const std::uint32_t i = phase_.getIntegerPart();
+    const double r = phase_.getFractionalPart();
+    const double interpolated = (1.0 - r) * sample_.buffer->at(i) + r * sample_.buffer->at(i + 1);
+    return volEnv_.getValue()
+        * centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
+        * volume_ * (interpolated / INT16_MAX);
 }
 
 bool Voice::isSounding() const {
