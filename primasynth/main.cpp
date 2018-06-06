@@ -91,6 +91,8 @@ int main(int argc, char** argv) {
         reinterpret_cast<DWORD_PTR>(MidiInProc),
         reinterpret_cast<DWORD_PTR>(&synth), CALLBACK_FUNCTION);
 
+    SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+
     bool running = true;
     std::thread thread([&running, &synth, &buffer, sampleRate] {
         static const int mutexSteps = 64;
