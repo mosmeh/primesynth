@@ -98,13 +98,11 @@ int main(int argc, char** argv) {
             const double stepTime = mutexSteps / sampleRate;
             ahead += stepTime;
             auto currTime = std::chrono::high_resolution_clock::now();
-            const double aheadFactor = 2.0;
-            ahead -= aheadFactor * std::chrono::duration<double>(currTime - lastTime).count();
+            ahead -= 2.0 * std::chrono::duration<double>(currTime - lastTime).count();
             lastTime = currTime;
             ahead = std::max(ahead, 0.0);
 
-            static const double aheadMax = 1.0;
-            if (ahead > aheadMax) {
+            if (ahead > 1.0) {
                 std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
             }
         }
