@@ -37,6 +37,7 @@ private:
     std::vector<Modulator> modulators_;
     std::array<double, NUM_GENERATORS> modulated_;
     double deltaPhaseFactor_;
+    unsigned int steps_;
     bool released_;
     double voicePitch_;
     FixedPoint phase_, deltaPhase_;

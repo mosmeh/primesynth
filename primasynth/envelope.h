@@ -17,8 +17,9 @@ public:
         Finished
     };
 
-    explicit Envelope(double outputRate) :
+    explicit Envelope(double outputRate, unsigned int interval) :
         outputRate_(outputRate),
+        interval_(interval),
         params_{},
         section_(Section::Delay),
         periodSteps_(0),
@@ -29,7 +30,7 @@ public:
         if (section == Section::Sustain) {
             params_.at(static_cast<int>(Section::Sustain)) = 0.001 * param;
         } else if (section < Section::Finished) {
-            params_.at(static_cast<int>(section)) = outputRate_ * timecentToSecond(param);
+            params_.at(static_cast<int>(section)) = outputRate_ * timecentToSecond(param) / interval_;
         } else {
             throw std::invalid_argument("unknown section");
         }
@@ -104,6 +105,7 @@ public:
 
 private:
     const double outputRate_;
+    const unsigned int interval_;
     std::array<double, 6> params_;
     Section section_;
     unsigned int periodSteps_;

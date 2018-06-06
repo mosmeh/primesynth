@@ -2,6 +2,8 @@
 
 namespace primasynth {
 
+static constexpr unsigned int CALC_INTERVAL = 32;
+
 StereoValue calculatePannedVolume(double pan) {
     if (pan <= -500.0) {
         return {1.0, 0.0};
@@ -18,13 +20,14 @@ Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample
     noteID_(noteID),
     generators_(generators),
     actualKey_(key),
+    steps_(0),
     released_(false),
     phase_(sample->start),
     volume_({1.0, 1.0}),
-    volEnv_(outputRate),
-    modEnv_(outputRate),
-    vibLFO_(outputRate),
-    modLFO_(outputRate) {
+    volEnv_(outputRate, 1),
+    modEnv_(outputRate, CALC_INTERVAL),
+    vibLFO_(outputRate, CALC_INTERVAL),
+    modLFO_(outputRate, 1) {
 
     const std::int16_t overriddenKey = generators.getOrDefault(SFGenerator::keynum);
     key_ = overriddenKey > 0 ? overriddenKey : key;
@@ -131,15 +134,17 @@ void Voice::update() {
         break;
     }
 
-    vibLFO_.update();
     modLFO_.update();
     volEnv_.update();
-    modEnv_.update();
+    if (steps_++ % CALC_INTERVAL == 0) {
+        vibLFO_.update();
+        modEnv_.update();
 
-    deltaPhase_ = FixedPoint(deltaPhaseFactor_ * keyToHeltz(voicePitch_
-        + 0.01 * getModulatedGenerator(SFGenerator::modEnvToPitch) * modEnv_.getValue()
-        + 0.01 * getModulatedGenerator(SFGenerator::vibLfoToPitch) * vibLFO_.getValue()
-        + 0.01 * getModulatedGenerator(SFGenerator::modLfoToPitch) * modLFO_.getValue()));
+        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * keyToHeltz(voicePitch_
+            + 0.01 * getModulatedGenerator(SFGenerator::modEnvToPitch) * modEnv_.getValue()
+            + 0.01 * getModulatedGenerator(SFGenerator::vibLfoToPitch) * vibLFO_.getValue()
+            + 0.01 * getModulatedGenerator(SFGenerator::modLfoToPitch) * modLFO_.getValue()));
+    }
 }
 
 void Voice::updateSFController(SFGeneralController controller, std::int16_t value) {

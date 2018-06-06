@@ -6,8 +6,9 @@ namespace primasynth {
 
 class LFO {
 public:
-    explicit LFO(double outputRate) :
+    explicit LFO(double outputRate, unsigned int interval) :
         outputRate_(outputRate),
+        interval_(interval),
         steps_(0),
         delay_(0.0),
         delta_(0.0),
@@ -15,11 +16,11 @@ public:
         up_(true) {}
 
     void setDelay(double delay) {
-        delay_ = outputRate_ * timecentToSecond(delay);
+        delay_ = outputRate_ * timecentToSecond(delay) / interval_;
     }
 
     void setFrequency(double freq) {
-        delta_ = 4.0 * absoluteCentToHeltz(freq) / outputRate_;
+        delta_ = 4.0 * absoluteCentToHeltz(freq) / (outputRate_ * interval_);
     }
 
     void update() {
@@ -48,6 +49,7 @@ public:
 
 private:
     const double outputRate_;
+    const unsigned int interval_;
     unsigned int steps_;
     double delay_, delta_, value_;
     bool up_;
