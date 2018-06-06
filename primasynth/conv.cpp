@@ -3,12 +3,12 @@
 
 namespace primasynth {
 
-std::array<double, 961> centibelToRatioTable;
+std::array<double, 1441> centibelToRatioTable;
 std::array<double, 1200> centToHeltzTable;
 
 void initializeConversionTables() {
     for (std::size_t i = 0; i < centibelToRatioTable.size(); ++i) {
-        centibelToRatioTable.at(i) = std::pow(10.0, i / -100.0);
+        centibelToRatioTable.at(i) = std::pow(10.0, i / -200.0);
     }
     for (std::size_t i = 0; i < centToHeltzTable.size(); i++) {
         centToHeltzTable.at(i) = 6.875 * std::exp2(i / 1200.0);
