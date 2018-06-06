@@ -44,9 +44,12 @@ int main(int argc, char** argv) {
     HMIDIIN hmi = NULL;
     try {
         cmdline::parser argparser;
+        argparser.set_program_name("primasynth");
+        argparser.add<unsigned int>("in", 'i', "input MIDI device ID", false, 0);
+        argparser.add<unsigned int>("out", 'o', "output audio device ID", false);
         argparser.add<double>("volume", 'v', "volume in [0, 1]", false, 1.0);
-        argparser.add<int>("buffer", 'b', "buffer size", false, 1 << 12);
-        argparser.add<int>("channels", 'c', "number of channels", false, 16);
+        argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
+        argparser.add<unsigned int>("channels", 'c', "number of channels", false, 16);
         argparser.footer("soundfont_filename");
         argparser.parse_check(argc, argv);
         if (argparser.rest().empty()) {
@@ -58,15 +61,23 @@ int main(int argc, char** argv) {
         CHECK_PA(Pa_Initialize());
 
         PaStreamParameters params = {};
-        params.device = Pa_GetDefaultOutputDevice();
+        if (argparser.exist("out")) {
+            const auto id = static_cast<int>(argparser.get<unsigned int>("out"));
+            if (id >= Pa_GetDeviceCount()) {
+                throw std::runtime_error("invalid output device ID");
+            }
+            params.device = id;
+        } else {
+            params.device = Pa_GetDefaultOutputDevice();
+        }
         params.channelCount = 2;
         params.sampleFormat = paFloat32;
         const auto deviceInfo = Pa_GetDeviceInfo(params.device);
         params.suggestedLatency = deviceInfo->defaultLowOutputLatency;
         const double sampleRate = deviceInfo->defaultSampleRate;
 
-        RingBuffer buffer(argparser.get<int>("buffer"));
-        Synthesizer synth(sampleRate, argparser.get<int>("channels"));
+        RingBuffer buffer(argparser.get<unsigned int>("buffer"));
+        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"));
         synth.loadSoundFont(argparser.rest().at(0));
         synth.setVolume(argparser.get<double>("volume"));
 
@@ -80,7 +91,7 @@ int main(int argc, char** argv) {
             paFramesPerBufferUnspecified, paNoFlag, streamCallback, &buffer));
 
         MIDIINCAPS caps;
-        const MMRESULT res = midiInGetDevCaps(0, &caps, sizeof(caps));
+        const MMRESULT res = midiInGetDevCaps(argparser.get<unsigned int>("in"), &caps, sizeof(caps));
         if (res != MMSYSERR_NOERROR) {
             TCHAR msg[MAXERRORLENGTH];
             midiInGetErrorText(res, msg, sizeof(msg));
