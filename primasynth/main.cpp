@@ -102,10 +102,11 @@ int main(int argc, char** argv) {
         checkPaError(Pa_OpenStream(&stream, nullptr, &params, sampleRate,
             paFramesPerBufferUnspecified, paNoFlag, streamCallback, &buffer));
 
+        const UINT midiDeviceID = argparser.get<unsigned int>("in");
         MIDIINCAPS caps;
-        checkMMError(midiInGetDevCaps(argparser.get<unsigned int>("in"), &caps, sizeof(caps)));
+        checkMMError(midiInGetDevCaps(midiDeviceID, &caps, sizeof(caps)));
         std::wcout << "MIDI: opening " << caps.szPname << std::endl;
-        checkMMError(midiInOpen(&hmi, 0,
+        checkMMError(midiInOpen(&hmi, midiDeviceID,
             reinterpret_cast<DWORD_PTR>(MidiInProc),
             reinterpret_cast<DWORD_PTR>(&synth), CALLBACK_FUNCTION));
 
