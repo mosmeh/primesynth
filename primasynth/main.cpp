@@ -16,6 +16,46 @@ void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, D
         break;
     case MIM_DATA:
         reinterpret_cast<Synthesizer*>(dwInstance)->processMIDIMessage(dwParam1);
+        break;
+    }
+}
+
+void CALLBACK verboseMidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
+    switch (wMsg) {
+    case MIM_OPEN:
+        std::cout << "MIDI: opened" << std::endl;
+        break;
+    case MIM_CLOSE:
+        std::cout << "MIDI: closed" << std::endl;
+        break;
+    case MIM_DATA: {
+        const auto msg = reinterpret_cast<std::uint8_t*>(&dwParam1);
+        const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
+        switch (status) {
+        case MIDIMessageStatus::NoteOff:
+            std::cout << "Note off, key=" << static_cast<int>(msg[1]) << std::endl;
+            break;
+        case MIDIMessageStatus::NoteOn:
+            std::cout << "Note on, key=" << static_cast<int>(msg[1])
+                << " velocity=" << static_cast<int>(msg[2]) << std::endl;
+            break;
+        case MIDIMessageStatus::ControlChange:
+            std::cout << "Control change, controller=" << static_cast<int>(msg[1])
+                << " value=" << static_cast<int>(msg[2]) << std::endl;
+            break;
+        case MIDIMessageStatus::ProgramChange:
+            std::cout << "Program change, program=" << static_cast<int>(msg[1]) << std::endl;
+            break;
+        case MIDIMessageStatus::ChannelPressure:
+            std::cout << "Channel pressure, value=" << static_cast<int>(msg[1]) << std::endl;
+            break;
+        case MIDIMessageStatus::PitchBend:
+            std::cout << "Pitch bend, value=" << joinBytes(msg[2], msg[1]) << std::endl;
+            break;
+        }
+        reinterpret_cast<Synthesizer*>(dwInstance)->processMIDIMessage(dwParam1);
+        break;
+    }
     }
 }
 
@@ -90,6 +130,7 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("samplerate", 's', "sample rate (Hz)", false);
         argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
+        argparser.add("print-midi", 'p', "print MIDI messages");
         argparser.footer("soundfont_filename");
         argparser.parse_check(argc, argv);
         if (argparser.rest().empty()) {
@@ -135,7 +176,7 @@ int main(int argc, char** argv) {
         checkMMError(midiInGetDevCaps(midiDeviceID, &caps, sizeof(caps)));
         std::wcout << "MIDI: opening " << caps.szPname << std::endl;
         checkMMError(midiInOpen(&hmi, midiDeviceID,
-            reinterpret_cast<DWORD_PTR>(MidiInProc),
+            reinterpret_cast<DWORD_PTR>(argparser.exist("print-midi") ? verboseMidiInProc : MidiInProc),
             reinterpret_cast<DWORD_PTR>(&synth), CALLBACK_FUNCTION));
 
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);

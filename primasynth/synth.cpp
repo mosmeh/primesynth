@@ -30,35 +30,23 @@ void Synthesizer::processMIDIMessage(DWORD param) {
     const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
     switch (status) {
     case MIDIMessageStatus::NoteOff:
-        //std::cout << "Note off, key=" << static_cast<int>(msg[1]) << std::endl;
         channel->noteOff(msg[1]);
         break;
     case MIDIMessageStatus::NoteOn:
-        /*std::cout << "Note on, key=" << static_cast<int>(msg[1])
-            << " velocity=" << static_cast<int>(msg[2]) << std::endl;*/
         channel->noteOn(msg[1], msg[2]);
         break;
     case MIDIMessageStatus::ControlChange:
-        /*std::cout << "Control change, controller=" << static_cast<int>(msg[1])
-            << " value=" << static_cast<int>(msg[2]) << std::endl;*/
         channel->controlChange(msg[1], msg[2]);
         break;
-    case MIDIMessageStatus::ProgramChange: {
-        const auto preset = findPreset(channel->isDrumChannel() ? 128 : 0, msg[1]);
-        //std::cout << "Program change, program=" << static_cast<int>(msg[1]) << " (" << preset->name << ")" << std::endl;
-        channel->setPreset(preset);
+    case MIDIMessageStatus::ProgramChange:
+        channel->setPreset(findPreset(channel->isDrumChannel() ? 128 : 0, msg[1]));
         break;
-    }
     case MIDIMessageStatus::ChannelPressure:
-        //std::cout << "Channel pressure, value=" << static_cast<int>(msg[1]) << std::endl;
         channel->channelPressure(msg[1]);
         break;
-    case MIDIMessageStatus::PitchBend: {
-        const std::uint16_t value = joinBytes(msg[2], msg[1]);
-        //std::cout << "Pitch bend, value=" << value << std::endl;
-        channel->pitchBend(value);
+    case MIDIMessageStatus::PitchBend:
+        channel->pitchBend(joinBytes(msg[2], msg[1]));
         break;
-    }
     }
 }
 
