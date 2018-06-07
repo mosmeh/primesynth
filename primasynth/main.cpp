@@ -43,6 +43,8 @@ int main(int argc, char** argv) {
 
     HMIDIIN hmi = NULL;
     try {
+        CHECK_PA(Pa_Initialize());
+
         cmdline::parser argparser;
         argparser.set_program_name("primasynth");
         argparser.add<unsigned int>("in", 'i', "input MIDI device ID", false, 0);
@@ -57,8 +59,6 @@ int main(int argc, char** argv) {
         }
 
         initializeConversionTables();
-
-        CHECK_PA(Pa_Initialize());
 
         PaStreamParameters params = {};
         if (argparser.exist("out")) {
@@ -142,9 +142,11 @@ int main(int argc, char** argv) {
         std::cerr << ex.what() << std::endl;
     }
 
-    midiInStop(hmi);
     Pa_Terminate();
-    midiInClose(hmi);
+    if (hmi != NULL) {
+        midiInStop(hmi);
+        midiInClose(hmi);
+    }
 
     return EXIT_SUCCESS;
 }
