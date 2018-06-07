@@ -30,6 +30,31 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
     return PaStreamCallbackResult::paContinue;
 }
 
+void render(bool& running, const Synthesizer& synth, RingBuffer& buffer, double sampleRate) {
+    static const int mutexSteps = 64;
+    const double stepTime = mutexSteps / sampleRate;
+
+    double ahead = 0.0;
+    auto lastTime = std::chrono::high_resolution_clock::now();
+    while (running) {
+        for (int i = 0; i < mutexSteps && !buffer.full(); ++i) {
+            const StereoValue sample = synth.render();
+            buffer.push(static_cast<float>(sample.left));
+            buffer.push(static_cast<float>(sample.right));
+        }
+
+        ahead += stepTime;
+        auto currTime = std::chrono::high_resolution_clock::now();
+        ahead -= 2.0 * std::chrono::duration<double>(currTime - lastTime).count();
+        lastTime = currTime;
+        ahead = std::max(ahead, 0.0);
+
+        if (ahead > 1.0) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
+        }
+    }
+}
+
 void checkPaError(PaError error) {
     if (error != paNoError) {
         std::ostringstream ss;
@@ -113,29 +138,7 @@ int main(int argc, char** argv) {
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
         bool running = true;
-        std::thread thread([&running, &synth, &buffer, sampleRate] {
-            static const int mutexSteps = 64;
-            double ahead = 0.0;
-            auto lastTime = std::chrono::high_resolution_clock::now();
-            while (running) {
-                for (int i = 0; i < mutexSteps && !buffer.full(); ++i) {
-                    const StereoValue sample = synth.render();
-                    buffer.push(static_cast<float>(sample.left));
-                    buffer.push(static_cast<float>(sample.right));
-                }
-
-                const double stepTime = mutexSteps / sampleRate;
-                ahead += stepTime;
-                auto currTime = std::chrono::high_resolution_clock::now();
-                ahead -= 2.0 * std::chrono::duration<double>(currTime - lastTime).count();
-                lastTime = currTime;
-                ahead = std::max(ahead, 0.0);
-
-                if (ahead > 1.0) {
-                    std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
-                }
-            }
-        });
+        std::thread thread(render, std::ref(running), std::ref(synth), std::ref(buffer), sampleRate);
 
         checkPaError(Pa_StartStream(stream));
         checkMMError(midiInStart(hmi));
