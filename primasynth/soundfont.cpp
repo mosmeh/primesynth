@@ -270,6 +270,9 @@ constexpr std::uint32_t toFourCC(const char str[5]) {
 
 SoundFont::SoundFont(const std::string& filename) {
     std::ifstream ifs(filename, std::ios::binary);
+    if (!ifs) {
+        throw std::runtime_error("failed open file");
+    }
 
     const RIFFHeader riffHeader = readHeader(ifs);
     const std::uint32_t riffType = readFourCC(ifs);
