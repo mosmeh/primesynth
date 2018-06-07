@@ -18,6 +18,7 @@ StereoValue calculatePannedVolume(double pan) {
 Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample> sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
+    sampleBuffer_(sample->soundFont->getSampleBuffer()),
     generators_(generators),
     actualKey_(key),
     steps_(0),
@@ -34,7 +35,6 @@ Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample
     const std::int16_t overriddenVelocity = generators.getOrDefault(SFGenerator::velocity);
     velocity_ = overriddenVelocity > 0 ? overriddenVelocity : velocity;
 
-    sample_.buffer = sample->soundFont->getSampleBuffer();
     const std::int16_t overriddenSampleKey = generators.getOrDefault(SFGenerator::overridingRootKey);
     sample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample->key) - 0.01 * sample->correction;
     sample_.mode = static_cast<SampleMode>(generators.getOrDefault(SFGenerator::sampleModes));
@@ -172,7 +172,7 @@ void Voice::overrideGenerator(SFGenerator generator, std::int16_t value) {
 StereoValue Voice::render() const {
     const std::uint32_t i = phase_.getIntegerPart();
     const double r = phase_.getFractionalPart();
-    const double interpolated = (1.0 - r) * sample_.buffer->at(i) + r * sample_.buffer->at(i + 1);
+    const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
     return volEnv_.getValue()
         * centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
         * volume_ * (interpolated / INT16_MAX);

@@ -26,9 +26,9 @@ public:
 private:
     const std::size_t noteID_;
     const std::uint8_t actualKey_;
+    const std::vector<std::int16_t>& sampleBuffer_;
     GeneratorSet generators_;
     struct {
-        std::shared_ptr<std::vector<std::int16_t>> buffer;
         SampleMode mode;
         double pitch;
         std::uint32_t start, end, startLoop, endLoop;

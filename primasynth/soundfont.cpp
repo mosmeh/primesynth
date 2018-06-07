@@ -311,7 +311,7 @@ const std::string& SoundFont::getName() const {
     return name_;
 }
 
-const std::shared_ptr<std::vector<std::int16_t>>& SoundFont::getSampleBuffer() const {
+const std::vector<std::int16_t>& SoundFont::getSampleBuffer() const {
     return sampleBuffer_;
 }
 
@@ -359,8 +359,8 @@ void SoundFont::readSdtaChunk(std::ifstream& ifs, std::size_t size) {
         s += sizeof(subchunkHeader) + subchunkHeader.size;
         switch (subchunkHeader.id) {
         case toFourCC("smpl"):
-            sampleBuffer_ = std::make_shared<std::vector<std::int16_t>>(subchunkHeader.size / sizeof(std::int16_t));
-            ifs.read(reinterpret_cast<char*>(sampleBuffer_->data()), subchunkHeader.size);
+            sampleBuffer_.resize(subchunkHeader.size / sizeof(std::int16_t));
+            ifs.read(reinterpret_cast<char*>(sampleBuffer_.data()), subchunkHeader.size);
             break;
         default:
             ifs.ignore(subchunkHeader.size);

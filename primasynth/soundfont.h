@@ -83,14 +83,14 @@ public:
     explicit SoundFont(const std::string& filename);
 
     const std::string& getName() const;
-    const std::shared_ptr<std::vector<std::int16_t>>& getSampleBuffer() const;
+    const std::vector<std::int16_t>& getSampleBuffer() const;
     const std::vector<std::shared_ptr<const Sample>>& getSamples() const;
     const std::vector<std::shared_ptr<const Instrument>>& getInstruments() const;
     const std::vector<std::shared_ptr<const Preset>>& getPresets() const;
 
 private:
     std::string name_;
-    std::shared_ptr<std::vector<std::int16_t>> sampleBuffer_;
+    std::vector<std::int16_t> sampleBuffer_;
     std::vector<std::shared_ptr<const Sample>> samples_;
     std::vector<std::shared_ptr<const Instrument>> instruments_;
     std::vector<std::shared_ptr<const Preset>> presets_;
