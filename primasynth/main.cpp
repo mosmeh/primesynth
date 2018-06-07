@@ -32,10 +32,22 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
 
 }
 
-#define CHECK_PA(x) { \
-	const PaError err = x; \
-	if (err != paNoError) \
-		throw std::runtime_error(Pa_GetErrorText(err)); \
+void checkPaError(PaError error) {
+    if (error != paNoError) {
+        std::ostringstream ss;
+        ss << "PortAudio: " << Pa_GetErrorText(error);
+        throw std::runtime_error(ss.str());
+    }
+}
+
+void checkMMError(MMRESULT result) {
+    if (result != MMSYSERR_NOERROR) {
+        char msg[MAXERRORLENGTH];
+        midiInGetErrorTextA(result, msg, sizeof(msg));
+        std::ostringstream ss;
+        ss << "MIDI: " << msg;
+        throw std::runtime_error(ss.str());
+    }
 }
 
 int main(int argc, char** argv) {
@@ -43,7 +55,7 @@ int main(int argc, char** argv) {
 
     HMIDIIN hmi = NULL;
     try {
-        CHECK_PA(Pa_Initialize());
+        checkPaError(Pa_Initialize());
 
         cmdline::parser argparser;
         argparser.set_program_name("primasynth");
@@ -87,21 +99,15 @@ int main(int argc, char** argv) {
             << "sample rate: " << deviceInfo->defaultSampleRate << std::endl;
 
         PaStream* stream;
-        CHECK_PA(Pa_OpenStream(&stream, nullptr, &params, sampleRate,
+        checkPaError(Pa_OpenStream(&stream, nullptr, &params, sampleRate,
             paFramesPerBufferUnspecified, paNoFlag, streamCallback, &buffer));
 
         MIDIINCAPS caps;
-        const MMRESULT res = midiInGetDevCaps(argparser.get<unsigned int>("in"), &caps, sizeof(caps));
-        if (res != MMSYSERR_NOERROR) {
-            TCHAR msg[MAXERRORLENGTH];
-            midiInGetErrorText(res, msg, sizeof(msg));
-            std::wcerr << "MIDI: " << msg << std::endl;
-            throw std::runtime_error("failed to get device capabilities");
-        }
+        checkMMError(midiInGetDevCaps(argparser.get<unsigned int>("in"), &caps, sizeof(caps)));
         std::wcout << "MIDI: opening " << caps.szPname << std::endl;
-        midiInOpen(&hmi, 0,
+        checkMMError(midiInOpen(&hmi, 0,
             reinterpret_cast<DWORD_PTR>(MidiInProc),
-            reinterpret_cast<DWORD_PTR>(&synth), CALLBACK_FUNCTION);
+            reinterpret_cast<DWORD_PTR>(&synth), CALLBACK_FUNCTION));
 
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
@@ -130,14 +136,14 @@ int main(int argc, char** argv) {
             }
         });
 
-        CHECK_PA(Pa_StartStream(stream));
-        midiInStart(hmi);
+        checkPaError(Pa_StartStream(stream));
+        checkMMError(midiInStart(hmi));
         std::cout << "Press enter to exit" << std::endl;
         std::getchar();
         running = false;
         thread.join();
 
-        CHECK_PA(Pa_StopStream(stream));
+        checkPaError(Pa_StopStream(stream));
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
     }
