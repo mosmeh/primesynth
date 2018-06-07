@@ -28,11 +28,11 @@ public:
         return end_ - start_ >= size_;
     }
 
-    int size() const {
+    std::size_t size() const {
         return end_ - start_;
     }
 
-    int capacity() const {
+    std::size_t capacity() const {
         return size_ - size();
     }
 
