@@ -4,9 +4,9 @@ namespace primasynth {
 
 class RingBuffer {
 public:
-    explicit RingBuffer(std::size_t size) : size_(size) {
-        data_.resize(size);
-    }
+    explicit RingBuffer(std::size_t size) :
+        size_(size),
+        data_(size) {}
 
     void push(float t) {
         data_.at(mask(end_++)) = t;
