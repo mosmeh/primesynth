@@ -30,8 +30,6 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
     return PaStreamCallbackResult::paContinue;
 }
 
-}
-
 void checkPaError(PaError error) {
     if (error != paNoError) {
         std::ostringstream ss;
@@ -48,6 +46,8 @@ void checkMMError(MMRESULT result) {
         ss << "MIDI: " << msg;
         throw std::runtime_error(ss.str());
     }
+}
+
 }
 
 int main(int argc, char** argv) {
