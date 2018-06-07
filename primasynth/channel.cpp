@@ -79,7 +79,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
                 voice->updateSFController(SFGeneralController::pitchWheelSensitivity, value);
                 break;
             case MIDIRPN::FineTuning:
-                voice->overrideGenerator(SFGenerator::fineTune, static_cast<std::int16_t>(100.0 * (value - 8192) / 8192.0));
+                voice->overrideGenerator(SFGenerator::fineTune, static_cast<std::int16_t>((value - 8192) / 81.92));
                 break;
             case MIDIRPN::CoarseTuning:
                 voice->overrideGenerator(SFGenerator::coarseTune, value - 64);
