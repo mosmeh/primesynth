@@ -18,6 +18,40 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\channel.cpp" />
+    <ClCompile Include="src\conv.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\modulator.cpp" />
+    <ClCompile Include="src\soundfont.cpp" />
+    <ClCompile Include="src\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\stereovalue.cpp" />
+    <ClCompile Include="src\synth.cpp" />
+    <ClCompile Include="src\voice.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\channel.h" />
+    <ClInclude Include="include\cmdline.h" />
+    <ClInclude Include="include\conv.h" />
+    <ClInclude Include="include\envelope.h" />
+    <ClInclude Include="include\fixedpoint.h" />
+    <ClInclude Include="include\lfo.h" />
+    <ClInclude Include="include\midi.h" />
+    <ClInclude Include="include\modulator.h" />
+    <ClInclude Include="include\portaudio.h" />
+    <ClInclude Include="include\ringbuffer.h" />
+    <ClInclude Include="include\sfspec.h" />
+    <ClInclude Include="include\soundfont.h" />
+    <ClInclude Include="include\stdafx.h" />
+    <ClInclude Include="include\stereovalue.h" />
+    <ClInclude Include="include\synth.h" />
+    <ClInclude Include="include\voice.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{4741E648-BCB4-4936-8025-E35396041706}</ProjectGuid>
@@ -72,15 +106,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,7 +145,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(ProjectDir)portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
+      <Command>copy /B /Y "$(ProjectDir)lib\portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,7 +169,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(ProjectDir)portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
+      <Command>copy /B /Y "$(ProjectDir)lib\portaudio_x86d.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -155,7 +197,7 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(ProjectDir)portaudio_x86.dll" "$(TargetDir)portaudio_x86.dll"</Command>
+      <Command>copy /B /Y "$(ProjectDir)lib\portaudio_x86.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -183,41 +225,9 @@
       </Command>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /B /Y "$(ProjectDir)portaudio_x86.dll" "$(TargetDir)portaudio_x86.dll"</Command>
+      <Command>copy /B /Y "$(ProjectDir)lib\portaudio_x86.dll" "$(TargetDir)portaudio_x86.dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="channel.h" />
-    <ClInclude Include="conv.h" />
-    <ClInclude Include="envelope.h" />
-    <ClInclude Include="fixedpoint.h" />
-    <ClInclude Include="lfo.h" />
-    <ClInclude Include="midi.h" />
-    <ClInclude Include="modulator.h" />
-    <ClInclude Include="ringbuffer.h" />
-    <ClInclude Include="sfspec.h" />
-    <ClInclude Include="soundfont.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="stereovalue.h" />
-    <ClInclude Include="synth.h" />
-    <ClInclude Include="voice.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="channel.cpp" />
-    <ClCompile Include="conv.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="modulator.cpp" />
-    <ClCompile Include="soundfont.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="stereovalue.cpp" />
-    <ClCompile Include="synth.cpp" />
-    <ClCompile Include="voice.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
