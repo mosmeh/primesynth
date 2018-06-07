@@ -11,5 +11,6 @@
 #include <array>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 #include "portaudio.h"

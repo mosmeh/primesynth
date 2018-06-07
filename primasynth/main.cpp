@@ -30,7 +30,7 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
     return PaStreamCallbackResult::paContinue;
 }
 
-void render(bool& running, const Synthesizer& synth, RingBuffer& buffer, double sampleRate) {
+void render(std::atomic_bool& running, const Synthesizer& synth, RingBuffer& buffer, double sampleRate) {
     static const int mutexSteps = 64;
     const double stepTime = mutexSteps / sampleRate;
 
@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
-        bool running = true;
+        std::atomic_bool running = true;
         std::thread thread(render, std::ref(running), std::ref(synth), std::ref(buffer), sampleRate);
 
         checkPaError(Pa_StartStream(stream));
