@@ -87,6 +87,7 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("in", 'i', "input MIDI device ID", false, 0);
         argparser.add<unsigned int>("out", 'o', "output audio device ID", false);
         argparser.add<double>("volume", 'v', "volume (1 = 100%)", false, 1.0);
+        argparser.add<unsigned int>("samplerate", 's', "sample rate (Hz)", false);
         argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
         argparser.footer("soundfont_filename");
@@ -111,7 +112,9 @@ int main(int argc, char** argv) {
         params.sampleFormat = paFloat32;
         const auto deviceInfo = Pa_GetDeviceInfo(params.device);
         params.suggestedLatency = deviceInfo->defaultLowOutputLatency;
-        const double sampleRate = deviceInfo->defaultSampleRate;
+
+        const double sampleRate = argparser.exist("samplerate") ?
+            argparser.get<unsigned int>("samplerate") : deviceInfo->defaultSampleRate;
 
         RingBuffer buffer(argparser.get<unsigned int>("buffer"));
         Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"));
@@ -119,9 +122,9 @@ int main(int argc, char** argv) {
         synth.setVolume(argparser.get<double>("volume"));
 
         SetConsoleOutputCP(CP_UTF8);
-        printf("opening %s\n", deviceInfo->name);
-        std::cout << "API: " << Pa_GetHostApiInfo(deviceInfo->hostApi)->name << std::endl
-            << "sample rate: " << deviceInfo->defaultSampleRate << std::endl;
+        std::cout << "opening " << deviceInfo->name << std::endl
+            << "API: " << Pa_GetHostApiInfo(deviceInfo->hostApi)->name << std::endl
+            << "sample rate: " << sampleRate << "Hz" << std::endl;
 
         PaStream* stream;
         checkPaError(Pa_OpenStream(&stream, nullptr, &params, sampleRate,
