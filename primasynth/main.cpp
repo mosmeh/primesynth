@@ -70,27 +70,26 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
     return PaStreamCallbackResult::paContinue;
 }
 
-void render(std::atomic_bool& running, const Synthesizer& synth, RingBuffer& buffer, double sampleRate) {
-    static const int mutexSteps = 64;
-    const double stepTime = mutexSteps / sampleRate;
+void doRenderingLoop(std::atomic_bool& running, const Synthesizer& synth, RingBuffer& buffer, double sampleRate) {
+    static const int unitSteps = 64;
+    const double stepDuration = unitSteps / sampleRate;
 
-    double ahead = 0.0;
+    double aheadDuration = 0.0;
     auto lastTime = std::chrono::high_resolution_clock::now();
     while (running) {
-        for (int i = 0; i < mutexSteps && !buffer.full(); ++i) {
+        for (int i = 0; i < unitSteps && !buffer.full(); ++i) {
             const StereoValue sample = synth.render();
             buffer.push(static_cast<float>(sample.left));
             buffer.push(static_cast<float>(sample.right));
         }
 
-        ahead += stepTime;
-        auto currTime = std::chrono::high_resolution_clock::now();
-        ahead -= 2.0 * std::chrono::duration<double>(currTime - lastTime).count();
-        lastTime = currTime;
-        ahead = std::max(ahead, 0.0);
+        auto now = std::chrono::high_resolution_clock::now();
+        aheadDuration += stepDuration - 2.0 * std::chrono::duration<double>(now - lastTime).count();
+        lastTime = now;
+        aheadDuration = std::max(aheadDuration, 0.0);
 
-        if (ahead > 1.0) {
-            std::this_thread::sleep_for(std::chrono::duration<double>(stepTime));
+        if (aheadDuration > 1.0) {
+            std::this_thread::sleep_for(std::chrono::duration<double>(stepDuration));
         }
     }
 }
@@ -182,7 +181,7 @@ int main(int argc, char** argv) {
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
         std::atomic_bool running = true;
-        std::thread thread(render, std::ref(running), std::ref(synth), std::ref(buffer), sampleRate);
+        std::thread thread(doRenderingLoop, std::ref(running), std::ref(synth), std::ref(buffer), sampleRate);
 
         checkPaError(Pa_StartStream(stream));
         checkMMError(midiInStart(hmi));
