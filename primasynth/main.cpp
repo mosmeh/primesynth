@@ -161,9 +161,11 @@ int main(int argc, char** argv) {
         synth.loadSoundFont(argparser.rest().at(0));
         synth.setVolume(argparser.get<double>("volume"));
 
+        const UINT cp = GetConsoleCP();
         SetConsoleOutputCP(CP_UTF8);
-        std::cout << "opening " << deviceInfo->name << std::endl
-            << "API: " << Pa_GetHostApiInfo(deviceInfo->hostApi)->name << std::endl
+        printf("opening %s\n", deviceInfo->name);
+        SetConsoleOutputCP(cp);
+        std::cout << "API: " << Pa_GetHostApiInfo(deviceInfo->hostApi)->name << std::endl
             << "sample rate: " << sampleRate << "Hz" << std::endl;
 
         PaStream* stream;
