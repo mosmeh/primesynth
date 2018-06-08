@@ -8,6 +8,7 @@ Channel::Channel(double outputRate, bool drum) :
     controllers_{},
     pitchBend_(1 << 13),
     channelPressure_(0),
+    pitchBendSensitivity_(2),
     currentNoteID_(0) {
 
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)) = 127;
@@ -76,6 +77,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         for (const auto& voice : voices_) {
             switch (static_cast<MIDIRPN>(rpn)) {
             case MIDIRPN::PitchBendSensitivity:
+                pitchBendSensitivity_ = value;
                 voice->updateSFController(SFGeneralController::pitchWheelSensitivity, value);
                 break;
             case MIDIRPN::FineTuning:
@@ -92,7 +94,30 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         voices_.clear();
         break;
     case MIDIControlChange::ResetAllControllers:
-        // TODO: Reset All Controllers
+        pitchBend_ = 1 << 13;
+        channelPressure_ = 0;
+        for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
+            switch (static_cast<MIDIControlChange>(i)) {
+            case MIDIControlChange::Volume:
+            case MIDIControlChange::Pan:
+                break;
+            case MIDIControlChange::RPNMSB:
+            case MIDIControlChange::RPNLSB:
+            case MIDIControlChange::Expression:
+                controllers_.at(i) = 127;
+                break;
+            default:
+                controllers_.at(i) = 0;
+                break;
+            }
+        }
+        for (const auto& voice : voices_) {
+            voice->updateSFController(SFGeneralController::pitchWheel, pitchBend_);
+            voice->updateSFController(SFGeneralController::channelPressure, channelPressure_);
+            for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
+                voice->updateMIDIController(i, controllers_.at(i));
+            }
+        }
         break;
     case MIDIControlChange::AllNotesOff:
         for (const auto& voice : voices_) {
@@ -153,6 +178,7 @@ bool Channel::isDrumChannel() const {
 void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass) {
     voice->updateSFController(SFGeneralController::pitchWheel, pitchBend_);
     voice->updateSFController(SFGeneralController::channelPressure, channelPressure_);
+    voice->updateSFController(SFGeneralController::pitchWheelSensitivity, pitchBendSensitivity_);
     for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
         voice->updateMIDIController(i, controllers_.at(i));
     }

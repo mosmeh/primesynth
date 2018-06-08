@@ -27,6 +27,7 @@ private:
     std::array<std::uint8_t, NUM_CONTROLLERS> controllers_;
     std::uint16_t pitchBend_;
     std::uint8_t channelPressure_;
+    std::int16_t pitchBendSensitivity_;
     std::vector<std::unique_ptr<Voice>> voices_;
     std::size_t currentNoteID_;
     std::mutex voiceMutex_;

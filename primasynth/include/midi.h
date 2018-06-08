@@ -14,6 +14,7 @@ enum class MIDIMessageStatus {
 
 static constexpr size_t NUM_CONTROLLERS = 128;
 
+// GM CCs
 enum class MIDIControlChange {
     Modulation = 1,
     DataEntryMSB = 6,
@@ -29,6 +30,7 @@ enum class MIDIControlChange {
     AllNotesOff = 123
 };
 
+// GM RPNs
 enum class MIDIRPN {
     PitchBendSensitivity = 0,
     FineTuning = 1,

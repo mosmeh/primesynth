@@ -59,7 +59,6 @@ Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample
 
     updateSFController(SFGeneralController::noteOnVelocity, velocity);
     updateSFController(SFGeneralController::noteOnKeyNumber, key);
-    updateSFController(SFGeneralController::pitchWheelSensitivity, 2);
 
     for (int i = 0; i < NUM_GENERATORS; ++i) {
         modulated_.at(i) = generators.getOrDefault(static_cast<SFGenerator>(i));
