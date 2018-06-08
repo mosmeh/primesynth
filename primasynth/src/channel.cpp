@@ -11,11 +11,11 @@ Channel::Channel(double outputRate, bool drum) :
     pitchBendSensitivity_(2),
     currentNoteID_(0) {
 
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)) = 127;
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)) = 127;
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::Volume)) = 100;
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::Pan)) = 64;
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::Expression)) = 127;
+    controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)) = 127;
+    controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)) = 127;
     voices_.reserve(128);
 }
 
@@ -94,16 +94,23 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         voices_.clear();
         break;
     case MIDIControlChange::ResetAllControllers:
+        // General MIDI System Level 1 Developer Guidelines Second Revision p.5
+        // Response to "Reset All Controllers" Message
         pitchBend_ = 1 << 13;
         channelPressure_ = 0;
-        for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
+        for (std::uint8_t i = 0; i < 122; ++i) {
+            if ((91 <= i && i <= 95) || (70 <= i && i <= 79) || i == 120) {
+                continue;
+            }
             switch (static_cast<MIDIControlChange>(i)) {
+            case MIDIControlChange::BankSelectMSB:
             case MIDIControlChange::Volume:
             case MIDIControlChange::Pan:
+            case MIDIControlChange::BankSelectLSB:
                 break;
-            case MIDIControlChange::RPNMSB:
-            case MIDIControlChange::RPNLSB:
             case MIDIControlChange::Expression:
+            case MIDIControlChange::RPNLSB:
+            case MIDIControlChange::RPNMSB:
                 controllers_.at(i) = 127;
                 break;
             default:

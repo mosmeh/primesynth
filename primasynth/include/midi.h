@@ -14,13 +14,14 @@ enum class MIDIMessageStatus {
 
 static constexpr size_t NUM_CONTROLLERS = 128;
 
-// GM CCs
 enum class MIDIControlChange {
+    BankSelectMSB = 0,
     Modulation = 1,
     DataEntryMSB = 6,
     Volume = 7,
     Pan = 10,
     Expression = 11,
+    BankSelectLSB = 32,
     DataEntryLSB = 38,
     Sustain = 64,
     RPNLSB = 100,
