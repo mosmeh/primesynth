@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
         argparser.add("print-midi", 'p', "print MIDI messages");
-        argparser.footer("soundfont_filename");
+        argparser.footer("[soundfont_filenames] ...");
         argparser.parse_check(argc, argv);
         if (argparser.rest().empty()) {
             throw std::runtime_error("SoundFont file required");
@@ -158,7 +158,9 @@ int main(int argc, char** argv) {
 
         RingBuffer buffer(argparser.get<unsigned int>("buffer"));
         Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"));
-        synth.loadSoundFont(argparser.rest().at(0));
+        for (const std::string& filename : argparser.rest()) {
+            synth.loadSoundFont(filename);
+        }
         synth.setVolume(argparser.get<double>("volume"));
 
         const UINT cp = GetConsoleCP();

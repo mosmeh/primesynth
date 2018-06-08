@@ -4,7 +4,7 @@ SoundFont-powered MIDI synthesizer
 ## Usage
 ```
 $ primasynth --help
-usage: primasynth [options] ... soundfont_filename
+usage: primasynth [options] ... [soundfont_filenames] ...
 options:
   -i, --in            input MIDI device ID (unsigned int [=0])
   -o, --out           output audio device ID (unsigned int [=0])
