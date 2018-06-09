@@ -21,6 +21,8 @@ Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample
     sampleBuffer_(sample->soundFont->getSampleBuffer()),
     generators_(generators),
     actualKey_(key),
+    fineTuning_(0.0),
+    coarseTuning_(0.0),
     steps_(0),
     released_(false),
     phase_(sample->start),
@@ -164,8 +166,14 @@ void Voice::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
     }
 }
 
-void Voice::overrideGenerator(SFGenerator generator, std::int16_t value) {
-    generators_.set(generator, value);
+void Voice::updateFineTuning(double fineTuning) {
+    fineTuning_ = fineTuning;
+    updateModulatedParams(SFGenerator::fineTune);
+}
+
+void Voice::updateCoarseTuning(double coarseTuning) {
+    coarseTuning_ = coarseTuning;
+    updateModulatedParams(SFGenerator::coarseTune);
 }
 
 StereoValue Voice::render() const {
@@ -270,8 +278,8 @@ void Voice::updateModulatedParams(SFGenerator destination) {
         voicePitch_ = sample_.pitch
             + 0.01 * getModulatedGenerator(SFGenerator::pitch)
             + 0.01 * getModulatedGenerator(SFGenerator::scaleTuning) * (actualKey_ - sample_.pitch)
-            + getModulatedGenerator(SFGenerator::coarseTune)
-            + 0.01 * getModulatedGenerator(SFGenerator::fineTune);;
+            + coarseTuning_ + getModulatedGenerator(SFGenerator::coarseTune)
+            + 0.01 * (fineTuning_ + getModulatedGenerator(SFGenerator::fineTune));
         break;
     }
 }

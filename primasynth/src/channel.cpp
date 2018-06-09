@@ -11,6 +11,8 @@ Channel::Channel(double outputRate, bool drum) :
     pitchBend_(1 << 13),
     channelPressure_(0),
     pitchBendSensitivity_(2),
+    fineTuning_(0.0),
+    coarseTuning_(0.0),
     currentNoteID_(0) {
 
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::Volume)) = 100;
@@ -74,8 +76,8 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             const std::uint16_t rpn = joinBytes(
                 controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)),
                 controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)));
-            const std::uint16_t data = joinBytes(
-                value, controllers_.at(static_cast<std::size_t>(MIDIControlChange::DataEntryLSB)));
+            const auto data = static_cast<std::int32_t>(joinBytes(
+                value, controllers_.at(static_cast<std::size_t>(MIDIControlChange::DataEntryLSB))));
 
             switch (static_cast<MIDIRPN>(rpn)) {
             case MIDIRPN::PitchBendSensitivity:
@@ -85,16 +87,16 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
                 }
                 break;
             case MIDIRPN::FineTuning: {
-                const auto fineTune = static_cast<std::int16_t>((data - 8192) / 81.92);
+                fineTuning_ = (data - 8192) / 81.92;
                 for (const auto& voice : voices_) {
-                    voice->overrideGenerator(SFGenerator::fineTune, fineTune);
+                    voice->updateFineTuning(fineTuning_);
                 }
                 break;
             }
             case MIDIRPN::CoarseTuning: {
-                const auto coarseTune = static_cast<std::int16_t>(data - 64);
+                coarseTuning_ = value - 64;
                 for (const auto& voice : voices_) {
-                    voice->overrideGenerator(SFGenerator::coarseTune, coarseTune);
+                    voice->updateCoarseTuning(coarseTuning_);
                 }
                 break;
             }
@@ -213,6 +215,8 @@ void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass
     voice->updateSFController(SFGeneralController::pitchWheel, pitchBend_);
     voice->updateSFController(SFGeneralController::channelPressure, channelPressure_);
     voice->updateSFController(SFGeneralController::pitchWheelSensitivity, pitchBendSensitivity_);
+    voice->updateFineTuning(fineTuning_);
+    voice->updateCoarseTuning(coarseTuning_);
     for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
         voice->updateMIDIController(i, controllers_.at(i));
     }

@@ -18,7 +18,8 @@ public:
     void update();
     void updateSFController(SFGeneralController controller, std::int16_t value);
     void updateMIDIController(std::uint8_t controller, std::uint8_t value);
-    void overrideGenerator(SFGenerator generator, std::int16_t amount);
+    void updateFineTuning(double fineTuning);
+    void updateCoarseTuning(double coarseTuning);
     StereoValue render() const;
     bool isSounding() const;
     void release();
@@ -36,6 +37,7 @@ private:
     std::int16_t key_, velocity_;
     std::vector<Modulator> modulators_;
     std::array<double, NUM_GENERATORS> modulated_;
+    double fineTuning_, coarseTuning_;
     double deltaPhaseFactor_;
     unsigned int steps_;
     bool released_;
