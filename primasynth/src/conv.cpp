@@ -26,22 +26,23 @@ double centibelToRatio(double cb) {
 }
 
 double keyToHeltz(double key) {
-    if (key < 0.0 || key >= 140.0) {
+    if (key < 0.0) {
         return 1.0;
-    } else {
-        std::size_t offset = 300;
-        int th = 900;
-        double r = 1.0;
-        while (th < 14000) {
-            if (key * 100 < th) {
-                return r * centToHeltzTable.at(static_cast<std::size_t>(key * 100) + offset);
-            }
-            th += 1200;
-            offset -= 1200;
-            r *= 2.0;
-        }
     }
-    throw std::logic_error("unreachable");
+
+    std::size_t offset = 300;
+    int th = 900;
+    double r = 1.0;
+    while (th <= 14100) {
+        if (key * 100 < th) {
+            return r * centToHeltzTable.at(static_cast<std::size_t>(key * 100) + offset);
+        }
+        th += 1200;
+        offset -= 1200;
+        r *= 2.0;
+    }
+
+    return 1.0;
 }
 
 double timecentToSecond(double tc) {
