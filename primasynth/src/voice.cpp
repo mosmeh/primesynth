@@ -268,7 +268,7 @@ void Voice::updateModulatedParams(SFGenerator destination) {
     case SFGenerator::scaleTuning:
     case SFGenerator::pitch:
         voicePitch_ = sample_.pitch
-            + 0.01 * modulated_.at(static_cast<size_t>(SFGenerator::pitch))
+            + 0.01 * getModulatedGenerator(SFGenerator::pitch)
             + 0.01 * getModulatedGenerator(SFGenerator::scaleTuning) * (actualKey_ - sample_.pitch)
             + getModulatedGenerator(SFGenerator::coarseTune)
             + 0.01 * getModulatedGenerator(SFGenerator::fineTune);;
