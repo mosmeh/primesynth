@@ -98,31 +98,34 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         // Response to "Reset All Controllers" Message
         pitchBend_ = 1 << 13;
         channelPressure_ = 0;
-        for (std::uint8_t i = 0; i < 122; ++i) {
-            if ((91 <= i && i <= 95) || (70 <= i && i <= 79) || i == 120) {
+        for (const auto& voice : voices_) {
+            voice->updateSFController(SFGeneralController::pitchWheel, pitchBend_);
+            voice->updateSFController(SFGeneralController::channelPressure, channelPressure_);
+        }
+        for (std::uint8_t i = 1; i < 122; ++i) {
+            if ((91 <= i && i <= 95) || (70 <= i && i <= 79)) {
                 continue;
             }
             switch (static_cast<MIDIControlChange>(i)) {
-            case MIDIControlChange::BankSelectMSB:
             case MIDIControlChange::Volume:
             case MIDIControlChange::Pan:
             case MIDIControlChange::BankSelectLSB:
+            case MIDIControlChange::AllSoundOff:
                 break;
             case MIDIControlChange::Expression:
             case MIDIControlChange::RPNLSB:
             case MIDIControlChange::RPNMSB:
                 controllers_.at(i) = 127;
+                for (const auto& voice : voices_) {
+                    voice->updateMIDIController(i, 127);
+                }
                 break;
             default:
                 controllers_.at(i) = 0;
+                for (const auto& voice : voices_) {
+                    voice->updateMIDIController(i, 0);
+                }
                 break;
-            }
-        }
-        for (const auto& voice : voices_) {
-            voice->updateSFController(SFGeneralController::pitchWheel, pitchBend_);
-            voice->updateSFController(SFGeneralController::channelPressure, channelPressure_);
-            for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
-                voice->updateMIDIController(i, controllers_.at(i));
             }
         }
         break;
