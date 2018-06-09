@@ -12,6 +12,7 @@ options:
   -s, --samplerate    sample rate (Hz) (unsigned int [=0])
   -b, --buffer        buffer size (unsigned int [=4096])
   -c, --channels      number of MIDI channels (unsigned int [=16])
+      --midistd       MIDI standard (affects bank selection) (string [=gs])
   -p, --print-midi    print MIDI messages
   -?, --help          print this message
 ```
