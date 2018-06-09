@@ -15,8 +15,9 @@ void Synthesizer::loadSoundFont(const std::string& filename) {
     if (soundFonts_.empty()) {
         soundFonts_.emplace_back(sf);
         defaultPreset_ = findPreset(0, 0);
+        defaultDrumPreset_ = findPreset(128, 0);
         for (const auto& channel : channels_) {
-            channel->setPreset(defaultPreset_);
+            channel->setPreset(channel->isDrumChannel() ? defaultDrumPreset_ : defaultPreset_);
         }
     } else {
         soundFonts_.emplace_back(sf);
