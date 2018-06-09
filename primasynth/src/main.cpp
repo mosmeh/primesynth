@@ -31,26 +31,33 @@ void CALLBACK verboseMidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwPa
     case MIM_DATA: {
         const auto msg = reinterpret_cast<std::uint8_t*>(&dwParam1);
         const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
+        const auto channel = msg[0] & 0xf;
         switch (status) {
         case MIDIMessageStatus::NoteOff:
-            std::cout << "Note off, key=" << static_cast<int>(msg[1]) << std::endl;
+            std::cout << "Note off: channel=" << channel
+                << " key=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case MIDIMessageStatus::NoteOn:
-            std::cout << "Note on, key=" << static_cast<int>(msg[1])
+            std::cout << "Note on: channel=" << channel
+                << " key=" << static_cast<int>(msg[1])
                 << " velocity=" << static_cast<int>(msg[2]) << std::endl;
             break;
         case MIDIMessageStatus::ControlChange:
-            std::cout << "Control change, controller=" << static_cast<int>(msg[1])
+            std::cout << "Control change: channel=" << channel
+                << " controller=" << static_cast<int>(msg[1])
                 << " value=" << static_cast<int>(msg[2]) << std::endl;
             break;
         case MIDIMessageStatus::ProgramChange:
-            std::cout << "Program change, program=" << static_cast<int>(msg[1]) << std::endl;
+            std::cout << "Program change: channel=" << channel
+                << " program=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case MIDIMessageStatus::ChannelPressure:
-            std::cout << "Channel pressure, value=" << static_cast<int>(msg[1]) << std::endl;
+            std::cout << "Channel pressure: channel=" << channel
+                << " value=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case MIDIMessageStatus::PitchBend:
-            std::cout << "Pitch bend, value=" << joinBytes(msg[2], msg[1]) << std::endl;
+            std::cout << "Pitch bend: channel=" << channel
+                << " value=" << joinBytes(msg[2], msg[1]) << std::endl;
             break;
         }
         reinterpret_cast<Synthesizer*>(dwInstance)->processMIDIMessage(dwParam1);
