@@ -72,7 +72,16 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
             }
         }
     }
-    if (bank != 0) {
+
+    // fallback
+    if (bank == 128) {
+        // if drum bank
+        if (presetNum != 0 && defaultDrumPreset_) {
+            return defaultDrumPreset_;
+        } else {
+            throw std::runtime_error("failed to find preset 128:0 (GM Percussion)");
+        }
+    } else if (bank != 0) {
         // fall back to GM bank
         return findPreset(0, presetNum);
     } else if (defaultPreset_) {
@@ -80,7 +89,7 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
         return defaultPreset_;
     } else {
         // Piano not found, there is no more fallback
-        throw std::runtime_error("failed to find preset");
+        throw std::runtime_error("failed to find preset 0:0 (GM Acoustic Grand Piano)");
     }
 }
 
