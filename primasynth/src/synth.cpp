@@ -14,9 +14,9 @@ void Synthesizer::loadSoundFont(const std::string& filename) {
     const auto sf = std::make_shared<SoundFont>(filename);
     if (soundFonts_.empty()) {
         soundFonts_.emplace_back(sf);
-        const auto& preset = findPreset(0, 0);
+        defaultPreset_ = findPreset(0, 0);
         for (const auto& channel : channels_) {
-            channel->setPreset(preset);
+            channel->setPreset(defaultPreset_);
         }
     } else {
         soundFonts_.emplace_back(sf);
@@ -39,7 +39,7 @@ void Synthesizer::processMIDIMessage(DWORD param) {
         channel->controlChange(msg[1], msg[2]);
         break;
     case MIDIMessageStatus::ProgramChange:
-        channel->setPreset(findPreset(channel->isDrumChannel() ? 128 : 0, msg[1]));
+        channel->setPreset(findPreset(channel->isDrumChannel() ? 128 : channel->getBank(), msg[1]));
         break;
     case MIDIMessageStatus::ChannelPressure:
         channel->channelPressure(msg[1]);
@@ -63,7 +63,7 @@ StereoValue Synthesizer::render() const {
     return volume_ * sum;
 }
 
-std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint8_t bank, std::uint8_t presetNum) const {
+std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint8_t presetNum) const {
     for (const auto& sf : soundFonts_) {
         for (const auto& preset : sf->getPresets()) {
             if (preset->bank == bank && preset->presetNum == presetNum) {
@@ -71,7 +71,16 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint8_t bank, std::ui
             }
         }
     }
-    throw std::runtime_error("preset not found");
+    if (bank != 0) {
+        // fall back to GM bank
+        return findPreset(0, presetNum);
+    } else if (defaultPreset_) {
+        // preset not found even in GM bank, fall back to Piano
+        return defaultPreset_;
+    } else {
+        // Piano not found, there is no more fallback
+        throw std::runtime_error("failed to find preset");
+    }
 }
 
 }

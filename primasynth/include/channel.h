@@ -19,10 +19,12 @@ public:
     void update();
     StereoValue render();
     bool isDrumChannel() const;
+    std::uint16_t getBank() const;
 
 private:
     const double outputRate_;
     const bool drum_;
+    std::uint16_t bank_;
     std::shared_ptr<const Preset> preset_;
     std::array<std::uint8_t, NUM_CONTROLLERS> controllers_;
     std::uint16_t pitchBend_;

@@ -18,8 +18,9 @@ private:
     std::vector<std::unique_ptr<Channel>> channels_;
     std::vector<std::shared_ptr<const SoundFont>> soundFonts_;
     double volume_;
+    std::shared_ptr<const Preset> defaultPreset_;
 
-    std::shared_ptr<const Preset> findPreset(std::uint8_t bank, std::uint8_t presetNum) const;
+    std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetNum) const;
 };
 
 }
