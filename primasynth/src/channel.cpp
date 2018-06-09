@@ -7,6 +7,7 @@ Channel::Channel(double outputRate, bool drum) :
     drum_(drum),
     bank_(0),
     controllers_(),
+    dataEntryMode_(DataEntryMode::RPN),
     pitchBend_(1 << 13),
     channelPressure_(0),
     pitchBendSensitivity_(2),
@@ -68,37 +69,46 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
 
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     switch (static_cast<MIDIControlChange>(controller)) {
-    case MIDIControlChange::DataEntryMSB: {
-        const std::uint16_t rpn = joinBytes(
-            controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)),
-            controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)));
-        const std::uint16_t data = joinBytes(
-            value, controllers_.at(static_cast<std::size_t>(MIDIControlChange::DataEntryLSB)));
+    case MIDIControlChange::DataEntryMSB:
+        if (dataEntryMode_ == DataEntryMode::RPN) {
+            const std::uint16_t rpn = joinBytes(
+                controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)),
+                controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)));
+            const std::uint16_t data = joinBytes(
+                value, controllers_.at(static_cast<std::size_t>(MIDIControlChange::DataEntryLSB)));
 
-        switch (static_cast<MIDIRPN>(rpn)) {
-        case MIDIRPN::PitchBendSensitivity:
-            pitchBendSensitivity_ = value;
-            for (const auto& voice : voices_) {
-                voice->updateSFController(SFGeneralController::pitchWheelSensitivity, value);
+            switch (static_cast<MIDIRPN>(rpn)) {
+            case MIDIRPN::PitchBendSensitivity:
+                pitchBendSensitivity_ = value;
+                for (const auto& voice : voices_) {
+                    voice->updateSFController(SFGeneralController::pitchWheelSensitivity, value);
+                }
+                break;
+            case MIDIRPN::FineTuning: {
+                const auto fineTune = static_cast<std::int16_t>((data - 8192) / 81.92);
+                for (const auto& voice : voices_) {
+                    voice->overrideGenerator(SFGenerator::fineTune, fineTune);
+                }
+                break;
             }
-            break;
-        case MIDIRPN::FineTuning: {
-            const auto fineTune = static_cast<std::int16_t>((data - 8192) / 81.92);
-            for (const auto& voice : voices_) {
-                voice->overrideGenerator(SFGenerator::fineTune, fineTune);
+            case MIDIRPN::CoarseTuning: {
+                const auto coarseTune = static_cast<std::int16_t>(data - 64);
+                for (const auto& voice : voices_) {
+                    voice->overrideGenerator(SFGenerator::coarseTune, coarseTune);
+                }
+                break;
             }
-            break;
-        }
-        case MIDIRPN::CoarseTuning: {
-            const auto coarseTune = static_cast<std::int16_t>(data - 64);
-            for (const auto& voice : voices_) {
-                voice->overrideGenerator(SFGenerator::coarseTune, coarseTune);
             }
-            break;
-        }
         }
         break;
-    }
+    case MIDIControlChange::NRPNMSB:
+    case MIDIControlChange::NRPNLSB:
+        dataEntryMode_ = DataEntryMode::NRPN;
+        break;
+    case MIDIControlChange::RPNMSB:
+    case MIDIControlChange::RPNLSB:
+        dataEntryMode_ = DataEntryMode::RPN;
+        break;
     case MIDIControlChange::AllSoundOff:
         voices_.clear();
         break;

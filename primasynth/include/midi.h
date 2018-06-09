@@ -24,6 +24,8 @@ enum class MIDIControlChange {
     BankSelectLSB = 32,
     DataEntryLSB = 38,
     Sustain = 64,
+    NRPNLSB = 98,
+    NRPNMSB = 99,
     RPNLSB = 100,
     RPNMSB = 101,
     AllSoundOff = 120,
