@@ -74,19 +74,27 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         const std::uint16_t data = joinBytes(
             value, controllers_.at(static_cast<std::size_t>(MIDIControlChange::DataEntryLSB)));
 
-        for (const auto& voice : voices_) {
-            switch (static_cast<MIDIRPN>(rpn)) {
-            case MIDIRPN::PitchBendSensitivity:
-                pitchBendSensitivity_ = value;
+        switch (static_cast<MIDIRPN>(rpn)) {
+        case MIDIRPN::PitchBendSensitivity:
+            pitchBendSensitivity_ = value;
+            for (const auto& voice : voices_) {
                 voice->updateSFController(SFGeneralController::pitchWheelSensitivity, value);
-                break;
-            case MIDIRPN::FineTuning:
-                voice->overrideGenerator(SFGenerator::fineTune, static_cast<std::int16_t>((value - 8192) / 81.92));
-                break;
-            case MIDIRPN::CoarseTuning:
-                voice->overrideGenerator(SFGenerator::coarseTune, value - 64);
-                break;
             }
+            break;
+        case MIDIRPN::FineTuning: {
+            const auto fineTune = static_cast<std::int16_t>((data - 8192) / 81.92);
+            for (const auto& voice : voices_) {
+                voice->overrideGenerator(SFGenerator::fineTune, fineTune);
+            }
+            break;
+        }
+        case MIDIRPN::CoarseTuning: {
+            const auto coarseTune = static_cast<std::int16_t>(data - 64);
+            for (const auto& voice : voices_) {
+                voice->overrideGenerator(SFGenerator::coarseTune, coarseTune);
+            }
+            break;
+        }
         }
         break;
     }
