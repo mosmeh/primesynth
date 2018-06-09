@@ -5,7 +5,6 @@ namespace primasynth {
 Channel::Channel(double outputRate, bool drum) :
     outputRate_(outputRate),
     drum_(drum),
-    bank_(0),
     controllers_(),
     dataEntryMode_(DataEntryMode::RPN),
     pitchBend_(1 << 13),
