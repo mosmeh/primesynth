@@ -20,7 +20,7 @@ public:
     explicit Envelope(double outputRate, unsigned int interval) :
         outputRate_(outputRate),
         interval_(interval),
-        params_{},
+        params_(),
         section_(Section::Delay),
         periodSteps_(0),
         atten_(1.0),
