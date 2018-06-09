@@ -2,6 +2,12 @@
 
 namespace primasynth {
 
+enum class MIDIStandard {
+    GM,
+    GS,
+    XG
+};
+
 enum class MIDIMessageStatus {
     NoteOff = 0x80,
     NoteOn = 0x90,

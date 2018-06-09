@@ -3,7 +3,10 @@
 
 namespace primasynth {
 
-Synthesizer::Synthesizer(double outputRate, std::size_t numChannels) : volume_(1.0) {
+Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, MIDIStandard midiStandard) :
+    volume_(1.0),
+    midiStandard_(midiStandard) {
+
     channels_.reserve(numChannels);
     for (std::size_t i = 0; i < numChannels; ++i) {
         channels_.emplace_back(std::make_unique<Channel>(outputRate, i == 9));
@@ -39,9 +42,23 @@ void Synthesizer::processMIDIMessage(DWORD param) {
     case MIDIMessageStatus::ControlChange:
         channel->controlChange(msg[1], msg[2]);
         break;
-    case MIDIMessageStatus::ProgramChange:
-        channel->setPreset(findPreset(channel->isDrumChannel() ? 128 : channel->getBank(), msg[1]));
+    case MIDIMessageStatus::ProgramChange: {
+        const auto midiBank = channel->getBank();
+        std::uint16_t sfBank = 0;
+        switch (midiStandard_) {
+        case MIDIStandard::GS:
+            sfBank = midiBank.msb;
+            break;
+        case MIDIStandard::XG:
+            // msb=0:   normal voices
+            // msb=127: drum voices
+            // assuming no one uses SFX (msb=64, 126)
+            sfBank = midiBank.msb == 127 ? 128 : midiBank.lsb;
+            break;
+        }
+        channel->setPreset(findPreset(channel->isDrumChannel() ? 128 : sfBank, msg[1]));
         break;
+    }
     case MIDIMessageStatus::ChannelPressure:
         channel->channelPressure(msg[1]);
         break;

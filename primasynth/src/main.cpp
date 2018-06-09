@@ -136,6 +136,8 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("samplerate", 's', "sample rate (Hz)", false);
         argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
+        argparser.add<std::string>("midistd", '\0', "MIDI standard (affects bank selection)", false, "gs",
+            cmdline::oneof<std::string>("gm", "gs", "xg"));
         argparser.add("print-midi", 'p', "print MIDI messages");
         argparser.footer("[soundfont_filenames] ...");
         argparser.parse_check(argc, argv);
@@ -164,7 +166,13 @@ int main(int argc, char** argv) {
             argparser.get<unsigned int>("samplerate") : deviceInfo->defaultSampleRate;
 
         RingBuffer buffer(argparser.get<unsigned int>("buffer"));
-        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"));
+        auto midiStandard = MIDIStandard::GM;
+        if (argparser.get<std::string>("midistd") == "gs") {
+            midiStandard = MIDIStandard::GS;
+        } else if (argparser.get<std::string>("midistd") == "xg") {
+            midiStandard = MIDIStandard::XG;
+        }
+        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard);
         for (const std::string& filename : argparser.rest()) {
             synth.loadSoundFont(filename);
         }

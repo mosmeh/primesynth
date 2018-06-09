@@ -6,6 +6,10 @@
 
 namespace primasynth {
 
+struct Bank {
+    std::uint8_t msb, lsb;
+};
+
 class Channel {
 public:
     explicit Channel(double outputRate, bool drum);
@@ -19,7 +23,7 @@ public:
     void update();
     StereoValue render();
     bool isDrumChannel() const;
-    std::uint16_t getBank() const;
+    Bank getBank() const;
 
 private:
     enum class DataEntryMode {

@@ -206,8 +206,11 @@ bool Channel::isDrumChannel() const {
     return drum_;
 }
 
-std::uint16_t Channel::getBank() const {
-    return controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectMSB));
+Bank Channel::getBank() const {
+    return {
+        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectMSB)),
+        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectLSB))
+    };
 }
 
 void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass) {
