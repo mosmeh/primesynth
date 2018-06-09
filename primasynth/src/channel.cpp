@@ -134,10 +134,11 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             voice->release();
         }
         break;
-    }
-
-    for (const auto& voice : voices_) {
-        voice->updateMIDIController(controller, value);
+    default:
+        for (const auto& voice : voices_) {
+            voice->updateMIDIController(controller, value);
+        }
+        break;
     }
 }
 
