@@ -15,9 +15,10 @@ StereoValue calculatePannedVolume(double pan) {
     }
 }
 
-Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample> sample,
+Voice::Voice(std::size_t noteID, double outputRate, bool drum, std::shared_ptr<const Sample> sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
+    drum_(drum),
     sampleBuffer_(sample->soundFont->getSampleBuffer()),
     generators_(generators),
     actualKey_(key),
@@ -191,6 +192,10 @@ const Voice::State& Voice::getStatus() const {
 }
 
 void Voice::release(bool sustained) {
+    if (drum_) {
+        return;
+    }
+
     if (sustained) {
         status_ = State::Sustained;
     } else {

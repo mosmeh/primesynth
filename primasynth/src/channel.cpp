@@ -47,7 +47,7 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
                     modparams.merge(ModulatorParameterSet::getDefaultParameters());
 
                     addVoice(std::make_unique<Voice>(
-                        currentNoteID_, outputRate_, sample, generators, modparams, key, velocity),
+                        currentNoteID_, outputRate_, preset_->bank == DRUM_BANK, sample, generators, modparams, key, velocity),
                         generators.getOrDefault(SFGenerator::exclusiveClass));
                 }
             }
