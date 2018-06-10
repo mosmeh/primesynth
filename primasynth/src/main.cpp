@@ -140,10 +140,10 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("samplerate", 's', "sample rate (Hz)", false);
         argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
-        argparser.add<std::string>("midistd", '\0', "MIDI standard (affects bank selection)", false, "gs",
+        argparser.add<std::string>("std", '\0', "MIDI standard, affects bank selection (gm, gs, xg)", false, "gs",
             cmdline::oneof<std::string>("gm", "gs", "xg"));
         argparser.add("print-midi", 'p', "print MIDI messages");
-        argparser.footer("[soundfont_filenames] ...");
+        argparser.footer("[soundfonts] ...");
         argparser.parse_check(argc, argv);
         if (argparser.rest().empty()) {
             throw std::runtime_error("SoundFont file required");
@@ -170,9 +170,9 @@ int main(int argc, char** argv) {
             argparser.get<unsigned int>("samplerate") : deviceInfo->defaultSampleRate;
 
         auto midiStandard = MIDIStandard::GM;
-        if (argparser.get<std::string>("midistd") == "gs") {
+        if (argparser.get<std::string>("std") == "gs") {
             midiStandard = MIDIStandard::GS;
-        } else if (argparser.get<std::string>("midistd") == "xg") {
+        } else if (argparser.get<std::string>("std") == "xg") {
             midiStandard = MIDIStandard::XG;
         }
 
