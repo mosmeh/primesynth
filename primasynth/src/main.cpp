@@ -148,6 +148,9 @@ int main(int argc, char** argv) {
         initializeConversionTables();
 
         PaStreamParameters params = {};
+        params.channelCount = 2;
+        params.sampleFormat = paFloat32;
+
         if (argparser.exist("out")) {
             const auto id = static_cast<int>(argparser.get<unsigned int>("out"));
             if (id >= Pa_GetDeviceCount()) {
@@ -157,26 +160,27 @@ int main(int argc, char** argv) {
         } else {
             params.device = Pa_GetDefaultOutputDevice();
         }
-        params.channelCount = 2;
-        params.sampleFormat = paFloat32;
+
         const auto deviceInfo = Pa_GetDeviceInfo(params.device);
         params.suggestedLatency = deviceInfo->defaultLowOutputLatency;
 
         const double sampleRate = argparser.exist("samplerate") ?
             argparser.get<unsigned int>("samplerate") : deviceInfo->defaultSampleRate;
 
-        RingBuffer buffer(argparser.get<unsigned int>("buffer"));
         auto midiStandard = MIDIStandard::GM;
         if (argparser.get<std::string>("midistd") == "gs") {
             midiStandard = MIDIStandard::GS;
         } else if (argparser.get<std::string>("midistd") == "xg") {
             midiStandard = MIDIStandard::XG;
         }
+
         Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard);
         for (const std::string& filename : argparser.rest()) {
             synth.loadSoundFont(filename);
         }
         synth.setVolume(argparser.get<double>("volume"));
+
+        RingBuffer buffer(argparser.get<unsigned int>("buffer"));
 
         const UINT cp = GetConsoleCP();
         SetConsoleOutputCP(CP_UTF8);
@@ -184,7 +188,6 @@ int main(int argc, char** argv) {
         SetConsoleOutputCP(cp);
         std::cout << "API: " << Pa_GetHostApiInfo(deviceInfo->hostApi)->name << std::endl
             << "sample rate: " << sampleRate << "Hz" << std::endl;
-
         PaStream* stream;
         checkPaError(Pa_OpenStream(&stream, nullptr, &params, sampleRate,
             paFramesPerBufferUnspecified, paNoFlag, streamCallback, &buffer));
@@ -206,9 +209,9 @@ int main(int argc, char** argv) {
         checkMMError(midiInStart(hmi));
         std::cout << "Press enter to exit" << std::endl;
         std::getchar();
+
         running = false;
         thread.join();
-
         checkPaError(Pa_StopStream(stream));
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;

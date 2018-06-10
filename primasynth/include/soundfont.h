@@ -3,22 +3,15 @@
 
 namespace primasynth {
 
-class SoundFont;
-
-struct Sample {
-    const SoundFont* soundFont;
-    std::string name;
-    std::uint32_t start, end, startLoop, endLoop, sampleRate;
-    std::int8_t key, correction;
-};
-
 class GeneratorSet {
 public:
     GeneratorSet();
+
+    std::int16_t getOrDefault(SFGenerator type) const;
+
     void set(SFGenerator type, std::int16_t amount);
     void merge(const GeneratorSet& b);
     void mergeAndAdd(const GeneratorSet& b);
-    std::int16_t getOrDefault(SFGenerator type) const;
 
 private:
     struct Generator {
@@ -30,22 +23,17 @@ private:
 
 class ModulatorParameterSet {
 public:
+    static const ModulatorParameterSet& getDefaultParameters();
+
+    const std::vector<sfModList>& getParameters() const;
+
     void append(const sfModList& modparam);
     void addOrAppend(const sfModList& modparam);
     void merge(const ModulatorParameterSet& b);
     void mergeAndAdd(const ModulatorParameterSet& b);
-    const std::vector<sfModList>& getParameters() const;
-    static const ModulatorParameterSet& getDefaultParameters();
 
 private:
     std::vector<sfModList> modparams_;
-};
-
-enum class SampleMode {
-    UnLooped,
-    Looped,
-    UnUsed,
-    LoopedWithRemainder
 };
 
 struct Zone {
@@ -71,11 +59,27 @@ struct Instrument {
     std::vector<Zone> zones;
 };
 
+class SoundFont;
+
 struct Preset {
     const SoundFont* soundFont;
     std::string name;
-    std::uint16_t presetNum, bank;
+    std::uint16_t bank, presetNum;
     std::vector<Zone> zones;
+};
+
+struct Sample {
+    const SoundFont* soundFont;
+    std::string name;
+    std::uint32_t start, end, startLoop, endLoop, sampleRate;
+    std::int8_t key, correction;
+};
+
+enum class SampleMode {
+    UnLooped,
+    Looped,
+    UnUsed,
+    LoopedWithRemainder
 };
 
 class SoundFont {

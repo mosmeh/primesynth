@@ -26,6 +26,14 @@ public:
         atten_(1.0),
         value_(1.0) {}
 
+    double getValue() const {
+        return value_;
+    }
+
+    bool isFinished() const {
+        return section_ == Section::Finished;
+    }
+
     void setParameter(Section section, double param) {
         if (section == Section::Sustain) {
             params_.at(static_cast<int>(Section::Sustain)) = 0.001 * param;
@@ -89,14 +97,6 @@ public:
         } else {
             value_ = centibelToRatio(480.0 * atten_);
         }
-    }
-
-    double getValue() const {
-        return value_;
-    }
-
-    bool isFinished() const {
-        return section_ == Section::Finished;
     }
 
 private:

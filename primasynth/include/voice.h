@@ -22,14 +22,15 @@ public:
     std::size_t getNoteID() const;
     std::uint8_t getActualKey() const;
     std::int16_t getExclusiveClass() const;
-    void update();
+    const State& getStatus() const;
+    StereoValue render() const;
+
     void updateSFController(SFGeneralController controller, std::int16_t value);
     void updateMIDIController(std::uint8_t controller, std::uint8_t value);
     void updateFineTuning(double fineTuning);
     void updateCoarseTuning(double coarseTuning);
-    StereoValue render() const;
-    const State& getStatus() const;
     void release(bool sustained);
+    void update();
 
 private:
     const std::size_t noteID_;

@@ -14,6 +14,26 @@ public:
             | static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value))
                 * (static_cast<double>(UINT32_MAX) + 1.0))) {}
 
+    std::uint64_t getRaw() const {
+        return raw_;
+    }
+
+    std::uint32_t getIntegerPart() const {
+        return raw_ >> 32;
+    }
+
+    double getFractionalPart() const {
+        return (raw_ & UINT32_MAX) / (static_cast<double>(UINT32_MAX) + 1.0);
+    }
+
+    double getReal() const {
+        return getIntegerPart() + getFractionalPart();
+    }
+
+    std::uint32_t getRoundedInteger() const {
+        return ((raw_ + INT32_MAX) + 1) >> 32;
+    }
+
     FixedPoint& operator+=(const FixedPoint& b) {
         raw_ += b.raw_;
         return *this;
@@ -34,26 +54,6 @@ public:
         auto x = *this;
         x -= b;
         return x;
-    }
-
-    std::uint64_t getRaw() const {
-        return raw_;
-    }
-
-    std::uint32_t getIntegerPart() const {
-        return raw_ >> 32;
-    }
-
-    double getFractionalPart() const {
-        return (raw_ & UINT32_MAX) / (static_cast<double>(UINT32_MAX) + 1.0);
-    }
-
-    double getReal() const {
-        return getIntegerPart() + getFractionalPart();
-    }
-
-    std::uint32_t getRoundedInteger() const {
-        return ((raw_ + INT32_MAX) + 1) >> 32;
     }
 
 private:

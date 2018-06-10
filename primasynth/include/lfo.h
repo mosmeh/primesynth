@@ -15,6 +15,10 @@ public:
         value_(0.0),
         up_(true) {}
 
+    double getValue() const {
+        return value_;
+    }
+
     void setDelay(double delay) {
         delay_ = outputRate_ * timecentToSecond(delay) / interval_;
     }
@@ -41,10 +45,6 @@ public:
                 up_ = true;
             }
         }
-    }
-
-    double getValue() const {
-        return value_;
     }
 
 private:

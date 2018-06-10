@@ -8,18 +8,6 @@ public:
         size_(size),
         data_(size) {}
 
-    void push(float t) {
-        data_.at(mask(end_++)) = t;
-    }
-
-    float shift() {
-        return data_.at(mask(start_++));
-    }
-
-    void clear() {
-        start_ = end_;
-    }
-
     bool empty() const {
         return start_ >= end_;
     }
@@ -34,6 +22,18 @@ public:
 
     std::size_t capacity() const {
         return size_ - size();
+    }
+    
+    void push(float t) {
+        data_.at(mask(end_++)) = t;
+    }
+
+    float shift() {
+        return data_.at(mask(start_++));
+    }
+
+    void clear() {
+        start_ = end_;
     }
 
 private:

@@ -4,17 +4,6 @@ namespace primasynth {
 
 static constexpr unsigned int CALC_INTERVAL = 32;
 
-StereoValue calculatePannedVolume(double pan) {
-    if (pan <= -500.0) {
-        return {1.0, 0.0};
-    } else if (pan >= 500.0) {
-        return {0.0, 1.0};
-    } else {
-        static constexpr double f = 3.141592653589793 / 2000.0;
-        return {std::sin(f * (-pan + 500.0)), std::sin(f * (pan + 500.0))};
-    }
-}
-
 Voice::Voice(std::size_t noteID, double outputRate, bool drum, std::shared_ptr<const Sample> sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
@@ -103,6 +92,61 @@ std::int16_t Voice::getExclusiveClass() const {
     return static_cast<std::int16_t>(getModulatedGenerator(SFGenerator::exclusiveClass));
 }
 
+const Voice::State& Voice::getStatus() const {
+    return status_;
+}
+
+StereoValue Voice::render() const {
+    const std::uint32_t i = phase_.getIntegerPart();
+    const double r = phase_.getFractionalPart();
+    const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
+    return volEnv_.getValue()
+        * centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
+        * volume_ * (interpolated / INT16_MAX);
+}
+
+void Voice::updateSFController(SFGeneralController controller, std::int16_t value) {
+    for (auto& mod : modulators_) {
+        if (mod.isSourceSFController(controller)) {
+            mod.updateSFController(controller, value);
+            updateModulatedParams(mod.getDestination());
+        }
+    }
+}
+
+void Voice::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
+    for (auto& mod : modulators_) {
+        if (mod.isSourceMIDIController(controller)) {
+            mod.updateMIDIController(controller, value);
+            updateModulatedParams(mod.getDestination());
+        }
+    }
+}
+
+void Voice::updateFineTuning(double fineTuning) {
+    fineTuning_ = fineTuning;
+    updateModulatedParams(SFGenerator::fineTune);
+}
+
+void Voice::updateCoarseTuning(double coarseTuning) {
+    coarseTuning_ = coarseTuning;
+    updateModulatedParams(SFGenerator::coarseTune);
+}
+
+void Voice::release(bool sustained) {
+     if (drum_) { 
+        return; 
+    } 
+ 
+    if (sustained) {
+        status_ = State::Sustained;
+    } else {
+        status_ = State::Released;
+        volEnv_.release();
+        modEnv_.release();
+    }
+}
+
 void Voice::update() {
     phase_ += deltaPhase_;
 
@@ -150,63 +194,19 @@ void Voice::update() {
     }
 }
 
-void Voice::updateSFController(SFGeneralController controller, std::int16_t value) {
-    for (auto& mod : modulators_) {
-        if (mod.isSourceSFController(controller)) {
-            mod.updateSFController(controller, value);
-            updateModulatedParams(mod.getDestination());
-        }
-    }
-}
-
-void Voice::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
-    for (auto& mod : modulators_) {
-        if (mod.isSourceMIDIController(controller)) {
-            mod.updateMIDIController(controller, value);
-            updateModulatedParams(mod.getDestination());
-        }
-    }
-}
-
-void Voice::updateFineTuning(double fineTuning) {
-    fineTuning_ = fineTuning;
-    updateModulatedParams(SFGenerator::fineTune);
-}
-
-void Voice::updateCoarseTuning(double coarseTuning) {
-    coarseTuning_ = coarseTuning;
-    updateModulatedParams(SFGenerator::coarseTune);
-}
-
-StereoValue Voice::render() const {
-    const std::uint32_t i = phase_.getIntegerPart();
-    const double r = phase_.getFractionalPart();
-    const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
-    return volEnv_.getValue()
-        * centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
-        * volume_ * (interpolated / INT16_MAX);
-}
-
-const Voice::State& Voice::getStatus() const {
-    return status_;
-}
-
-void Voice::release(bool sustained) {
-    if (drum_) {
-        return;
-    }
-
-    if (sustained) {
-        status_ = State::Sustained;
-    } else {
-        status_ = State::Released;
-        volEnv_.release();
-        modEnv_.release();
-    }
-}
-
 double Voice::getModulatedGenerator(SFGenerator type) const {
     return modulated_.at(static_cast<std::size_t>(type));
+}
+
+StereoValue calculatePannedVolume(double pan) {
+    if (pan <= -500.0) {
+        return {1.0, 0.0};
+    } else if (pan >= 500.0) {
+        return {0.0, 1.0};
+    } else {
+        static constexpr double f = 3.141592653589793 / 2000.0;
+        return {std::sin(f * (-pan + 500.0)), std::sin(f * (pan + 500.0))};
+    }
 }
 
 void Voice::updateModulatedParams(SFGenerator destination) {

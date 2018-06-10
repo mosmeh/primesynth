@@ -17,11 +17,11 @@ public:
     StereoValue render() const;
 
 private:
+    const MIDIStandard midiStandard_;
     std::vector<std::unique_ptr<Channel>> channels_;
     std::vector<std::shared_ptr<const SoundFont>> soundFonts_;
     double volume_;
     std::shared_ptr<const Preset> defaultPreset_, defaultDrumPreset_;
-    MIDIStandard midiStandard_;
 
     std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetNum) const;
 };

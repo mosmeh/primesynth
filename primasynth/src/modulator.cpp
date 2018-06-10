@@ -2,6 +2,30 @@
 
 namespace primasynth {
 
+Modulator::Modulator(const sfModList& param) :
+    param_(param),
+    source_(0.0),
+    amountSource_(1.0),
+    value_(0.0) {}
+
+bool Modulator::isSourceSFController(SFGeneralController controller) const {
+    return (param_.sfModSrcOper.palette == SFControllerPalette::generalController && controller == param_.sfModSrcOper.index.general)
+        || (param_.sfModAmtSrcOper.palette == SFControllerPalette::generalController && controller == param_.sfModAmtSrcOper.index.general);
+}
+
+bool Modulator::isSourceMIDIController(std::uint8_t controller) const {
+    return (param_.sfModSrcOper.palette == SFControllerPalette::midiController && controller == param_.sfModSrcOper.index.midi)
+        || (param_.sfModAmtSrcOper.palette == SFControllerPalette::midiController && controller == param_.sfModAmtSrcOper.index.midi);
+}
+
+SFGenerator Modulator::getDestination() const {
+    return param_.sfModDestOper;
+}
+
+double Modulator::getValue() const {
+    return value_;
+}
+
 double concave(double x) {
     if (x <= 0.0) {
         return 0.0;
@@ -60,32 +84,6 @@ double map(double value, SFModulator mod) {
     throw std::runtime_error("unknown modulator controller type");
 }
 
-double transform(double value, SFTransform transform) {
-    switch (transform) {
-    case SFTransform::linear:
-        return value;
-    case SFTransform::absoluteValue:
-        return std::abs(value);
-    }
-    throw std::invalid_argument("unknown transform");
-}
-
-Modulator::Modulator(const sfModList& param) :
-    param_(param),
-    source_(0.0),
-    amountSource_(1.0),
-    value_(0.0) {}
-
-bool Modulator::isSourceSFController(SFGeneralController controller) {
-    return (param_.sfModSrcOper.palette == SFControllerPalette::generalController && controller == param_.sfModSrcOper.index.general)
-        || (param_.sfModAmtSrcOper.palette == SFControllerPalette::generalController && controller == param_.sfModAmtSrcOper.index.general);
-}
-
-bool Modulator::isSourceMIDIController(std::uint8_t controller) {
-    return (param_.sfModSrcOper.palette == SFControllerPalette::midiController && controller == param_.sfModSrcOper.index.midi)
-        || (param_.sfModAmtSrcOper.palette == SFControllerPalette::midiController && controller == param_.sfModAmtSrcOper.index.midi);
-}
-
 void Modulator::updateSFController(SFGeneralController controller, std::int16_t value) {
     if (param_.sfModSrcOper.palette == SFControllerPalette::generalController && controller == param_.sfModSrcOper.index.general) {
         source_ = map(value, param_.sfModSrcOper);
@@ -106,12 +104,14 @@ void Modulator::updateMIDIController(std::uint8_t controller, std::uint8_t value
     calculateValue();
 }
 
-SFGenerator Modulator::getDestination() const {
-    return param_.sfModDestOper;
-}
-
-double Modulator::getValue() const {
-    return value_;
+double transform(double value, SFTransform transform) {
+    switch (transform) {
+    case SFTransform::linear:
+        return value;
+    case SFTransform::absoluteValue:
+        return std::abs(value);
+    }
+    throw std::invalid_argument("unknown transform");
 }
 
 void Modulator::calculateValue() {

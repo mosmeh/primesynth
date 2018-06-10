@@ -14,6 +14,9 @@ class Channel {
 public:
     Channel(double outputRate, bool drum);
 
+    bool isDrumChannel() const;
+    Bank getBank() const;
+
     void noteOn(std::uint8_t key, std::uint8_t velocity);
     void noteOff(std::uint8_t key);
     void controlChange(std::uint8_t controller, std::uint8_t value);
@@ -22,8 +25,6 @@ public:
     void setPreset(const std::shared_ptr<const Preset>& preset);
     void update();
     StereoValue render();
-    bool isDrumChannel() const;
-    Bank getBank() const;
 
 private:
     enum class DataEntryMode {

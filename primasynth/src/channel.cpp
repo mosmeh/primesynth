@@ -22,6 +22,17 @@ Channel::Channel(double outputRate, bool drum) :
     voices_.reserve(128);
 }
 
+bool Channel::isDrumChannel() const {
+    return drum_;
+}
+
+Bank Channel::getBank() const {
+    return {
+        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectMSB)),
+        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectLSB))
+    };
+}
+
 void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
     if (velocity == 0) {
         noteOff(key);
@@ -207,17 +218,6 @@ StereoValue Channel::render() {
         }
     }
     return sum;
-}
-
-bool Channel::isDrumChannel() const {
-    return drum_;
-}
-
-Bank Channel::getBank() const {
-    return {
-        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectMSB)),
-        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectLSB))
-    };
 }
 
 void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass) {

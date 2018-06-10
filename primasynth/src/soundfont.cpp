@@ -8,6 +8,10 @@ GeneratorSet::GeneratorSet() {
     }
 }
 
+std::int16_t GeneratorSet::getOrDefault(SFGenerator type) const {
+    return generators_.at(static_cast<std::size_t>(type)).amount;
+}
+
 void GeneratorSet::set(SFGenerator type, std::int16_t amount) {
     generators_.at(static_cast<std::size_t>(type)) = {true, amount};
 }
@@ -30,60 +34,6 @@ void GeneratorSet::mergeAndAdd(const GeneratorSet& b) {
             }
         }
     }
-}
-
-std::int16_t GeneratorSet::getOrDefault(SFGenerator type) const {
-    return generators_.at(static_cast<std::size_t>(type)).amount;
-}
-
-bool operator==(const SFModulator& a, const SFModulator& b) {
-    return a.index.midi == b.index.midi
-        && a.palette == b.palette
-        && a.direction == b.direction
-        && a.polarity == b.polarity
-        && a.type == b.type;
-}
-
-bool modulatorsAreIdentical(const sfModList& a, const sfModList& b) {
-    return a.sfModSrcOper == b.sfModSrcOper
-        && a.sfModDestOper == b.sfModDestOper
-        && a.sfModAmtSrcOper == b.sfModAmtSrcOper
-        && a.sfModTransOper == b.sfModTransOper;
-}
-
-void ModulatorParameterSet::append(const sfModList& modparam) {
-    for (const auto& mp : modparams_) {
-        if (modulatorsAreIdentical(mp, modparam)) {
-            return;
-        }
-    }
-    modparams_.push_back(modparam);
-}
-
-void ModulatorParameterSet::addOrAppend(const sfModList& modparam) {
-    for (auto& mp : modparams_) {
-        if (modulatorsAreIdentical(mp, modparam)) {
-            mp.modAmount += modparam.modAmount;
-            return;
-        }
-    }
-    modparams_.push_back(modparam);
-}
-
-void ModulatorParameterSet::merge(const ModulatorParameterSet& b) {
-    for (const auto& mp : b.modparams_) {
-        append(mp);
-    }
-}
-
-void ModulatorParameterSet::mergeAndAdd(const ModulatorParameterSet& b) {
-    for (const auto& mp : b.modparams_) {
-        addOrAppend(mp);
-    }
-}
-
-const std::vector<sfModList>& ModulatorParameterSet::getParameters() const {
-    return modparams_;
 }
 
 const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
@@ -248,6 +198,56 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
     return params;
 }
 
+const std::vector<sfModList>& ModulatorParameterSet::getParameters() const {
+    return modparams_;
+}
+
+bool operator==(const SFModulator& a, const SFModulator& b) {
+    return a.index.midi == b.index.midi
+        && a.palette == b.palette
+        && a.direction == b.direction
+        && a.polarity == b.polarity
+        && a.type == b.type;
+}
+
+bool modulatorsAreIdentical(const sfModList& a, const sfModList& b) {
+    return a.sfModSrcOper == b.sfModSrcOper
+        && a.sfModDestOper == b.sfModDestOper
+        && a.sfModAmtSrcOper == b.sfModAmtSrcOper
+        && a.sfModTransOper == b.sfModTransOper;
+}
+
+void ModulatorParameterSet::append(const sfModList& modparam) {
+    for (const auto& mp : modparams_) {
+        if (modulatorsAreIdentical(mp, modparam)) {
+            return;
+        }
+    }
+    modparams_.push_back(modparam);
+}
+
+void ModulatorParameterSet::addOrAppend(const sfModList& modparam) {
+    for (auto& mp : modparams_) {
+        if (modulatorsAreIdentical(mp, modparam)) {
+            mp.modAmount += modparam.modAmount;
+            return;
+        }
+    }
+    modparams_.push_back(modparam);
+}
+
+void ModulatorParameterSet::merge(const ModulatorParameterSet& b) {
+    for (const auto& mp : b.modparams_) {
+        append(mp);
+    }
+}
+
+void ModulatorParameterSet::mergeAndAdd(const ModulatorParameterSet& b) {
+    for (const auto& mp : b.modparams_) {
+        addOrAppend(mp);
+    }
+}
+
 RIFFHeader readHeader(std::ifstream& ifs) {
     RIFFHeader header;
     ifs.read(reinterpret_cast<char*>(&header), sizeof(header));
@@ -271,7 +271,7 @@ constexpr std::uint32_t toFourCC(const char str[5]) {
 SoundFont::SoundFont(const std::string& filename) {
     std::ifstream ifs(filename, std::ios::binary);
     if (!ifs) {
-        throw std::runtime_error("failed open file");
+        throw std::runtime_error("failed to open file");
     }
 
     const RIFFHeader riffHeader = readHeader(ifs);
