@@ -6,6 +6,8 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, MIDIStandar
     volume_(1.0),
     midiStandard_(midiStandard) {
 
+    initializeConversionTables();
+
     channels_.reserve(numChannels);
     for (std::size_t i = 0; i < numChannels; ++i) {
         channels_.emplace_back(std::make_unique<Channel>(outputRate, i == 9));

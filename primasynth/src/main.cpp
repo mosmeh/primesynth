@@ -149,8 +149,6 @@ int main(int argc, char** argv) {
             throw std::runtime_error("SoundFont file required");
         }
 
-        initializeConversionTables();
-
         PaStreamParameters params = {};
         params.channelCount = 2;
         params.sampleFormat = paFloat32;
