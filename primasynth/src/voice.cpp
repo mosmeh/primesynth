@@ -89,7 +89,7 @@ std::uint8_t Voice::getActualKey() const {
 }
 
 std::int16_t Voice::getExclusiveClass() const {
-    return static_cast<std::int16_t>(getModulatedGenerator(SFGenerator::exclusiveClass));
+    return generators_.getOrDefault(SFGenerator::exclusiveClass);
 }
 
 const Voice::State& Voice::getStatus() const {
@@ -287,7 +287,7 @@ void Voice::updateModulatedParams(SFGenerator destination) {
     case SFGenerator::pitch:
         voicePitch_ = sample_.pitch
             + 0.01 * getModulatedGenerator(SFGenerator::pitch)
-            + 0.01 * getModulatedGenerator(SFGenerator::scaleTuning) * (actualKey_ - sample_.pitch)
+            + 0.01 * generators_.getOrDefault(SFGenerator::scaleTuning) * (actualKey_ - sample_.pitch)
             + coarseTuning_ + getModulatedGenerator(SFGenerator::coarseTune)
             + 0.01 * (fineTuning_ + getModulatedGenerator(SFGenerator::fineTune));
         break;
