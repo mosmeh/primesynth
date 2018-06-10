@@ -60,7 +60,7 @@ void Channel::noteOff(std::uint8_t key) {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
-            voice->release();
+            voice->release(controllers_.at(static_cast<std::size_t>(MIDIControlChange::Sustain)) >= 64);
         }
     }
 }
@@ -99,6 +99,13 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
                 }
                 break;
             }
+            }
+        }
+        break;
+    case MIDIControlChange::Sustain:
+        for (const auto& voice : voices_) {
+            if (voice->getStatus() == Voice::State::Sustained) {
+                voice->release(false);
             }
         }
         break;
@@ -151,7 +158,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         break;
     case MIDIControlChange::AllNotesOff:
         for (const auto& voice : voices_) {
-            voice->release();
+            voice->release(false);
         }
         break;
     default:
@@ -185,7 +192,7 @@ void Channel::setPreset(const std::shared_ptr<const Preset>& preset) {
 void Channel::update() {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
-        if (voice->isSounding()) {
+        if (voice->getStatus() != Voice::State::Finished) {
             voice->update();
         }
     }
@@ -195,7 +202,7 @@ StereoValue Channel::render() {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     StereoValue sum;
     for (const auto& voice : voices_) {
-        if (voice->isSounding()) {
+        if (voice->getStatus() != Voice::State::Finished) {
             sum += voice->render();
         }
     }
@@ -226,13 +233,13 @@ void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass
     if (exclusiveClass != 0) {
         for (const auto& v : voices_) {
             if (currentNoteID_ != v->getNoteID() && exclusiveClass == v->getExclusiveClass()) {
-                v->release();
+                v->release(false);
             }
         }
     }
 
     for (auto& v : voices_) {
-        if (!v->isSounding()) {
+        if (v->getStatus() == Voice::State::Finished) {
             v = std::move(voice);
             return;
         }

@@ -42,10 +42,6 @@ public:
         released_ = true;
     }
 
-    void finish() {
-        changeSection(Section::Finished);
-    }
-
     void update() {
         if (section_ == Section::Finished) {
             return;

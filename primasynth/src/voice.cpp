@@ -24,7 +24,7 @@ Voice::Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample
     fineTuning_(0.0),
     coarseTuning_(0.0),
     steps_(0),
-    released_(false),
+    status_(State::Playing),
     phase_(sample->start),
     volume_({1.0, 1.0}),
     volEnv_(outputRate, 1),
@@ -109,7 +109,7 @@ void Voice::update() {
     case SampleMode::UnLooped:
     case SampleMode::UnUsed:
         if (phase_.getIntegerPart() > sample_.end - 1) {
-            volEnv_.finish();
+            status_ = State::Finished;
             return;
         }
         break;
@@ -119,9 +119,9 @@ void Voice::update() {
         }
         break;
     case SampleMode::LoopedWithRemainder:
-        if (released_) {
+        if (status_ == State::Released) {
             if (phase_.getIntegerPart() > sample_.end - 1) {
-                volEnv_.finish();
+                status_ = State::Finished;
                 return;
             }
         } else if (phase_.getIntegerPart() > sample_.endLoop - 1) {
@@ -132,6 +132,12 @@ void Voice::update() {
 
     modLFO_.update();
     volEnv_.update();
+
+    if (volEnv_.isFinished()) {
+        status_ = State::Finished;
+        return;
+    }
+
     if (steps_++ % CALC_INTERVAL == 0) {
         vibLFO_.update();
         modEnv_.update();
@@ -180,14 +186,18 @@ StereoValue Voice::render() const {
         * volume_ * (interpolated / INT16_MAX);
 }
 
-bool Voice::isSounding() const {
-    return !volEnv_.isFinished();
+const Voice::State& Voice::getStatus() const {
+    return status_;
 }
 
-void Voice::release() {
-    released_ = true;
-    volEnv_.release();
-    modEnv_.release();
+void Voice::release(bool sustained) {
+    if (sustained) {
+        status_ = State::Sustained;
+    } else {
+        status_ = State::Released;
+        volEnv_.release();
+        modEnv_.release();
+    }
 }
 
 double Voice::getModulatedGenerator(SFGenerator type) const {

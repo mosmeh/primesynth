@@ -9,6 +9,13 @@ namespace primasynth {
 
 class Voice {
 public:
+    enum class State {
+        Playing,
+        Sustained,
+        Released,
+        Finished
+    };
+
     Voice(std::size_t noteID, double outputRate, std::shared_ptr<const Sample> sample,
         const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity);
 
@@ -21,8 +28,8 @@ public:
     void updateFineTuning(double fineTuning);
     void updateCoarseTuning(double coarseTuning);
     StereoValue render() const;
-    bool isSounding() const;
-    void release();
+    const State& getStatus() const;
+    void release(bool sustained);
 
 private:
     const std::size_t noteID_;
@@ -40,7 +47,7 @@ private:
     double fineTuning_, coarseTuning_;
     double deltaPhaseFactor_;
     unsigned int steps_;
-    bool released_;
+    State status_;
     double voicePitch_;
     FixedPoint phase_, deltaPhase_;
     StereoValue volume_;
