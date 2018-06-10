@@ -17,7 +17,7 @@ public:
         Finished
     };
 
-    explicit Envelope(double outputRate, unsigned int interval) :
+    Envelope(double outputRate, unsigned int interval) :
         outputRate_(outputRate),
         interval_(interval),
         params_(),

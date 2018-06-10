@@ -6,7 +6,7 @@ namespace primasynth {
 
 class LFO {
 public:
-    explicit LFO(double outputRate, unsigned int interval) :
+    LFO(double outputRate, unsigned int interval) :
         outputRate_(outputRate),
         interval_(interval),
         steps_(0),

@@ -12,7 +12,7 @@ struct Bank {
 
 class Channel {
 public:
-    explicit Channel(double outputRate, bool drum);
+    Channel(double outputRate, bool drum);
 
     void noteOn(std::uint8_t key, std::uint8_t velocity);
     void noteOff(std::uint8_t key);
