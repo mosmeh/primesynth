@@ -8,8 +8,6 @@
 #include "synth.h"
 #include "ringbuffer.h"
 
-static_assert(CHAR_BIT == 8, "char is assumed to be 8 bits");
-
 namespace primasynth {
 
 void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
