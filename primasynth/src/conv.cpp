@@ -1,5 +1,5 @@
 #include "conv.h"
-#include <cmath>
+#include <array>
 
 namespace primasynth {
 

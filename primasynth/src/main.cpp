@@ -1,6 +1,12 @@
+#include <sstream>
+#include <chrono>
+#include <atomic>
+#define NOMINMAX
+#include <Windows.h>
+#include "portaudio.h"
+#include "cmdline.h"
 #include "synth.h"
 #include "ringbuffer.h"
-#include "cmdline.h"
 
 static_assert(CHAR_BIT == 8, "char is assumed to be 8 bits");
 

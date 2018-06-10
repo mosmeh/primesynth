@@ -1,5 +1,4 @@
 #include "synth.h"
-#include "midi.h"
 
 namespace primasynth {
 
@@ -28,7 +27,11 @@ void Synthesizer::loadSoundFont(const std::string& filename) {
     std::cout << "loaded " << sf->getName() << " from " << filename << std::endl;
 }
 
-void Synthesizer::processMIDIMessage(DWORD param) {
+void Synthesizer::setVolume(double volume) {
+    volume_ = std::max(0.0, volume);
+}
+
+void Synthesizer::processMIDIMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
     const auto& channel = channels_.at(msg[0] & 0xf);
     const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
@@ -66,10 +69,6 @@ void Synthesizer::processMIDIMessage(DWORD param) {
         channel->pitchBend(joinBytes(msg[2], msg[1]));
         break;
     }
-}
-
-void Synthesizer::setVolume(double volume) {
-    volume_ = std::max(0.0, volume);
 }
 
 StereoValue Synthesizer::render() const {

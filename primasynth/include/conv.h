@@ -1,5 +1,4 @@
 #pragma once
-#include "sfspec.h"
 
 namespace primasynth {
 

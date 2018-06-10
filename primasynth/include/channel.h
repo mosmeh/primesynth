@@ -1,6 +1,5 @@
 #pragma once
-#include "soundfont.h"
-#include "stereovalue.h"
+#include <mutex>
 #include "midi.h"
 #include "voice.h"
 

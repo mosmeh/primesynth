@@ -1,6 +1,4 @@
 #pragma once
-#include "soundfont.h"
-#include "stereovalue.h"
 #include "channel.h"
 
 namespace primasynth {
@@ -12,8 +10,8 @@ public:
         MIDIStandard midiStandard = MIDIStandard::GM);
 
     void loadSoundFont(const std::string& filename);
-    void processMIDIMessage(DWORD param);
     void setVolume(double volume);
+    void processMIDIMessage(unsigned long param);
     StereoValue render() const;
 
 private:

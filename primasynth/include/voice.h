@@ -1,6 +1,7 @@
 #pragma once
 #include "soundfont.h"
 #include "stereovalue.h"
+#include "fixedpoint.h"
 #include "modulator.h"
 #include "envelope.h"
 #include "lfo.h"

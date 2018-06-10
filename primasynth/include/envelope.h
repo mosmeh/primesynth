@@ -1,7 +1,6 @@
 #pragma once
 #include <array>
 #include "conv.h"
-#include "fixedpoint.h"
 
 namespace primasynth {
 

@@ -3,7 +3,6 @@
 #define NOMINMAX
 #include <Windows.h>
 
-#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -14,3 +13,4 @@
 #include <atomic>
 
 #include "portaudio.h"
+#include "cmdline.h"
