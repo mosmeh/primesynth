@@ -93,7 +93,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
                 break;
             }
             case MIDIRPN::CoarseTuning: {
-                coarseTuning_ = value - 64;
+                coarseTuning_ = static_cast<std::int16_t>(value) - 64;
                 for (const auto& voice : voices_) {
                     voice->updateCoarseTuning(coarseTuning_);
                 }
