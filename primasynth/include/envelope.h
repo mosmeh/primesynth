@@ -22,7 +22,9 @@ public:
         interval_(interval),
         params_(),
         section_(Section::Delay),
+        steps_(0),
         periodSteps_(0),
+        released_(false),
         atten_(1.0),
         value_(1.0) {}
 
@@ -37,9 +39,7 @@ public:
     }
 
     void release() {
-        if (section_ < Section::Release) {
-            changeSection(Section::Release);
-        }
+        released_ = true;
     }
 
     void finish() {
@@ -51,7 +51,15 @@ public:
             return;
         }
 
+        ++steps_;
         ++periodSteps_;
+
+        static constexpr double minimumLength = 0.01;
+        if (section_ < Section::Release && released_
+            && steps_ > outputRate_ * minimumLength) {
+
+            changeSection(Section::Release);
+        }
 
         auto i = static_cast<int>(section_);
         if (section_ != Section::Sustain && periodSteps_ >= params_.at(i)) {
@@ -108,7 +116,8 @@ private:
     const unsigned int interval_;
     std::array<double, 6> params_;
     Section section_;
-    unsigned int periodSteps_;
+    unsigned int steps_, periodSteps_;
+    bool released_;
     double atten_, value_;
 
     void changeSection(Section section) {
