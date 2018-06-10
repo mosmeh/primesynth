@@ -17,7 +17,7 @@ public:
         Finished
     };
 
-    Voice(std::size_t noteID, double outputRate, bool drum, std::shared_ptr<const Sample> sample,
+    Voice(std::size_t noteID, double outputRate, bool percussion, std::shared_ptr<const Sample> sample,
         const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity);
 
     std::size_t getNoteID() const;
@@ -36,7 +36,7 @@ public:
 private:
     const std::size_t noteID_;
     const std::uint8_t actualKey_;
-    const bool drum_;
+    const bool percussion_;
     const std::vector<std::int16_t>& sampleBuffer_;
     GeneratorSet generators_;
     struct {

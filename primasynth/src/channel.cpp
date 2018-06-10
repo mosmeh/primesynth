@@ -2,9 +2,9 @@
 
 namespace primasynth {
 
-Channel::Channel(double outputRate, bool drum) :
+Channel::Channel(double outputRate, bool percussion) :
     outputRate_(outputRate),
-    drum_(drum),
+    percussion_(percussion),
     controllers_(),
     dataEntryMode_(DataEntryMode::RPN),
     pitchBend_(1 << 13),
@@ -22,8 +22,8 @@ Channel::Channel(double outputRate, bool drum) :
     voices_.reserve(128);
 }
 
-bool Channel::isDrumChannel() const {
-    return drum_;
+bool Channel::isPercussionChannel() const {
+    return percussion_;
 }
 
 Bank Channel::getBank() const {
@@ -58,7 +58,7 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
                     modparams.merge(ModulatorParameterSet::getDefaultParameters());
 
                     addVoice(std::make_unique<Voice>(
-                        currentNoteID_, outputRate_, preset_->bank == DRUM_BANK, sample, generators, modparams, key, velocity),
+                        currentNoteID_, outputRate_, preset_->bank == PERCUSSION_BANK, sample, generators, modparams, key, velocity),
                         generators.getOrDefault(SFGenerator::exclusiveClass));
                 }
             }

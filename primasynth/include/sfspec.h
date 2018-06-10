@@ -216,7 +216,7 @@ struct sfPresetHeader {
     std::uint32_t dwMorphology;
 };
 
-static constexpr std::uint16_t DRUM_BANK = 128;
+static constexpr std::uint16_t PERCUSSION_BANK = 128;
 
 struct sfBag {
     std::uint16_t wGenNdx;
