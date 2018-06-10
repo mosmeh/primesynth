@@ -18,7 +18,7 @@ void Synthesizer::loadSoundFont(const std::string& filename) {
     if (soundFonts_.empty()) {
         soundFonts_.emplace_back(sf);
         defaultPreset_ = findPreset(0, 0);
-        defaultDrumPreset_ = findPreset(128, 0);
+        defaultDrumPreset_ = findPreset(DRUM_BANK, 0);
         for (const auto& channel : channels_) {
             channel->setPreset(channel->isDrumChannel() ? defaultDrumPreset_ : defaultPreset_);
         }
@@ -53,10 +53,10 @@ void Synthesizer::processMIDIMessage(DWORD param) {
             // msb=0:   normal voices
             // msb=127: drum voices
             // assuming no one uses SFX (msb=64, 126)
-            sfBank = midiBank.msb == 127 ? 128 : midiBank.lsb;
+            sfBank = midiBank.msb == 127 ? DRUM_BANK : midiBank.lsb;
             break;
         }
-        channel->setPreset(findPreset(channel->isDrumChannel() ? 128 : sfBank, msg[1]));
+        channel->setPreset(findPreset(channel->isDrumChannel() ? DRUM_BANK : sfBank, msg[1]));
         break;
     }
     case MIDIMessageStatus::ChannelPressure:
@@ -91,7 +91,7 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
     }
 
     // fallback
-    if (bank == 128) {
+    if (bank == DRUM_BANK) {
         // if drum bank
         if (presetNum != 0 && defaultDrumPreset_) {
             return defaultDrumPreset_;
