@@ -2,9 +2,8 @@
 
 namespace primasynth {
 
-Channel::Channel(double outputRate, bool percussion) :
+Channel::Channel(double outputRate) :
     outputRate_(outputRate),
-    percussion_(percussion),
     controllers_(),
     dataEntryMode_(DataEntryMode::RPN),
     pitchBend_(1 << 13),
@@ -20,10 +19,6 @@ Channel::Channel(double outputRate, bool percussion) :
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)) = 127;
     controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)) = 127;
     voices_.reserve(128);
-}
-
-bool Channel::isPercussionChannel() const {
-    return percussion_;
 }
 
 Bank Channel::getBank() const {

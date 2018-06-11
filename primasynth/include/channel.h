@@ -11,9 +11,8 @@ struct Bank {
 
 class Channel {
 public:
-    Channel(double outputRate, bool percussion);
+    explicit Channel(double outputRate);
 
-    bool isPercussionChannel() const;
     Bank getBank() const;
 
     void noteOn(std::uint8_t key, std::uint8_t velocity);
@@ -32,7 +31,6 @@ private:
     };
 
     const double outputRate_;
-    const bool percussion_;
     std::shared_ptr<const Preset> preset_;
     std::array<std::uint8_t, NUM_CONTROLLERS> controllers_;
     DataEntryMode dataEntryMode_;

@@ -8,6 +8,8 @@ enum class MIDIStandard {
     XG
 };
 
+static constexpr std::uint8_t PERCUSSION_CHANNEL = 9;
+
 enum class MIDIMessageStatus {
     NoteOff = 0x80,
     NoteOn = 0x90,
@@ -18,7 +20,7 @@ enum class MIDIMessageStatus {
     PitchBend = 0xe0
 };
 
-static constexpr size_t NUM_CONTROLLERS = 128;
+static constexpr std::size_t NUM_CONTROLLERS = 128;
 
 enum class MIDIControlChange {
     BankSelectMSB = 0,

@@ -10,7 +10,7 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, MIDIStandar
 
     channels_.reserve(numChannels);
     for (std::size_t i = 0; i < numChannels; ++i) {
-        channels_.emplace_back(std::make_unique<Channel>(outputRate, i == 9));
+        channels_.emplace_back(std::make_unique<Channel>(outputRate));
     }
 }
 
@@ -20,8 +20,8 @@ void Synthesizer::loadSoundFont(const std::string& filename) {
         soundFonts_.emplace_back(sf);
         defaultPreset_ = findPreset(0, 0);
         defaultPercussionPreset_ = findPreset(PERCUSSION_BANK, 0);
-        for (const auto& channel : channels_) {
-            channel->setPreset(channel->isPercussionChannel() ? defaultPercussionPreset_ : defaultPreset_);
+        for (std::size_t i = 0; i < channels_.size(); ++i) {
+            channels_.at(i)->setPreset(i == PERCUSSION_CHANNEL ? defaultPercussionPreset_ : defaultPreset_);
         }
     } else {
         soundFonts_.emplace_back(sf);
@@ -35,7 +35,8 @@ void Synthesizer::setVolume(double volume) {
 
 void Synthesizer::processMIDIMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
-    const auto& channel = channels_.at(msg[0] & 0xf);
+    const std::uint8_t channelNum = msg[0] & 0xf;
+    const auto& channel = channels_.at(channelNum);
     const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
     switch (status) {
     case MIDIMessageStatus::NoteOff:
@@ -59,7 +60,7 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
             sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
             break;
         }
-        channel->setPreset(findPreset(channel->isPercussionChannel() ? PERCUSSION_BANK : sfBank, msg[1]));
+        channel->setPreset(findPreset(channelNum == PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
         break;
     }
     case MIDIMessageStatus::ChannelPressure:
