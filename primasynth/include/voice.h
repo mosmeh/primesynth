@@ -44,7 +44,7 @@ private:
         double pitch;
         std::uint32_t start, end, startLoop, endLoop;
     } sample_;
-    std::int16_t key_, velocity_;
+    int keyScaling_;
     std::vector<Modulator> modulators_;
     std::array<double, NUM_GENERATORS> modulated_;
     double fineTuning_, coarseTuning_;

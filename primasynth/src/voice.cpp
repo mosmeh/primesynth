@@ -22,11 +22,6 @@ Voice::Voice(std::size_t noteID, double outputRate, bool percussion, std::shared
     vibLFO_(outputRate, CALC_INTERVAL),
     modLFO_(outputRate, 1) {
 
-    const std::int16_t overriddenKey = generators.getOrDefault(SFGenerator::keynum);
-    key_ = overriddenKey > 0 ? overriddenKey : key;
-    const std::int16_t overriddenVelocity = generators.getOrDefault(SFGenerator::velocity);
-    velocity_ = overriddenVelocity > 0 ? overriddenVelocity : velocity;
-
     const std::int16_t overriddenSampleKey = generators.getOrDefault(SFGenerator::overridingRootKey);
     sample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample->key) - 0.01 * sample->correction;
     sample_.mode = static_cast<SampleMode>(generators.getOrDefault(SFGenerator::sampleModes));
@@ -49,8 +44,13 @@ Voice::Voice(std::size_t noteID, double outputRate, bool percussion, std::shared
         modulators_.emplace_back(mp);
     }
 
-    updateSFController(SFGeneralController::noteOnVelocity, velocity);
-    updateSFController(SFGeneralController::noteOnKeyNumber, key);
+    const std::int16_t genVelocity = generators.getOrDefault(SFGenerator::velocity);
+    updateSFController(SFGeneralController::noteOnVelocity, genVelocity > 0 ? genVelocity : velocity);
+
+    const std::int16_t genKey = generators.getOrDefault(SFGenerator::keynum);
+    const std::int16_t overriddenKey = genKey > 0 ? genKey : key;
+    keyScaling_ = 60 - overriddenKey;
+    updateSFController(SFGeneralController::noteOnKeyNumber, overriddenKey);
 
     for (int i = 0; i < NUM_GENERATORS; ++i) {
         modulated_.at(i) = generators.getOrDefault(static_cast<SFGenerator>(i));
@@ -246,12 +246,12 @@ void Voice::updateModulatedParams(SFGenerator destination) {
     case SFGenerator::holdModEnv:
     case SFGenerator::keynumToModEnvHold:
         modEnv_.setParameter(Envelope::Section::Hold,
-            getModulatedGenerator(SFGenerator::holdModEnv) + getModulatedGenerator(SFGenerator::keynumToModEnvHold) * (60 - key_));
+            getModulatedGenerator(SFGenerator::holdModEnv) + getModulatedGenerator(SFGenerator::keynumToModEnvHold) * keyScaling_);
         break;
     case SFGenerator::decayModEnv:
     case SFGenerator::keynumToModEnvDecay:
         modEnv_.setParameter(Envelope::Section::Decay,
-            getModulatedGenerator(SFGenerator::decayModEnv) + getModulatedGenerator(SFGenerator::keynumToModEnvDecay) * (60 - key_));
+            getModulatedGenerator(SFGenerator::decayModEnv) + getModulatedGenerator(SFGenerator::keynumToModEnvDecay) * keyScaling_);
         break;
     case SFGenerator::sustainModEnv:
         modEnv_.setParameter(Envelope::Section::Sustain, modulated);
@@ -268,12 +268,12 @@ void Voice::updateModulatedParams(SFGenerator destination) {
     case SFGenerator::holdVolEnv:
     case SFGenerator::keynumToVolEnvHold:
         volEnv_.setParameter(Envelope::Section::Hold,
-            getModulatedGenerator(SFGenerator::holdVolEnv) + getModulatedGenerator(SFGenerator::keynumToVolEnvHold) * (60 - key_));
+            getModulatedGenerator(SFGenerator::holdVolEnv) + getModulatedGenerator(SFGenerator::keynumToVolEnvHold) * keyScaling_);
         break;
     case SFGenerator::decayVolEnv:
     case SFGenerator::keynumToVolEnvDecay:
         volEnv_.setParameter(Envelope::Section::Decay,
-            getModulatedGenerator(SFGenerator::decayVolEnv) + getModulatedGenerator(SFGenerator::keynumToVolEnvDecay) * (60 - key_));
+            getModulatedGenerator(SFGenerator::decayVolEnv) + getModulatedGenerator(SFGenerator::keynumToVolEnvDecay) * keyScaling_);
         break;
     case SFGenerator::sustainVolEnv:
         volEnv_.setParameter(Envelope::Section::Sustain, modulated);
