@@ -177,6 +177,8 @@ void Voice::update() {
             phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
+    default:
+        throw std::runtime_error("unknown sample mode");
     }
 
     modLFO_.update();

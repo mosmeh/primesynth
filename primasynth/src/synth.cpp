@@ -57,6 +57,8 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
             // e.g. SFX voice, MSB=64
             sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
             break;
+        default:
+            throw std::runtime_error("unknown MIDI standard");
         }
         channel->setPreset(findPreset(channelNum == midi::PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
         break;
