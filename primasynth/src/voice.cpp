@@ -4,18 +4,18 @@ namespace primasynth {
 
 static constexpr unsigned int CALC_INTERVAL = 32;
 
-Voice::Voice(std::size_t noteID, double outputRate, bool percussion, std::shared_ptr<const Sample> sample,
+Voice::Voice(std::size_t noteID, double outputRate, bool percussion, const Sample& sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
     percussion_(percussion),
-    sampleBuffer_(sample->soundFont->getSampleBuffer()),
+    sampleBuffer_(sample.soundFont->getSampleBuffer()),
     generators_(generators),
     actualKey_(key),
     fineTuning_(0.0),
     coarseTuning_(0.0),
     steps_(0),
     status_(State::Playing),
-    phase_(sample->start),
+    phase_(sample.start),
     volume_({1.0, 1.0}),
     volEnv_(outputRate, 1),
     modEnv_(outputRate, CALC_INTERVAL),
@@ -23,22 +23,22 @@ Voice::Voice(std::size_t noteID, double outputRate, bool percussion, std::shared
     modLFO_(outputRate, 1) {
 
     const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::overridingRootKey);
-    sample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample->key) - 0.01 * sample->correction;
+    sample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
     sample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::sampleModes));
-    sample_.start = sample->start
+    sample_.start = sample.start
         + 32768 * generators.getOrDefault(sf::Generator::startAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::startAddrsOffset);
-    sample_.end = sample->end
+    sample_.end = sample.end
         + 32768 * generators.getOrDefault(sf::Generator::endAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::endAddrsOffset);
-    sample_.startLoop = sample->startLoop
+    sample_.startLoop = sample.startLoop
         + 32768 * generators.getOrDefault(sf::Generator::startloopAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::startloopAddrsOffset);
-    sample_.endLoop = sample->endLoop
+    sample_.endLoop = sample.endLoop
         + 32768 * generators.getOrDefault(sf::Generator::endloopAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::endloopAddrsOffset);
 
-    deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(sample_.pitch) * sample->sampleRate / outputRate;
+    deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(sample_.pitch) * sample.sampleRate / outputRate;
 
     for (const auto& mp : modparams.getParameters()) {
         modulators_.emplace_back(mp);

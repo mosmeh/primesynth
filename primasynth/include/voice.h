@@ -17,7 +17,7 @@ public:
         Finished
     };
 
-    Voice(std::size_t noteID, double outputRate, bool percussion, std::shared_ptr<const Sample> sample,
+    Voice(std::size_t noteID, double outputRate, bool percussion, const Sample& sample,
         const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity);
 
     std::size_t getNoteID() const;

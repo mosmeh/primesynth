@@ -386,15 +386,15 @@ const std::vector<std::int16_t>& SoundFont::getSampleBuffer() const {
     return sampleBuffer_;
 }
 
-const std::vector<std::shared_ptr<const Sample>>& SoundFont::getSamples() const {
+const std::vector<Sample>& SoundFont::getSamples() const {
     return samples_;
 }
 
-const std::vector<std::shared_ptr<const Instrument>>& SoundFont::getInstruments() const {
+const std::vector<Instrument>& SoundFont::getInstruments() const {
     return instruments_;
 }
 
-const std::vector<std::shared_ptr<const Preset>>& SoundFont::getPresets() const {
+const std::vector<std::shared_ptr<const Preset>>& SoundFont::getPresetPtrs() const {
     return presets_;
 }
 
@@ -571,17 +571,18 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         }
     }
 
+    instruments_.reserve(inst.size() - 1);
     for (auto it_inst = inst.begin(); it_inst != std::prev(inst.end()); ++it_inst) {
-        const auto instrument = std::make_shared<Instrument>();
-        instrument->name = achToString(it_inst->achInstName);
+        instruments_.emplace_back();
+        auto& instrument = instruments_.back();
+        instrument.name = achToString(it_inst->achInstName);
 
         const auto& bagBegin = ibag.begin() + it_inst->wInstBagNdx;
         const auto& bagEnd = ibag.begin() + std::next(it_inst)->wInstBagNdx;
-        readBags(instrument->zones, bagBegin, bagEnd, igen.begin(), imod.begin(), sf::Generator::sampleID);
-
-        instruments_.push_back(instrument);
+        readBags(instrument.zones, bagBegin, bagEnd, igen.begin(), imod.begin(), sf::Generator::sampleID);
     }
 
+    presets_.reserve(phdr.size() - 1);
     for (auto it_phdr = phdr.begin(); it_phdr != std::prev(phdr.end()); ++it_phdr) {
         const auto preset = std::make_shared<Preset>();
         preset->soundFont = this;
@@ -596,8 +597,9 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         presets_.push_back(preset);
     }
 
+    samples_.reserve(shdr.size() - 1);
     for (auto it_shdr = shdr.begin(); it_shdr < std::prev(shdr.end()); ++it_shdr) {
-        samples_.emplace_back(std::make_shared<Sample>(Sample{
+        samples_.emplace_back<Sample>({
             this,
             achToString(it_shdr->achSampleName),
             it_shdr->dwStart,
@@ -607,7 +609,7 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
             it_shdr->dwSampleRate,
             it_shdr->byOriginalKey,
             it_shdr->chCorrection
-        }));
+        });
     }
 }
 

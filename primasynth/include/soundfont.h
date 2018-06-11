@@ -94,15 +94,15 @@ public:
 
     const std::string& getName() const;
     const std::vector<std::int16_t>& getSampleBuffer() const;
-    const std::vector<std::shared_ptr<const Sample>>& getSamples() const;
-    const std::vector<std::shared_ptr<const Instrument>>& getInstruments() const;
-    const std::vector<std::shared_ptr<const Preset>>& getPresets() const;
+    const std::vector<Sample>& getSamples() const;
+    const std::vector<Instrument>& getInstruments() const;
+    const std::vector<std::shared_ptr<const Preset>>& getPresetPtrs() const;
 
 private:
     std::string name_;
     std::vector<std::int16_t> sampleBuffer_;
-    std::vector<std::shared_ptr<const Sample>> samples_;
-    std::vector<std::shared_ptr<const Instrument>> instruments_;
+    std::vector<Sample> samples_;
+    std::vector<Instrument> instruments_;
     std::vector<std::shared_ptr<const Preset>> presets_;
 
     void readInfoChunk(std::ifstream& ifs, std::size_t size);

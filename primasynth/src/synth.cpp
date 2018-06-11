@@ -17,18 +17,16 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Stand
 }
 
 void Synthesizer::loadSoundFont(const std::string& filename) {
-    const auto sf = std::make_shared<SoundFont>(filename);
-    if (soundFonts_.empty()) {
-        soundFonts_.emplace_back(sf);
+    soundFonts_.emplace_back(filename);
+    std::cout << "loaded " << soundFonts_.back().getName() << " from " << filename << std::endl;
+
+    if (soundFonts_.size() == 1) {
         defaultPreset_ = findPreset(0, 0);
         defaultPercussionPreset_ = findPreset(PERCUSSION_BANK, 0);
         for (std::size_t i = 0; i < channels_.size(); ++i) {
             channels_.at(i)->setPreset(i == midi::PERCUSSION_CHANNEL ? defaultPercussionPreset_ : defaultPreset_);
         }
-    } else {
-        soundFonts_.emplace_back(sf);
     }
-    std::cout << "loaded " << sf->getName() << " from " << filename << std::endl;
 }
 
 void Synthesizer::setVolume(double volume) {
@@ -86,7 +84,7 @@ StereoValue Synthesizer::render() const {
 
 std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint8_t presetNum) const {
     for (const auto& sf : soundFonts_) {
-        for (const auto& preset : sf->getPresets()) {
+        for (const auto& preset : sf.getPresetPtrs()) {
             if (preset->bank == bank && preset->presetNum == presetNum) {
                 return preset;
             }
