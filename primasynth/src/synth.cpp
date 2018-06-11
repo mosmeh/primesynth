@@ -1,4 +1,6 @@
 #include "synth.h"
+#include <iostream>
+#include <sstream>
 
 namespace primasynth {
 

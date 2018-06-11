@@ -1,16 +1,19 @@
 #pragma once
 
+#include <array>
+#include <atomic>
+#include <cmath>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <sstream>
+#include <stdexcept>
+#include <thread>
+#include <vector>
+
 #define NOMINMAX
 #include <Windows.h>
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <array>
-#include <thread>
-#include <mutex>
-#include <atomic>
-
-#include "portaudio.h"
 #include "cmdline.h"
+#include "portaudio.h"

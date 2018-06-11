@@ -1,4 +1,6 @@
 #include "modulator.h"
+#include <cmath>
+#include <stdexcept>
 
 namespace primasynth {
 

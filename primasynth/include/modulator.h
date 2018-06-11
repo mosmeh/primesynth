@@ -1,5 +1,5 @@
 #pragma once
-#include "soundfont.h"
+#include "sfspec.h"
 
 namespace primasynth {
 

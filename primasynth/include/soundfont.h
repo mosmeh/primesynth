@@ -1,5 +1,7 @@
 #pragma once
+#include <array>
 #include <fstream>
+#include <vector>
 #include "sfspec.h"
 
 namespace primasynth {

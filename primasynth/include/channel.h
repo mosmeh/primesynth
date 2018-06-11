@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <vector>
 #include "midi.h"
 #include "voice.h"
 

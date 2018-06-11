@@ -1,12 +1,11 @@
-#include <sstream>
-#include <chrono>
 #include <atomic>
+#include <sstream>
 #define NOMINMAX
 #include <Windows.h>
-#include "portaudio.h"
 #include "cmdline.h"
-#include "synth.h"
+#include "portaudio.h"
 #include "ringbuffer.h"
+#include "synth.h"
 
 namespace primasynth {
 
