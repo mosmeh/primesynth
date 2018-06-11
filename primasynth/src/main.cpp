@@ -222,6 +222,7 @@ int main(int argc, char** argv) {
     Pa_Terminate();
     if (hmi != NULL) {
         midiInStop(hmi);
+        midiInReset(hmi);
         midiInClose(hmi);
     }
 
