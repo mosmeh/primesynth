@@ -144,7 +144,7 @@ inline std::string readable_typename<std::string>()
 
 class cmdline_error : public std::exception {
 public:
-  cmdline_error(const std::string &msg): msg(msg){}
+  explicit cmdline_error(const std::string &msg): msg(msg){}
   ~cmdline_error() throw() {}
   const char *what() const throw() { return msg.c_str(); }
 private:
@@ -322,7 +322,7 @@ public:
   }
   ~parser(){
     for (std::map<std::string, option_base*>::iterator p=options.begin();
-         p!=options.end(); p++)
+         p!=options.end(); ++p)
       delete p->second;
   }
 
@@ -445,7 +445,7 @@ public:
 
     std::map<char, std::string> lookup;
     for (std::map<std::string, option_base*>::iterator p=options.begin();
-         p!=options.end(); p++){
+         p!=options.end(); ++p){
       if (p->first.length()==0) continue;
       char initial=p->second->short_name();
       if (initial){
@@ -526,7 +526,7 @@ public:
     }
 
     for (std::map<std::string, option_base*>::iterator p=options.begin();
-         p!=options.end(); p++)
+         p!=options.end(); ++p)
       if (!p->second->valid())
         errors.push_back("need option: --"+std::string(p->first));
 
