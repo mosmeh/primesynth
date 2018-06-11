@@ -4,13 +4,16 @@
 
 namespace primasynth {
 
+static constexpr std::size_t NUM_GENERATORS = static_cast<std::size_t>(sf::Generator::endOper);
+static constexpr std::uint16_t PERCUSSION_BANK = 128;
+
 class GeneratorSet {
 public:
     GeneratorSet();
 
-    std::int16_t getOrDefault(SFGenerator type) const;
+    std::int16_t getOrDefault(sf::Generator type) const;
 
-    void set(SFGenerator type, std::int16_t amount);
+    void set(sf::Generator type, std::int16_t amount);
     void merge(const GeneratorSet& b);
     void mergeAndAdd(const GeneratorSet& b);
 
@@ -26,15 +29,15 @@ class ModulatorParameterSet {
 public:
     static const ModulatorParameterSet& getDefaultParameters();
 
-    const std::vector<sfModList>& getParameters() const;
+    const std::vector<sf::ModList>& getParameters() const;
 
-    void append(const sfModList& modparam);
-    void addOrAppend(const sfModList& modparam);
+    void append(const sf::ModList& modparam);
+    void addOrAppend(const sf::ModList& modparam);
     void merge(const ModulatorParameterSet& b);
     void mergeAndAdd(const ModulatorParameterSet& b);
 
 private:
-    std::vector<sfModList> modparams_;
+    std::vector<sf::ModList> modparams_;
 };
 
 struct Zone {

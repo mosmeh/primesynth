@@ -26,7 +26,7 @@ public:
     const State& getStatus() const;
     StereoValue render() const;
 
-    void updateSFController(SFGeneralController controller, std::int16_t value);
+    void updateSFController(sf::GeneralController controller, std::int16_t value);
     void updateMIDIController(std::uint8_t controller, std::uint8_t value);
     void updateFineTuning(double fineTuning);
     void updateCoarseTuning(double coarseTuning);
@@ -57,8 +57,8 @@ private:
     Envelope volEnv_, modEnv_;
     LFO vibLFO_, modLFO_;
 
-    double getModulatedGenerator(SFGenerator type) const;
-    void updateModulatedParams(SFGenerator destination);
+    double getModulatedGenerator(sf::Generator type) const;
+    void updateModulatedParams(sf::Generator destination);
 };
 
 }

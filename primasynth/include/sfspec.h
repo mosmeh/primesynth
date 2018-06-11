@@ -1,14 +1,9 @@
 #pragma once
-#include <array>
 
 namespace primasynth {
+namespace sf {
 
-struct RIFFHeader {
-    std::uint32_t id;
-    std::uint32_t size;
-};
-
-enum class SFSampleLink : std::uint16_t {
+enum class SampleLink : std::uint16_t {
     monoSample = 1,
     rightSample = 2,
     leftSample = 4,
@@ -19,7 +14,7 @@ enum class SFSampleLink : std::uint16_t {
     RomLinkedSample = 0x8008
 };
 
-enum class SFGenerator : std::uint16_t {
+enum class Generator : std::uint16_t {
     startAddrsOffset = 0,
     endAddrsOffset = 1,
     startloopAddrsOffset = 2,
@@ -76,72 +71,7 @@ enum class SFGenerator : std::uint16_t {
     endOper = 60
 };
 
-static constexpr std::size_t NUM_GENERATORS = static_cast<std::size_t>(SFGenerator::endOper);
-
-static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES = {
-    0,      // startAddrsOffset
-    0,      // endAddrsOffset
-    0,      // startloopAddrsOffset
-    0,      // endloopAddrsOffset
-    0,      // startAddrsCoarseOffset
-    0,      // modLfoToPitch
-    0,      // vibLfoToPitch
-    0,      // modEnvToPitch
-    13500,  // initialFilterFc
-    0,      // initialFilterQ
-    0,      // modLfoToFilterFc
-    0,      // modEnvToFilterFc
-    0,      // endAddrsCoarseOffset
-    0,      // modLfoToVolume
-    0,      // unused
-    0,      // chorusEffectsSend
-    0,      // reverbEffectsSend
-    0,      // pan
-    0,      // unused
-    0,      // unused
-    0,      // unused
-    -12000, // delayModLFO
-    0,      // freqModLFO
-    -12000, // delayVibLFO
-    0,      // freqVibLFO
-    -12000, // delayModEnv
-    -12000, // attackModEnv
-    -12000, // holdModEnv
-    -12000, // decayModEnv
-    0,      // sustainModEnv
-    -12000, // releaseModEnv
-    0,      // keynumToModEnvHold
-    0,      // keynumToModEnvDecay
-    -12000, // delayVolEnv
-    -12000, // attackVolEnv
-    -12000, // holdVolEnv
-    -12000, // decayVolEnv
-    0,      // sustainVolEnv
-    -12000, // releaseVolEnv
-    0,      // keynumToVolEnvHold
-    0,      // keynumToVolEnvDecay
-    0,      // instrument 
-    0,      // reserved
-    0,      // keyRange, N/A
-    0,      // velRange, N/A
-    0,      // startloopAddrsCoarseOffset
-    -1,     // keynum
-    -1,     // velocity
-    0,      // initialAttenuation
-    0,      // reserved
-    0,      // endloopAddrsCoarseOffset
-    0,      // coarseTune
-    0,      // fineTune
-    0,      // sampleID
-    0,      // sampleModes
-    0,      // reserved
-    100,    // scaleTuning
-    0,      // exclusiveClass
-    -1,     // overridingRootKey
-    0       // pitch
-};
-
-enum class SFGeneralController {
+enum class GeneralController {
     noController = 0,
     noteOnVelocity = 2,
     noteOnKeyNumber = 3,
@@ -152,61 +82,61 @@ enum class SFGeneralController {
     link = 127
 };
 
-enum class SFControllerPalette {
+enum class ControllerPalette {
     generalController = 0,
     midiController = 1
 };
 
-enum class SFControllerDirection {
+enum class ControllerDirection {
     increase = 0,
     decrease = 1
 };
 
-enum class SFControllerPolarity {
+enum class ControllerPolarity {
     unipolar = 0,
     bipolar = 1
 };
 
-enum class SFControllerType {
+enum class ControllerType {
     linearType = 0,
     concaveType = 1,
     convexType = 2,
     switchType = 3
 };
 
-struct SFModulator {
+struct Modulator {
     union {
-        SFGeneralController general;
+        GeneralController general;
         std::uint8_t midi;
     } index;
-    SFControllerPalette palette;
-    SFControllerDirection direction;
-    SFControllerPolarity polarity;
-    SFControllerType type;
+    ControllerPalette palette;
+    ControllerDirection direction;
+    ControllerPolarity polarity;
+    ControllerType type;
 };
 
-enum class SFTransform : std::uint16_t {
+enum class Transform : std::uint16_t {
     linear = 0,
     absoluteValue = 2
 };
 
-struct rangesType {
+struct RangesType {
     std::int8_t byLo;
     std::int8_t byHi;
 };
 
-union genAmountType {
-    rangesType ranges;
+union GenAmountType {
+    RangesType ranges;
     std::int16_t shAmount;
     std::uint16_t wAmount;
 };
 
-struct sfVersionTag {
+struct VersionTag {
     std::uint16_t wMajor;
     std::uint16_t wMinor;
 };
 
-struct sfPresetHeader {
+struct PresetHeader {
     char achPresetName[20];
     std::uint16_t wPreset;
     std::uint16_t wBank;
@@ -216,32 +146,30 @@ struct sfPresetHeader {
     std::uint32_t dwMorphology;
 };
 
-static constexpr std::uint16_t PERCUSSION_BANK = 128;
-
-struct sfBag {
+struct Bag {
     std::uint16_t wGenNdx;
     std::uint16_t wModNdx;
 };
 
-struct sfModList {
-    SFModulator sfModSrcOper;
-    SFGenerator sfModDestOper;
+struct ModList {
+    Modulator sfModSrcOper;
+    Generator sfModDestOper;
     std::int16_t modAmount;
-    SFModulator sfModAmtSrcOper;
-    SFTransform sfModTransOper;
+    Modulator sfModAmtSrcOper;
+    Transform sfModTransOper;
 };
 
-struct sfGenList {
-    SFGenerator sfGenOper;
-    genAmountType genAmount;
+struct GenList {
+    Generator sfGenOper;
+    GenAmountType genAmount;
 };
 
-struct sfInst {
+struct Inst {
     char achInstName[20];
     std::uint16_t wInstBagNdx;
 };
 
-struct sfSample {
+struct Sample {
     char achSampleName[20];
     std::uint32_t dwStart;
     std::uint32_t dwEnd;
@@ -251,7 +179,8 @@ struct sfSample {
     std::int8_t byOriginalKey;
     std::int8_t chCorrection;
     std::uint16_t wSampleLink;
-    SFSampleLink sfSampleType;
+    SampleLink sfSampleType;
 };
 
+}
 }
