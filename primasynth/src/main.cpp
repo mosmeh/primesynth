@@ -34,32 +34,32 @@ void CALLBACK verboseMidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwPa
         break;
     case MIM_DATA: {
         const auto msg = reinterpret_cast<std::uint8_t*>(&dwParam1);
-        const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
+        const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
         const auto channel = msg[0] & 0xf;
         switch (status) {
-        case MIDIMessageStatus::NoteOff:
+        case midi::MessageStatus::NoteOff:
             std::cout << "Note off: channel=" << channel
                 << " key=" << static_cast<int>(msg[1]) << std::endl;
             break;
-        case MIDIMessageStatus::NoteOn:
+        case midi::MessageStatus::NoteOn:
             std::cout << "Note on: channel=" << channel
                 << " key=" << static_cast<int>(msg[1])
                 << " velocity=" << static_cast<int>(msg[2]) << std::endl;
             break;
-        case MIDIMessageStatus::ControlChange:
+        case midi::MessageStatus::ControlChange:
             std::cout << "Control change: channel=" << channel
                 << " controller=" << static_cast<int>(msg[1])
                 << " value=" << static_cast<int>(msg[2]) << std::endl;
             break;
-        case MIDIMessageStatus::ProgramChange:
+        case midi::MessageStatus::ProgramChange:
             std::cout << "Program change: channel=" << channel
                 << " program=" << static_cast<int>(msg[1]) << std::endl;
             break;
-        case MIDIMessageStatus::ChannelPressure:
+        case midi::MessageStatus::ChannelPressure:
             std::cout << "Channel pressure: channel=" << channel
                 << " value=" << static_cast<int>(msg[1]) << std::endl;
             break;
-        case MIDIMessageStatus::PitchBend:
+        case midi::MessageStatus::PitchBend:
             std::cout << "Pitch bend: channel=" << channel
                 << " value=" << joinBytes(msg[2], msg[1]) << std::endl;
             break;
@@ -169,11 +169,11 @@ int main(int argc, char** argv) {
         const double sampleRate = argparser.exist("samplerate") ?
             argparser.get<unsigned int>("samplerate") : deviceInfo->defaultSampleRate;
 
-        auto midiStandard = MIDIStandard::GM;
+        auto midiStandard = midi::Standard::GM;
         if (argparser.get<std::string>("std") == "gs") {
-            midiStandard = MIDIStandard::GS;
+            midiStandard = midi::Standard::GS;
         } else if (argparser.get<std::string>("std") == "xg") {
-            midiStandard = MIDIStandard::XG;
+            midiStandard = midi::Standard::XG;
         }
 
         Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard);

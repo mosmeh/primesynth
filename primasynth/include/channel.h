@@ -5,15 +5,11 @@
 
 namespace primasynth {
 
-struct Bank {
-    std::uint8_t msb, lsb;
-};
-
 class Channel {
 public:
     explicit Channel(double outputRate);
 
-    Bank getBank() const;
+    midi::Bank getBank() const;
 
     void noteOn(std::uint8_t key, std::uint8_t velocity);
     void noteOff(std::uint8_t key);
@@ -32,7 +28,7 @@ private:
 
     const double outputRate_;
     std::shared_ptr<const Preset> preset_;
-    std::array<std::uint8_t, NUM_CONTROLLERS> controllers_;
+    std::array<std::uint8_t, midi::NUM_CONTROLLERS> controllers_;
     DataEntryMode dataEntryMode_;
     std::uint16_t pitchBend_;
     std::uint8_t channelPressure_;

@@ -13,18 +13,18 @@ Channel::Channel(double outputRate) :
     coarseTuning_(0.0),
     currentNoteID_(0) {
 
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::Volume)) = 100;
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::Pan)) = 64;
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::Expression)) = 127;
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)) = 127;
-    controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)) = 127;
+    controllers_.at(static_cast<std::size_t>(midi::ControlChange::Volume)) = 100;
+    controllers_.at(static_cast<std::size_t>(midi::ControlChange::Pan)) = 64;
+    controllers_.at(static_cast<std::size_t>(midi::ControlChange::Expression)) = 127;
+    controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)) = 127;
+    controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)) = 127;
     voices_.reserve(128);
 }
 
-Bank Channel::getBank() const {
+midi::Bank Channel::getBank() const {
     return {
-        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectMSB)),
-        controllers_.at(static_cast<std::size_t>(MIDIControlChange::BankSelectLSB))
+        controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectMSB)),
+        controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectLSB))
     };
 }
 
@@ -65,7 +65,7 @@ void Channel::noteOff(std::uint8_t key) {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
-            voice->release(controllers_.at(static_cast<std::size_t>(MIDIControlChange::Sustain)) >= 64);
+            voice->release(controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64);
         }
     }
 }
@@ -74,30 +74,30 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     controllers_.at(controller) = value;
 
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
-    switch (static_cast<MIDIControlChange>(controller)) {
-    case MIDIControlChange::DataEntryMSB:
+    switch (static_cast<midi::ControlChange>(controller)) {
+    case midi::ControlChange::DataEntryMSB:
         if (dataEntryMode_ == DataEntryMode::RPN) {
             const std::uint16_t rpn = joinBytes(
-                controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNMSB)),
-                controllers_.at(static_cast<std::size_t>(MIDIControlChange::RPNLSB)));
+                controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
+                controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)));
             const auto data = static_cast<std::int32_t>(joinBytes(
-                value, controllers_.at(static_cast<std::size_t>(MIDIControlChange::DataEntryLSB))));
+                value, controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB))));
 
-            switch (static_cast<MIDIRPN>(rpn)) {
-            case MIDIRPN::PitchBendSensitivity:
+            switch (static_cast<midi::RPN>(rpn)) {
+            case midi::RPN::PitchBendSensitivity:
                 pitchBendSensitivity_ = value;
                 for (const auto& voice : voices_) {
                     voice->updateSFController(SFGeneralController::pitchWheelSensitivity, value);
                 }
                 break;
-            case MIDIRPN::FineTuning: {
+            case midi::RPN::FineTuning: {
                 fineTuning_ = (data - 8192) / 81.92;
                 for (const auto& voice : voices_) {
                     voice->updateFineTuning(fineTuning_);
                 }
                 break;
             }
-            case MIDIRPN::CoarseTuning: {
+            case midi::RPN::CoarseTuning: {
                 coarseTuning_ = static_cast<std::int16_t>(value) - 64;
                 for (const auto& voice : voices_) {
                     voice->updateCoarseTuning(coarseTuning_);
@@ -107,25 +107,25 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             }
         }
         break;
-    case MIDIControlChange::Sustain:
+    case midi::ControlChange::Sustain:
         for (const auto& voice : voices_) {
             if (voice->getStatus() == Voice::State::Sustained) {
                 voice->release(false);
             }
         }
         break;
-    case MIDIControlChange::NRPNMSB:
-    case MIDIControlChange::NRPNLSB:
+    case midi::ControlChange::NRPNMSB:
+    case midi::ControlChange::NRPNLSB:
         dataEntryMode_ = DataEntryMode::NRPN;
         break;
-    case MIDIControlChange::RPNMSB:
-    case MIDIControlChange::RPNLSB:
+    case midi::ControlChange::RPNMSB:
+    case midi::ControlChange::RPNLSB:
         dataEntryMode_ = DataEntryMode::RPN;
         break;
-    case MIDIControlChange::AllSoundOff:
+    case midi::ControlChange::AllSoundOff:
         voices_.clear();
         break;
-    case MIDIControlChange::ResetAllControllers:
+    case midi::ControlChange::ResetAllControllers:
         // General MIDI System Level 1 Developer Guidelines Second Revision p.5
         // Response to "Reset All Controllers" Message
         pitchBend_ = 1 << 13;
@@ -138,15 +138,15 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             if ((91 <= i && i <= 95) || (70 <= i && i <= 79)) {
                 continue;
             }
-            switch (static_cast<MIDIControlChange>(i)) {
-            case MIDIControlChange::Volume:
-            case MIDIControlChange::Pan:
-            case MIDIControlChange::BankSelectLSB:
-            case MIDIControlChange::AllSoundOff:
+            switch (static_cast<midi::ControlChange>(i)) {
+            case midi::ControlChange::Volume:
+            case midi::ControlChange::Pan:
+            case midi::ControlChange::BankSelectLSB:
+            case midi::ControlChange::AllSoundOff:
                 break;
-            case MIDIControlChange::Expression:
-            case MIDIControlChange::RPNLSB:
-            case MIDIControlChange::RPNMSB:
+            case midi::ControlChange::Expression:
+            case midi::ControlChange::RPNLSB:
+            case midi::ControlChange::RPNMSB:
                 controllers_.at(i) = 127;
                 for (const auto& voice : voices_) {
                     voice->updateMIDIController(i, 127);
@@ -161,7 +161,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             }
         }
         break;
-    case MIDIControlChange::AllNotesOff:
+    case midi::ControlChange::AllNotesOff:
         for (const auto& voice : voices_) {
             voice->release(false);
         }
@@ -220,7 +220,7 @@ void Channel::addVoice(std::unique_ptr<Voice> voice) {
     voice->updateSFController(SFGeneralController::pitchWheelSensitivity, pitchBendSensitivity_);
     voice->updateFineTuning(fineTuning_);
     voice->updateCoarseTuning(coarseTuning_);
-    for (std::uint8_t i = 0; i < NUM_CONTROLLERS; ++i) {
+    for (std::uint8_t i = 0; i < midi::NUM_CONTROLLERS; ++i) {
         voice->updateMIDIController(i, controllers_.at(i));
     }
 

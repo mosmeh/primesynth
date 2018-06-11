@@ -1,16 +1,18 @@
 #pragma once
 
 namespace primasynth {
+namespace midi {
 
-enum class MIDIStandard {
+static constexpr std::uint8_t PERCUSSION_CHANNEL = 9;
+static constexpr std::size_t NUM_CONTROLLERS = 128;
+
+enum class Standard {
     GM,
     GS,
     XG
 };
 
-static constexpr std::uint8_t PERCUSSION_CHANNEL = 9;
-
-enum class MIDIMessageStatus {
+enum class MessageStatus {
     NoteOff = 0x80,
     NoteOn = 0x90,
     KeyPressure = 0xa0,
@@ -20,9 +22,8 @@ enum class MIDIMessageStatus {
     PitchBend = 0xe0
 };
 
-static constexpr std::size_t NUM_CONTROLLERS = 128;
-
-enum class MIDIControlChange {
+// GM CCs + bank select + RPN/NRPN
+enum class ControlChange {
     BankSelectMSB = 0,
     Modulation = 1,
     DataEntryMSB = 6,
@@ -42,10 +43,15 @@ enum class MIDIControlChange {
 };
 
 // GM RPNs
-enum class MIDIRPN {
+enum class RPN {
     PitchBendSensitivity = 0,
     FineTuning = 1,
     CoarseTuning = 2
 };
 
+struct Bank {
+    std::uint8_t msb, lsb;
+};
+
+}
 }

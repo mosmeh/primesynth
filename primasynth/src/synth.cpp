@@ -2,7 +2,7 @@
 
 namespace primasynth {
 
-Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, MIDIStandard midiStandard) :
+Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Standard midiStandard) :
     volume_(1.0),
     midiStandard_(midiStandard) {
 
@@ -21,7 +21,7 @@ void Synthesizer::loadSoundFont(const std::string& filename) {
         defaultPreset_ = findPreset(0, 0);
         defaultPercussionPreset_ = findPreset(PERCUSSION_BANK, 0);
         for (std::size_t i = 0; i < channels_.size(); ++i) {
-            channels_.at(i)->setPreset(i == PERCUSSION_CHANNEL ? defaultPercussionPreset_ : defaultPreset_);
+            channels_.at(i)->setPreset(i == midi::PERCUSSION_CHANNEL ? defaultPercussionPreset_ : defaultPreset_);
         }
     } else {
         soundFonts_.emplace_back(sf);
@@ -37,36 +37,36 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
     const std::uint8_t channelNum = msg[0] & 0xf;
     const auto& channel = channels_.at(channelNum);
-    const auto status = static_cast<MIDIMessageStatus>(msg[0] & 0xf0);
+    const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
     switch (status) {
-    case MIDIMessageStatus::NoteOff:
+    case midi::MessageStatus::NoteOff:
         channel->noteOff(msg[1]);
         break;
-    case MIDIMessageStatus::NoteOn:
+    case midi::MessageStatus::NoteOn:
         channel->noteOn(msg[1], msg[2]);
         break;
-    case MIDIMessageStatus::ControlChange:
+    case midi::MessageStatus::ControlChange:
         channel->controlChange(msg[1], msg[2]);
         break;
-    case MIDIMessageStatus::ProgramChange: {
+    case midi::MessageStatus::ProgramChange: {
         const auto midiBank = channel->getBank();
         std::uint16_t sfBank = 0;
         switch (midiStandard_) {
-        case MIDIStandard::GS:
+        case midi::Standard::GS:
             sfBank = midiBank.msb;
             break;
-        case MIDIStandard::XG:
+        case midi::Standard::XG:
             // assuming no one uses XG voices MSBs of which overlap normal voices' LSBs (e.g. SFX voice, MSB=64)
             sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
             break;
         }
-        channel->setPreset(findPreset(channelNum == PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
+        channel->setPreset(findPreset(channelNum == midi::PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
         break;
     }
-    case MIDIMessageStatus::ChannelPressure:
+    case midi::MessageStatus::ChannelPressure:
         channel->channelPressure(msg[1]);
         break;
-    case MIDIMessageStatus::PitchBend:
+    case midi::MessageStatus::PitchBend:
         channel->pitchBend(joinBytes(msg[2], msg[1]));
         break;
     }
