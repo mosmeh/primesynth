@@ -126,7 +126,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         voices_.clear();
         break;
     case midi::ControlChange::ResetAllControllers:
-        // General MIDI System Level 1 Developer Guidelines Second Revision p.5
+        // cf. General MIDI System Level 1 Developer Guidelines Second Revision p.5
         // Response to "Reset All Controllers" Message
         pitchBend_ = 1 << 13;
         channelPressure_ = 0;

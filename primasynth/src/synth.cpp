@@ -58,7 +58,8 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
             sfBank = midiBank.msb;
             break;
         case midi::Standard::XG:
-            // assuming no one uses XG voices MSBs of which overlap normal voices' LSBs (e.g. SFX voice, MSB=64)
+            // assuming no one uses XG voices bank MSBs of which overlap normal voices' bank LSBs
+            // e.g. SFX voice, MSB=64
             sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
             break;
         }

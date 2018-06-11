@@ -13,6 +13,7 @@ void initialize() {
         initialized = true;
 
         for (std::size_t i = 0; i < centibelToRatioTable.size(); ++i) {
+            // -200 instead of -100 for compatibility
             centibelToRatioTable.at(i) = std::pow(10.0, i / -200.0);
         }
         for (std::size_t i = 0; i < centToHeltzTable.size(); i++) {
