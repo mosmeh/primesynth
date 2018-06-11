@@ -44,7 +44,7 @@ private:
     std::size_t currentNoteID_;
     std::mutex voiceMutex_;
 
-    void addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass);
+    void addVoice(std::unique_ptr<Voice> voice);
 };
 
 }

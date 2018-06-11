@@ -58,8 +58,7 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
                     modparams.merge(ModulatorParameterSet::getDefaultParameters());
 
                     addVoice(std::make_unique<Voice>(
-                        currentNoteID_, outputRate_, preset_->bank == PERCUSSION_BANK, sample, generators, modparams, key, velocity),
-                        generators.getOrDefault(SFGenerator::exclusiveClass));
+                        currentNoteID_, outputRate_, preset_->bank == PERCUSSION_BANK, sample, generators, modparams, key, velocity));
                 }
             }
         }
@@ -220,7 +219,7 @@ StereoValue Channel::render() {
     return sum;
 }
 
-void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass) {
+void Channel::addVoice(std::unique_ptr<Voice> voice) {
     voice->updateSFController(SFGeneralController::pitchWheel, pitchBend_);
     voice->updateSFController(SFGeneralController::channelPressure, channelPressure_);
     voice->updateSFController(SFGeneralController::pitchWheelSensitivity, pitchBendSensitivity_);
@@ -230,9 +229,10 @@ void Channel::addVoice(std::unique_ptr<Voice> voice, std::int16_t exclusiveClass
         voice->updateMIDIController(i, controllers_.at(i));
     }
 
+    const auto exclusiveClass = voice->getExclusiveClass();
     if (exclusiveClass != 0) {
         for (const auto& v : voices_) {
-            if (currentNoteID_ != v->getNoteID() && exclusiveClass == v->getExclusiveClass()) {
+            if (v->getNoteID() != currentNoteID_ && v->getExclusiveClass() == exclusiveClass) {
                 v->release(false);
             }
         }
