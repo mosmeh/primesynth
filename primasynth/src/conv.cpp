@@ -2,11 +2,12 @@
 #include <array>
 
 namespace primasynth {
+namespace conv {
 
 std::array<double, 1441> centibelToRatioTable;
 std::array<double, 1200> centToHeltzTable;
 
-void initializeConversionTables() {
+void initialize() {
     static bool initialized = false;
     if (!initialized) {
         initialized = true;
@@ -63,4 +64,4 @@ std::uint16_t joinBytes(std::uint8_t msb, std::uint8_t lsb) {
 }
 
 }
-
+}

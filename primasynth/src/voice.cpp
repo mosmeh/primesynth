@@ -38,7 +38,7 @@ Voice::Voice(std::size_t noteID, double outputRate, bool percussion, std::shared
         + 32768 * generators.getOrDefault(SFGenerator::endloopAddrsCoarseOffset)
         + generators.getOrDefault(SFGenerator::endloopAddrsOffset);
 
-    deltaPhaseFactor_ = 1.0 / keyToHeltz(sample_.pitch) * sample->sampleRate / outputRate;
+    deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(sample_.pitch) * sample->sampleRate / outputRate;
 
     for (const auto& mp : modparams.getParameters()) {
         modulators_.emplace_back(mp);
@@ -101,7 +101,7 @@ StereoValue Voice::render() const {
     const double r = phase_.getFractionalPart();
     const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
     return volEnv_.getValue()
-        * centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
+        * conv::centibelToRatio(getModulatedGenerator(SFGenerator::modLfoToVolume) * modLFO_.getValue())
         * volume_ * (interpolated / INT16_MAX);
 }
 
@@ -187,7 +187,7 @@ void Voice::update() {
         vibLFO_.update();
         modEnv_.update();
 
-        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * keyToHeltz(voicePitch_
+        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(voicePitch_
             + 0.01 * getModulatedGenerator(SFGenerator::modEnvToPitch) * modEnv_.getValue()
             + 0.01 * getModulatedGenerator(SFGenerator::vibLfoToPitch) * vibLFO_.getValue()
             + 0.01 * getModulatedGenerator(SFGenerator::modLfoToPitch) * modLFO_.getValue()));
@@ -221,7 +221,7 @@ void Voice::updateModulatedParams(SFGenerator destination) {
     switch (destination) {
     case SFGenerator::pan:
     case SFGenerator::initialAttenuation: {
-        volume_ = centibelToRatio(getModulatedGenerator(SFGenerator::initialAttenuation))
+        volume_ = conv::centibelToRatio(getModulatedGenerator(SFGenerator::initialAttenuation))
             * calculatePannedVolume(getModulatedGenerator(SFGenerator::pan));
         break;
     }

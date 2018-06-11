@@ -19,11 +19,11 @@ public:
     }
 
     void setDelay(double delay) {
-        delay_ = outputRate_ * timecentToSecond(delay) / interval_;
+        delay_ = outputRate_ * conv::timecentToSecond(delay) / interval_;
     }
 
     void setFrequency(double freq) {
-        delta_ = 4.0 * absoluteCentToHeltz(freq) / (outputRate_ * interval_);
+        delta_ = 4.0 * conv::absoluteCentToHeltz(freq) / (outputRate_ * interval_);
     }
 
     void update() {

@@ -61,7 +61,7 @@ void CALLBACK verboseMidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwPa
             break;
         case midi::MessageStatus::PitchBend:
             std::cout << "Pitch bend: channel=" << channel
-                << " value=" << joinBytes(msg[2], msg[1]) << std::endl;
+                << " value=" << conv::joinBytes(msg[2], msg[1]) << std::endl;
             break;
         }
         reinterpret_cast<Synthesizer*>(dwInstance)->processMIDIMessage(dwParam1);

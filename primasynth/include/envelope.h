@@ -37,7 +37,7 @@ public:
         if (section == Section::Sustain) {
             params_.at(static_cast<int>(Section::Sustain)) = 0.001 * param;
         } else if (section < Section::Finished) {
-            params_.at(static_cast<int>(section)) = outputRate_ * timecentToSecond(param) / interval_;
+            params_.at(static_cast<int>(section)) = outputRate_ * conv::timecentToSecond(param) / interval_;
         } else {
             throw std::invalid_argument("unknown section");
         }
@@ -94,7 +94,7 @@ public:
         if (section_ == Section::Attack) {
             value_ = atten_;
         } else {
-            value_ = centibelToRatio(480.0 * atten_);
+            value_ = conv::centibelToRatio(480.0 * atten_);
         }
     }
 

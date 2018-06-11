@@ -6,7 +6,7 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Stand
     volume_(1.0),
     midiStandard_(midiStandard) {
 
-    initializeConversionTables();
+    conv::initialize();
 
     channels_.reserve(numChannels);
     for (std::size_t i = 0; i < numChannels; ++i) {
@@ -67,7 +67,7 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
         channel->channelPressure(msg[1]);
         break;
     case midi::MessageStatus::PitchBend:
-        channel->pitchBend(joinBytes(msg[2], msg[1]));
+        channel->pitchBend(conv::joinBytes(msg[2], msg[1]));
         break;
     }
 }

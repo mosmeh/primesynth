@@ -77,10 +77,10 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     switch (static_cast<midi::ControlChange>(controller)) {
     case midi::ControlChange::DataEntryMSB:
         if (dataEntryMode_ == DataEntryMode::RPN) {
-            const std::uint16_t rpn = joinBytes(
+            const std::uint16_t rpn = conv::joinBytes(
                 controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
                 controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)));
-            const auto data = static_cast<std::int32_t>(joinBytes(
+            const auto data = static_cast<std::int32_t>(conv::joinBytes(
                 value, controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB))));
 
             switch (static_cast<midi::RPN>(rpn)) {
