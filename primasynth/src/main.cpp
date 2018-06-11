@@ -177,6 +177,7 @@ int main(int argc, char** argv) {
 
         Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard);
         for (const std::string& filename : argparser.rest()) {
+            std::cout << "loading " << filename << std::endl;
             synth.loadSoundFont(filename);
         }
         synth.setVolume(argparser.get<double>("volume"));

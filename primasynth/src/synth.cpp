@@ -1,6 +1,4 @@
 #include "synth.h"
-#include <iostream>
-#include <sstream>
 
 namespace primasynth {
 
@@ -18,7 +16,6 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Stand
 
 void Synthesizer::loadSoundFont(const std::string& filename) {
     soundFonts_.emplace_back(filename);
-    std::cout << "loaded " << soundFonts_.back().getName() << " from " << filename << std::endl;
 
     if (soundFonts_.size() == 1) {
         defaultPreset_ = findPreset(0, 0);
