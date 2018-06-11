@@ -22,23 +22,23 @@ Voice::Voice(std::size_t noteID, double outputRate, bool percussion, const Sampl
     vibLFO_(outputRate, CALC_INTERVAL),
     modLFO_(outputRate, 1) {
 
+    rtSample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::sampleModes));
     const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::overridingRootKey);
-    sample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
-    sample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::sampleModes));
-    sample_.start = sample.start
+    rtSample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
+    rtSample_.start = sample.start
         + 32768 * generators.getOrDefault(sf::Generator::startAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::startAddrsOffset);
-    sample_.end = sample.end
+    rtSample_.end = sample.end
         + 32768 * generators.getOrDefault(sf::Generator::endAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::endAddrsOffset);
-    sample_.startLoop = sample.startLoop
+    rtSample_.startLoop = sample.startLoop
         + 32768 * generators.getOrDefault(sf::Generator::startloopAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::startloopAddrsOffset);
-    sample_.endLoop = sample.endLoop
+    rtSample_.endLoop = sample.endLoop
         + 32768 * generators.getOrDefault(sf::Generator::endloopAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::endloopAddrsOffset);
 
-    deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(sample_.pitch) * sample.sampleRate / outputRate;
+    deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(rtSample_.pitch) * sample.sampleRate / outputRate;
 
     for (const auto& mp : modparams.getParameters()) {
         modulators_.emplace_back(mp);
@@ -154,27 +154,27 @@ void Voice::release(bool sustained) {
 void Voice::update() {
     phase_ += deltaPhase_;
 
-    switch (sample_.mode) {
+    switch (rtSample_.mode) {
     case SampleMode::UnLooped:
     case SampleMode::UnUsed:
-        if (phase_.getIntegerPart() > sample_.end - 1) {
+        if (phase_.getIntegerPart() > rtSample_.end - 1) {
             status_ = State::Finished;
             return;
         }
         break;
     case SampleMode::Looped:
-        if (phase_.getIntegerPart() > sample_.endLoop - 1) {
-            phase_ -= FixedPoint(sample_.endLoop - sample_.startLoop);
+        if (phase_.getIntegerPart() > rtSample_.endLoop - 1) {
+            phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
     case SampleMode::LoopedWithRemainder:
         if (status_ == State::Released) {
-            if (phase_.getIntegerPart() > sample_.end - 1) {
+            if (phase_.getIntegerPart() > rtSample_.end - 1) {
                 status_ = State::Finished;
                 return;
             }
-        } else if (phase_.getIntegerPart() > sample_.endLoop - 1) {
-            phase_ -= FixedPoint(sample_.endLoop - sample_.startLoop);
+        } else if (phase_.getIntegerPart() > rtSample_.endLoop - 1) {
+            phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
     }
@@ -289,9 +289,9 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     case sf::Generator::fineTune:
     case sf::Generator::scaleTuning:
     case sf::Generator::pitch:
-        voicePitch_ = sample_.pitch
+        voicePitch_ = rtSample_.pitch
             + 0.01 * getModulatedGenerator(sf::Generator::pitch)
-            + 0.01 * generators_.getOrDefault(sf::Generator::scaleTuning) * (actualKey_ - sample_.pitch)
+            + 0.01 * generators_.getOrDefault(sf::Generator::scaleTuning) * (actualKey_ - rtSample_.pitch)
             + coarseTuning_ + getModulatedGenerator(sf::Generator::coarseTune)
             + 0.01 * (fineTuning_ + getModulatedGenerator(sf::Generator::fineTune));
         break;

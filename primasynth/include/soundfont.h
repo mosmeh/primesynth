@@ -81,13 +81,6 @@ struct Sample {
     std::int8_t key, correction;
 };
 
-enum class SampleMode {
-    UnLooped,
-    Looped,
-    UnUsed,
-    LoopedWithRemainder
-};
-
 class SoundFont {
 public:
     explicit SoundFont(const std::string& filename);

@@ -34,16 +34,25 @@ public:
     void update();
 
 private:
+    enum class SampleMode {
+        UnLooped,
+        Looped,
+        UnUsed,
+        LoopedWithRemainder
+    };
+
+    struct RuntimeSample {
+        SampleMode mode;
+        double pitch;
+        std::uint32_t start, end, startLoop, endLoop;
+    };
+
     const std::size_t noteID_;
     const std::uint8_t actualKey_;
     const bool percussion_;
     const std::vector<std::int16_t>& sampleBuffer_;
     GeneratorSet generators_;
-    struct {
-        SampleMode mode;
-        double pitch;
-        std::uint32_t start, end, startLoop, endLoop;
-    } sample_;
+    RuntimeSample rtSample_;
     int keyScaling_;
     std::vector<Modulator> modulators_;
     std::array<double, NUM_GENERATORS> modulated_;
