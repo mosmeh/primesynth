@@ -128,6 +128,7 @@ int main(int argc, char** argv) {
     using namespace primasynth;
 
     HMIDIIN hmi = NULL;
+    std::thread renderingThread;
     try {
         checkPaError(Pa_Initialize());
 
@@ -205,7 +206,7 @@ int main(int argc, char** argv) {
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
         std::atomic_bool running = true;
-        std::thread thread(doRenderingLoop, std::ref(running), std::ref(synth), std::ref(buffer), sampleRate);
+        renderingThread = std::thread(doRenderingLoop, std::ref(running), std::ref(synth), std::ref(buffer), sampleRate);
 
         checkPaError(Pa_StartStream(stream));
         checkMMError(midiInStart(hmi));
@@ -213,18 +214,20 @@ int main(int argc, char** argv) {
         std::getchar();
 
         running = false;
-        thread.join();
         checkPaError(Pa_StopStream(stream));
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
     }
 
-    Pa_Terminate();
+    if (renderingThread.joinable()) {
+        renderingThread.join();
+    }
     if (hmi != NULL) {
         midiInStop(hmi);
         midiInReset(hmi);
         midiInClose(hmi);
     }
+    Pa_Terminate();
 
     return EXIT_SUCCESS;
 }
