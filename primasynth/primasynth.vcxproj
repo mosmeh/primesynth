@@ -36,14 +36,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\channel.h" />
-    <ClInclude Include="include\cmdline.h" />
     <ClInclude Include="include\conv.h" />
     <ClInclude Include="include\envelope.h" />
     <ClInclude Include="include\fixedpoint.h" />
     <ClInclude Include="include\lfo.h" />
     <ClInclude Include="include\midi.h" />
     <ClInclude Include="include\modulator.h" />
-    <ClInclude Include="include\portaudio.h" />
     <ClInclude Include="include\ringbuffer.h" />
     <ClInclude Include="include\sfspec.h" />
     <ClInclude Include="include\soundfont.h" />

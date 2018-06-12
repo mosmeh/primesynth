@@ -2,8 +2,8 @@
 #include <sstream>
 #define NOMINMAX
 #include <Windows.h>
-#include "cmdline.h"
-#include "portaudio.h"
+#include "third_party/cmdline.h"
+#include "third_party/portaudio.h"
 #include "ringbuffer.h"
 #include "synth.h"
 
