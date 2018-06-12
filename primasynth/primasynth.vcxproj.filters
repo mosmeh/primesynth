@@ -14,9 +14,6 @@
     <ClCompile Include="src\channel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\conv.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,13 +26,16 @@
     <ClCompile Include="src\stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stereovalue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\synth.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\voice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stereo_value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\synthesizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\conversion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -43,13 +43,7 @@
     <ClInclude Include="include\channel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\conv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\envelope.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\fixedpoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\lfo.h">
@@ -61,25 +55,31 @@
     <ClInclude Include="include\modulator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ringbuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\sfspec.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\soundfont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\stereovalue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\synth.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\voice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ring_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fixed_point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\stereo_value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\soundfont_spec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\synthesizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\conversion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

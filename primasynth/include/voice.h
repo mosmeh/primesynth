@@ -1,10 +1,10 @@
 #pragma once
 #include "envelope.h"
-#include "fixedpoint.h"
+#include "fixed_point.h"
 #include "lfo.h"
 #include "modulator.h"
 #include "soundfont.h"
-#include "stereovalue.h"
+#include "stereo_value.h"
 
 namespace primasynth {
 

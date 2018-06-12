@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\channel.cpp" />
-    <ClCompile Include="src\conv.cpp" />
+    <ClCompile Include="src\conversion.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\modulator.cpp" />
     <ClCompile Include="src\soundfont.cpp" />
@@ -30,24 +30,24 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\stereovalue.cpp" />
-    <ClCompile Include="src\synth.cpp" />
+    <ClCompile Include="src\stereo_value.cpp" />
+    <ClCompile Include="src\synthesizer.cpp" />
     <ClCompile Include="src\voice.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\channel.h" />
-    <ClInclude Include="include\conv.h" />
+    <ClInclude Include="include\conversion.h" />
     <ClInclude Include="include\envelope.h" />
-    <ClInclude Include="include\fixedpoint.h" />
+    <ClInclude Include="include\fixed_point.h" />
     <ClInclude Include="include\lfo.h" />
     <ClInclude Include="include\midi.h" />
     <ClInclude Include="include\modulator.h" />
-    <ClInclude Include="include\ringbuffer.h" />
-    <ClInclude Include="include\sfspec.h" />
+    <ClInclude Include="include\ring_buffer.h" />
+    <ClInclude Include="include\soundfont_spec.h" />
     <ClInclude Include="include\soundfont.h" />
     <ClInclude Include="include\stdafx.h" />
-    <ClInclude Include="include\stereovalue.h" />
-    <ClInclude Include="include\synth.h" />
+    <ClInclude Include="include\stereo_value.h" />
+    <ClInclude Include="include\synthesizer.h" />
     <ClInclude Include="include\voice.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

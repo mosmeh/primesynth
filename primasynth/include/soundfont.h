@@ -2,7 +2,7 @@
 #include <array>
 #include <fstream>
 #include <vector>
-#include "sfspec.h"
+#include "soundfont_spec.h"
 
 namespace primasynth {
 

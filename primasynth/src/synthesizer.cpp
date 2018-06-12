@@ -1,4 +1,4 @@
-#include "synth.h"
+#include "synthesizer.h"
 
 namespace primasynth {
 

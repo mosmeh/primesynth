@@ -4,8 +4,8 @@
 #include <Windows.h>
 #include "third_party/cmdline.h"
 #include "third_party/portaudio.h"
-#include "ringbuffer.h"
-#include "synth.h"
+#include "ring_buffer.h"
+#include "synthesizer.h"
 
 namespace primasynth {
 

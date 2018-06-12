@@ -1,4 +1,4 @@
-#include "stereovalue.h"
+#include "stereo_value.h"
 
 namespace primasynth {
 
