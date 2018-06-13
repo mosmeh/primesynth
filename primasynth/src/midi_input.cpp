@@ -14,17 +14,25 @@ void checkMMResult(MMRESULT result) {
     }
 }
 
-void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
-    switch (wMsg) {
-    case MIM_DATA:
-        reinterpret_cast<Synthesizer*>(dwInstance)->processMIDIMessage(dwParam1);
-        break;
+void CALLBACK MidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
+    const auto cbParam = reinterpret_cast<MIDIInput::CallbackParam*>(dwInstance);
+    if (cbParam->running) {
+        switch (wMsg) {
+        case MIM_DATA:
+            cbParam->synth.processShortMessage(dwParam1);
+            break;
+        case MIM_LONGDATA: {
+            const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
+            cbParam->synth.processSysEx(mh->lpData, mh->dwBytesRecorded);
+            checkMMResult(midiInAddBuffer(hmi, mh, sizeof(MIDIHDR)));
+            break;
+        }
+        }
     }
 }
 
-void CALLBACK verboseMidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
-    switch (wMsg) {
-    case MIM_DATA: {
+void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2) {
+    if (wMsg == MIM_DATA) {
         const auto msg = reinterpret_cast<std::uint8_t*>(&dwParam1);
         const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
         const auto channel = msg[0] & 0xf;
@@ -56,26 +64,38 @@ void CALLBACK verboseMidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwPa
                 << " value=" << conv::joinBytes(msg[2], msg[1]) << std::endl;
             break;
         }
-        reinterpret_cast<Synthesizer*>(dwInstance)->processMIDIMessage(dwParam1);
-        break;
     }
-    }
+
+    MidiInProc(hmi, wMsg, dwInstance, dwParam1, dwParam2);
 }
 
-MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) {
+MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) :
+    sysExBuffer_(512),
+    mh_(),
+    callbackParam_{synth, true} {
+
     MIDIINCAPS caps;
     checkMMResult(midiInGetDevCaps(deviceID, &caps, sizeof(caps)));
     std::wcout << "MIDI: opening " << caps.szPname << std::endl;
     checkMMResult(midiInOpen(&hmi_, deviceID,
         reinterpret_cast<DWORD_PTR>(verbose ? verboseMidiInProc : MidiInProc),
-        reinterpret_cast<DWORD_PTR>(&synth), CALLBACK_FUNCTION));
+        reinterpret_cast<DWORD_PTR>(&callbackParam_), CALLBACK_FUNCTION));
+
+    mh_.lpData = sysExBuffer_.data();
+    mh_.dwBufferLength = sysExBuffer_.size();
+
+    checkMMResult(midiInPrepareHeader(hmi_, &mh_, sizeof(mh_)));
+    checkMMResult(midiInAddBuffer(hmi_, &mh_, sizeof(mh_)));
+
     checkMMResult(midiInStart(hmi_));
 }
 
 MIDIInput::~MIDIInput() {
-    if (hmi_ != NULL) {
+    callbackParam_.running = false;
+    if (hmi_) {
         checkMMResult(midiInStop(hmi_));
         checkMMResult(midiInReset(hmi_));
+        checkMMResult(midiInUnprepareHeader(hmi_, &mh_, sizeof(mh_)));
         checkMMResult(midiInClose(hmi_));
     }
 }

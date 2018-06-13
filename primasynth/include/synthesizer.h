@@ -11,11 +11,13 @@ public:
 
     void loadSoundFont(const std::string& filename);
     void setVolume(double volume);
-    void processMIDIMessage(unsigned long param);
+    void processShortMessage(unsigned long param);
+    void processSysEx(const char* data, std::size_t length);
     StereoValue render() const;
 
 private:
-    const midi::Standard midiStandard_;
+    const midi::Standard initialMIDIStandard_;
+    midi::Standard midiStandard_;
     std::vector<std::unique_ptr<Channel>> channels_;
     std::vector<SoundFont> soundFonts_;
     double volume_;

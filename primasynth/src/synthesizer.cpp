@@ -4,7 +4,8 @@ namespace primasynth {
 
 Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Standard midiStandard) :
     volume_(1.0),
-    midiStandard_(midiStandard) {
+    midiStandard_(midiStandard),
+    initialMIDIStandard_(midiStandard) {
 
     conv::initialize();
 
@@ -30,7 +31,7 @@ void Synthesizer::setVolume(double volume) {
     volume_ = std::max(0.0, volume);
 }
 
-void Synthesizer::processMIDIMessage(unsigned long param) {
+void Synthesizer::processShortMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
     const std::uint8_t channelNum = msg[0] & 0xf;
     const auto& channel = channels_.at(channelNum);
@@ -49,6 +50,8 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
         const auto midiBank = channel->getBank();
         std::uint16_t sfBank = 0;
         switch (midiStandard_) {
+        case midi::Standard::GM:
+            break;
         case midi::Standard::GS:
             sfBank = midiBank.msb;
             break;
@@ -69,6 +72,43 @@ void Synthesizer::processMIDIMessage(unsigned long param) {
     case midi::MessageStatus::PitchBend:
         channel->pitchBend(conv::joinBytes(msg[2], msg[1]));
         break;
+    }
+}
+
+bool matchSysEx(const char* data, std::size_t bytesRecorded, const unsigned char* sysEx, std::size_t length) {
+    if (bytesRecorded != length) {
+        return false;
+    }
+
+    for (std::size_t i = 0; i < length; ++i) {
+        if (i == 2) {
+            continue;
+        } else if (data[i] != static_cast<char>(sysEx[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Synthesizer::processSysEx(const char* data, std::size_t length) {
+    static const unsigned char gmSystemOn[] = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
+    static const unsigned char gmSystemOff[] = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
+    static const unsigned char gsReset[] = {0xf0, 0x41, 0, 0x42, 0x12, 0x40, 0x00, 0x7f, 0x00, 0x41, 0xf7};
+    static const unsigned char gsSystemModeSet1[] = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x00, 0x01, 0xf7};
+    static const unsigned char gsSystemModeSet2[] = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
+    static const unsigned char xgSystemOn[] = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
+
+    if (matchSysEx(data, length, gmSystemOn, sizeof(gmSystemOn))) {
+        midiStandard_ = midi::Standard::GM;
+    } else if (matchSysEx(data, length, gmSystemOff, sizeof(gmSystemOff))) {
+        midiStandard_ = initialMIDIStandard_;
+    } else if (matchSysEx(data, length, gsReset, sizeof(gsReset))
+        || matchSysEx(data, length, gsSystemModeSet1, sizeof(gsSystemModeSet1))
+        || matchSysEx(data, length, gsSystemModeSet2, sizeof(gsSystemModeSet2))) {
+
+        midiStandard_ = midi::Standard::GS;
+    } else if (matchSysEx(data, length, xgSystemOn, sizeof(xgSystemOn))) {
+        midiStandard_ = midi::Standard::XG;
     }
 }
 
