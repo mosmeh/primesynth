@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\audio_output.cpp" />
     <ClCompile Include="src\channel.cpp" />
     <ClCompile Include="src\conversion.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\midi_input.cpp" />
     <ClCompile Include="src\modulator.cpp" />
     <ClCompile Include="src\soundfont.cpp" />
     <ClCompile Include="src\stdafx.cpp">
@@ -35,12 +37,14 @@
     <ClCompile Include="src\voice.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\audio_output.h" />
     <ClInclude Include="include\channel.h" />
     <ClInclude Include="include\conversion.h" />
     <ClInclude Include="include\envelope.h" />
     <ClInclude Include="include\fixed_point.h" />
     <ClInclude Include="include\lfo.h" />
     <ClInclude Include="include\midi.h" />
+    <ClInclude Include="include\midi_input.h" />
     <ClInclude Include="include\modulator.h" />
     <ClInclude Include="include\ring_buffer.h" />
     <ClInclude Include="include\soundfont_spec.h" />
