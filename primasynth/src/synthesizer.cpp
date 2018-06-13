@@ -75,15 +75,16 @@ void Synthesizer::processShortMessage(unsigned long param) {
     }
 }
 
-bool matchSysEx(const char* data, std::size_t bytesRecorded, const unsigned char* sysEx, std::size_t length) {
-    if (bytesRecorded != length) {
+template <std::size_t N>
+bool matchSysEx(const char* data, std::size_t length, const std::array<unsigned char, N>& sysEx) {
+    if (length != N) {
         return false;
     }
 
-    for (std::size_t i = 0; i < length; ++i) {
+    for (std::size_t i = 0; i < N; ++i) {
         if (i == 2) {
             continue;
-        } else if (data[i] != static_cast<char>(sysEx[i])) {
+        } else if (data[i] != static_cast<char>(sysEx.at(i))) {
             return false;
         }
     }
@@ -91,23 +92,20 @@ bool matchSysEx(const char* data, std::size_t bytesRecorded, const unsigned char
 }
 
 void Synthesizer::processSysEx(const char* data, std::size_t length) {
-    static const unsigned char gmSystemOn[] = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
-    static const unsigned char gmSystemOff[] = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
-    static const unsigned char gsReset[] = {0xf0, 0x41, 0, 0x42, 0x12, 0x40, 0x00, 0x7f, 0x00, 0x41, 0xf7};
-    static const unsigned char gsSystemModeSet1[] = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x00, 0x01, 0xf7};
-    static const unsigned char gsSystemModeSet2[] = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
-    static const unsigned char xgSystemOn[] = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
+    static constexpr std::array<unsigned char, 6>  gmSystemOn       = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
+    static constexpr std::array<unsigned char, 6>  gmSystemOff      = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
+    static constexpr std::array<unsigned char, 11> gsReset          = {0xf0, 0x41, 0, 0x42, 0x12, 0x40, 0x00, 0x7f, 0x00, 0x41, 0xf7};
+    static constexpr std::array<unsigned char, 11> gsSystemModeSet1 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x00, 0x01, 0xf7};
+    static constexpr std::array<unsigned char, 11> gsSystemModeSet2 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
+    static constexpr std::array<unsigned char, 9>  xgSystemOn       = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
 
-    if (matchSysEx(data, length, gmSystemOn, sizeof(gmSystemOn))) {
+    if (matchSysEx(data, length, gmSystemOn)) {
         midiStandard_ = midi::Standard::GM;
-    } else if (matchSysEx(data, length, gmSystemOff, sizeof(gmSystemOff))) {
+    } else if (matchSysEx(data, length, gmSystemOff)) {
         midiStandard_ = initialMIDIStandard_;
-    } else if (matchSysEx(data, length, gsReset, sizeof(gsReset))
-        || matchSysEx(data, length, gsSystemModeSet1, sizeof(gsSystemModeSet1))
-        || matchSysEx(data, length, gsSystemModeSet2, sizeof(gsSystemModeSet2))) {
-
+    } else if (matchSysEx(data, length, gsReset) || matchSysEx(data, length, gsSystemModeSet1) || matchSysEx(data, length, gsSystemModeSet2)) {
         midiStandard_ = midi::Standard::GS;
-    } else if (matchSysEx(data, length, xgSystemOn, sizeof(xgSystemOn))) {
+    } else if (matchSysEx(data, length, xgSystemOn)) {
         midiStandard_ = midi::Standard::XG;
     }
 }
