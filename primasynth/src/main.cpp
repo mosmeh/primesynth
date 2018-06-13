@@ -4,9 +4,9 @@
 #include "synthesizer.h"
 
 int main(int argc, char** argv) {
-    using namespace primasynth;
-
     try {
+        using namespace primasynth;
+
         cmdline::parser argparser;
         argparser.set_program_name("primasynth");
         argparser.add<unsigned int>("in", 'i', "input MIDI device ID", false, 0);
@@ -52,6 +52,7 @@ int main(int argc, char** argv) {
         std::getchar();
     } catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;
