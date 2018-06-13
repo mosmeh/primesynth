@@ -74,9 +74,9 @@ MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) {
 
 MIDIInput::~MIDIInput() {
     if (hmi_ != NULL) {
-        midiInStop(hmi_);
-        midiInReset(hmi_);
-        midiInClose(hmi_);
+        checkMMResult(midiInStop(hmi_));
+        checkMMResult(midiInReset(hmi_));
+        checkMMResult(midiInClose(hmi_));
     }
 }
 
