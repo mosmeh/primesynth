@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
         argparser.add<std::string>("std", '\0', "MIDI standard, affects bank selection (gm, gs, xg)", false, "gs",
             cmdline::oneof<std::string>("gm", "gs", "xg"));
+        argparser.add("fix-std", '\0', "do not respond to GM/XG System On, GS Reset, etc.");
         argparser.add("print-midi", 'p', "print MIDI messages");
         argparser.footer("[soundfonts] ...");
         argparser.parse_check(argc, argv);
@@ -34,7 +35,7 @@ int main(int argc, char** argv) {
             midiStandard = midi::Standard::XG;
         }
 
-        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard);
+        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard, argparser.exist("fix-std"));
         for (const std::string& filename : argparser.rest()) {
             std::cout << "loading " << filename << std::endl;
             synth.loadSoundFont(filename);

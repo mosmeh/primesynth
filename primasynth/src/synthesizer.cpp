@@ -2,10 +2,11 @@
 
 namespace primasynth {
 
-Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Standard midiStandard) :
+Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Standard midiStandard, bool standardFixed) :
     volume_(1.0),
     midiStandard_(midiStandard),
-    initialMIDIStandard_(midiStandard) {
+    initialMIDIStandard_(midiStandard),
+    standardFixed_(standardFixed) {
 
     conv::initialize();
 
@@ -99,6 +100,9 @@ void Synthesizer::processSysEx(const char* data, std::size_t length) {
     static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET2 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
     static constexpr std::array<unsigned char, 9>  XG_SYSTEM_ON        = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
 
+    if (standardFixed_) {
+        return;
+    }
     if (matchSysEx(data, length, GM_SYSTEM_ON)) {
         midiStandard_ = midi::Standard::GM;
     } else if (matchSysEx(data, length, GM_SYSTEM_OFF)) {

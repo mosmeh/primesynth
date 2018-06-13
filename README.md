@@ -13,6 +13,7 @@ options:
   -b, --buffer        buffer size (unsigned int [=4096])
   -c, --channels      number of MIDI channels (unsigned int [=16])
       --std           MIDI standard, affects bank selection (gm, gs, xg) (string [=gs])
+      --fix-std       do not respond to GM/XG System On, GS Reset, etc.
   -p, --print-midi    print MIDI messages
   -?, --help          print this message
 ```

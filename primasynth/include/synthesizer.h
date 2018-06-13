@@ -7,7 +7,8 @@ class Synthesizer {
 public:
     Synthesizer(double outputRate = 44100,
         std::size_t numChannels = 16,
-        midi::Standard midiStandard = midi::Standard::GM);
+        midi::Standard midiStandard = midi::Standard::GM,
+        bool standardFixed = false);
 
     void loadSoundFont(const std::string& filename);
     void setVolume(double volume);
@@ -17,6 +18,7 @@ public:
 
 private:
     const midi::Standard initialMIDIStandard_;
+    const bool standardFixed_;
     midi::Standard midiStandard_;
     std::vector<std::unique_ptr<Channel>> channels_;
     std::vector<SoundFont> soundFonts_;
