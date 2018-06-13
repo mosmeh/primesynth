@@ -92,20 +92,20 @@ bool matchSysEx(const char* data, std::size_t length, const std::array<unsigned 
 }
 
 void Synthesizer::processSysEx(const char* data, std::size_t length) {
-    static constexpr std::array<unsigned char, 6>  gmSystemOn       = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
-    static constexpr std::array<unsigned char, 6>  gmSystemOff      = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
-    static constexpr std::array<unsigned char, 11> gsReset          = {0xf0, 0x41, 0, 0x42, 0x12, 0x40, 0x00, 0x7f, 0x00, 0x41, 0xf7};
-    static constexpr std::array<unsigned char, 11> gsSystemModeSet1 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x00, 0x01, 0xf7};
-    static constexpr std::array<unsigned char, 11> gsSystemModeSet2 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
-    static constexpr std::array<unsigned char, 9>  xgSystemOn       = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
+    static constexpr std::array<unsigned char, 6>  GM_SYSTEM_ON        = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
+    static constexpr std::array<unsigned char, 6>  GM_SYSTEM_OFF       = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
+    static constexpr std::array<unsigned char, 11> GS_RESET            = {0xf0, 0x41, 0, 0x42, 0x12, 0x40, 0x00, 0x7f, 0x00, 0x41, 0xf7};
+    static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET1 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x00, 0x01, 0xf7};
+    static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET2 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
+    static constexpr std::array<unsigned char, 9>  XG_SYSTEM_ON        = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
 
-    if (matchSysEx(data, length, gmSystemOn)) {
+    if (matchSysEx(data, length, GM_SYSTEM_ON)) {
         midiStandard_ = midi::Standard::GM;
-    } else if (matchSysEx(data, length, gmSystemOff)) {
+    } else if (matchSysEx(data, length, GM_SYSTEM_OFF)) {
         midiStandard_ = initialMIDIStandard_;
-    } else if (matchSysEx(data, length, gsReset) || matchSysEx(data, length, gsSystemModeSet1) || matchSysEx(data, length, gsSystemModeSet2)) {
+    } else if (matchSysEx(data, length, GS_RESET) || matchSysEx(data, length, GS_SYSTEM_MODE_SET1) || matchSysEx(data, length, GS_SYSTEM_MODE_SET2)) {
         midiStandard_ = midi::Standard::GS;
-    } else if (matchSysEx(data, length, xgSystemOn)) {
+    } else if (matchSysEx(data, length, XG_SYSTEM_ON)) {
         midiStandard_ = midi::Standard::XG;
     }
 }

@@ -18,13 +18,13 @@ int streamCallback(const void*, void* output, unsigned long frameCount,
 }
 
 void doRenderingLoop(std::atomic_bool& running, const Synthesizer& synth, RingBuffer& buffer, double sampleRate) {
-    static const int unitSteps = 64;
-    const double stepDuration = unitSteps / sampleRate;
+    static const int UNIT_STEPS = 64;
+    const double stepDuration = UNIT_STEPS / sampleRate;
 
     double aheadDuration = 0.0;
     auto lastTime = std::chrono::high_resolution_clock::now();
     while (running) {
-        for (int i = 0; i < unitSteps && !buffer.full(); ++i) {
+        for (int i = 0; i < UNIT_STEPS && !buffer.full(); ++i) {
             const StereoValue sample = synth.render();
             buffer.push(static_cast<float>(sample.left));
             buffer.push(static_cast<float>(sample.right));

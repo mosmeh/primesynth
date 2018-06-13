@@ -210,8 +210,8 @@ StereoValue calculatePannedVolume(double pan) {
     } else if (pan >= 500.0) {
         return {0.0, 1.0};
     } else {
-        static constexpr double f = 3.141592653589793 / 2000.0;
-        return {std::sin(f * (-pan + 500.0)), std::sin(f * (pan + 500.0))};
+        static constexpr double FACTOR = 3.141592653589793 / 2000.0;
+        return {std::sin(FACTOR * (-pan + 500.0)), std::sin(FACTOR * (pan + 500.0))};
     }
 }
 
