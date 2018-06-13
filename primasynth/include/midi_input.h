@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #define NOMINMAX
 #include <Windows.h>
 #include "synthesizer.h"
