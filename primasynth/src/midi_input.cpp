@@ -14,17 +14,24 @@ void checkMMResult(MMRESULT result) {
     }
 }
 
-void CALLBACK MidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
-    const auto cbParam = reinterpret_cast<MIDIInput::CallbackParam*>(dwInstance);
-    if (cbParam->running) {
+void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
+    const auto sp = reinterpret_cast<MIDIInput::SharedParam*>(dwInstance);
+    if (sp->running) {
         switch (wMsg) {
         case MIM_DATA:
-            cbParam->synth.processShortMessage(dwParam1);
+            sp->synth.processShortMessage(dwParam1);
             break;
         case MIM_LONGDATA: {
             const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
-            cbParam->synth.processSysEx(mh->lpData, mh->dwBytesRecorded);
-            checkMMResult(midiInAddBuffer(hmi, mh, sizeof(MIDIHDR)));
+            sp->synth.processSysEx(mh->lpData, mh->dwBytesRecorded);
+
+            // See https://msdn.microsoft.com/en-us/library/dd798460(v=vs.85).aspx
+            // "Applications should not call any multimedia functions from inside the callback function,
+            // as doing so can cause a deadlock"
+            std::unique_lock<std::mutex> uniqueLock(sp->mutex);
+            sp->addingBufferRequested = true;
+            sp->cv.notify_one();
+
             break;
         }
         }
@@ -72,14 +79,14 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
 MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) :
     sysExBuffer_(512),
     mh_(),
-    callbackParam_{synth, true} {
+    sharedParam_{synth, true, false} {
 
     MIDIINCAPS caps;
     checkMMResult(midiInGetDevCaps(deviceID, &caps, sizeof(caps)));
     std::wcout << "MIDI: opening " << caps.szPname << std::endl;
     checkMMResult(midiInOpen(&hmi_, deviceID,
         reinterpret_cast<DWORD_PTR>(verbose ? verboseMidiInProc : MidiInProc),
-        reinterpret_cast<DWORD_PTR>(&callbackParam_), CALLBACK_FUNCTION));
+        reinterpret_cast<DWORD_PTR>(&sharedParam_), CALLBACK_FUNCTION));
 
     mh_.lpData = sysExBuffer_.data();
     mh_.dwBufferLength = sysExBuffer_.size();
@@ -87,11 +94,31 @@ MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) :
     checkMMResult(midiInPrepareHeader(hmi_, &mh_, sizeof(mh_)));
     checkMMResult(midiInAddBuffer(hmi_, &mh_, sizeof(mh_)));
 
+    bufferAddingThread_ = std::thread([&, &sp = sharedParam_] {
+        while (true) {
+            std::unique_lock<std::mutex> uniqueLock(sp.mutex);
+            sp.cv.wait(uniqueLock, [&] {
+                return sp.addingBufferRequested || !sp.running;
+            });
+            if (sp.running) {
+                checkMMResult(midiInAddBuffer(hmi_, &mh_, sizeof(mh_)));
+                sp.addingBufferRequested = false;
+            } else {
+                break;
+            }
+        }
+    });
+
     checkMMResult(midiInStart(hmi_));
 }
 
 MIDIInput::~MIDIInput() {
-    callbackParam_.running = false;
+    sharedParam_.running = false;
+    sharedParam_.cv.notify_all();
+    if (bufferAddingThread_.joinable()) {
+        bufferAddingThread_.join();
+    }
+
     if (hmi_) {
         checkMMResult(midiInStop(hmi_));
         checkMMResult(midiInReset(hmi_));

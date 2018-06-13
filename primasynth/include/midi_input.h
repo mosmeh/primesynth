@@ -8,9 +8,12 @@ namespace primasynth {
 
 class MIDIInput {
 public:
-    struct CallbackParam {
+    struct SharedParam {
         Synthesizer& synth;
         std::atomic_bool running;
+        bool addingBufferRequested;
+        std::mutex mutex;
+        std::condition_variable cv;
     };
 
     MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose = false);
@@ -20,7 +23,8 @@ private:
     HMIDIIN hmi_;
     std::vector<char> sysExBuffer_;
     MIDIHDR mh_;
-    CallbackParam callbackParam_;
+    SharedParam sharedParam_;
+    std::thread bufferAddingThread_;
 };
 
 }
