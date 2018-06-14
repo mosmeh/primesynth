@@ -17,11 +17,10 @@ public:
     };
 
     Envelope(double outputRate, unsigned int interval) :
-        outputRate_(outputRate),
-        interval_(interval),
+        effectiveOutputRate_(outputRate / interval),
         params_(),
         section_(Section::Delay),
-        periodSteps_(0),
+        sectionSteps_(0),
         atten_(1.0),
         value_(1.0) {}
 
@@ -35,9 +34,9 @@ public:
 
     void setParameter(Section section, double param) {
         if (section == Section::Sustain) {
-            params_.at(static_cast<int>(Section::Sustain)) = 0.001 * param;
+            params_.at(static_cast<std::size_t>(Section::Sustain)) = 0.001 * param;
         } else if (section < Section::Finished) {
-            params_.at(static_cast<int>(section)) = outputRate_ * conv::timecentToSecond(param) / interval_;
+            params_.at(static_cast<std::size_t>(section)) = effectiveOutputRate_ * conv::timecentToSecond(param);
         } else {
             throw std::invalid_argument("unknown section");
         }
@@ -54,28 +53,28 @@ public:
             return;
         }
 
-        ++periodSteps_;
+        ++sectionSteps_;
 
         auto i = static_cast<int>(section_);
-        if (section_ != Section::Sustain && periodSteps_ >= params_.at(i)) {
+        if (section_ != Section::Sustain && sectionSteps_ >= params_.at(i)) {
             ++i;
             changeSection(static_cast<Section>(i));
         }
 
-        const double& sustain = params_.at(static_cast<int>(Section::Sustain));
+        const double& sustain = params_.at(static_cast<std::size_t>(Section::Sustain));
         switch (section_) {
         case Section::Delay:
         case Section::Finished:
             atten_ = 1.0;
             break;
         case Section::Attack:
-            atten_ = periodSteps_ / params_.at(i);
+            atten_ = sectionSteps_ / params_.at(i);
             break;
         case Section::Hold:
-            atten_ = 0;
+            atten_ = 0.0;
             break;
         case Section::Decay:
-            atten_ = periodSteps_ / params_.at(i);
+            atten_ = sectionSteps_ / params_.at(i);
             if (atten_ > sustain) {
                 changeSection(Section::Sustain);
             }
@@ -99,16 +98,15 @@ public:
     }
 
 private:
-    const double outputRate_;
-    const unsigned int interval_;
+    const double effectiveOutputRate_;
     std::array<double, 6> params_;
     Section section_;
-    unsigned int periodSteps_;
+    unsigned int sectionSteps_;
     double atten_, value_;
 
     void changeSection(Section section) {
         section_ = section;
-        periodSteps_ = 0;
+        sectionSteps_ = 0;
     }
 };
 

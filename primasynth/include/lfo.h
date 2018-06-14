@@ -9,7 +9,7 @@ public:
         outputRate_(outputRate),
         interval_(interval),
         steps_(0),
-        delay_(0.0),
+        delay_(0),
         delta_(0.0),
         value_(0.0),
         up_(true) {}
@@ -19,7 +19,7 @@ public:
     }
 
     void setDelay(double delay) {
-        delay_ = outputRate_ * conv::timecentToSecond(delay) / interval_;
+        delay_ = static_cast<unsigned int>(outputRate_ * conv::timecentToSecond(delay) / interval_);
     }
 
     void setFrequency(double freq) {
@@ -27,8 +27,8 @@ public:
     }
 
     void update() {
-        ++steps_;
-        if (steps_ < delay_) {
+        if (steps_ <= delay_) {
+            ++steps_;
             return;
         }
         if (up_) {
@@ -49,8 +49,8 @@ public:
 private:
     const double outputRate_;
     const unsigned int interval_;
-    unsigned int steps_;
-    double delay_, delta_, value_;
+    unsigned int steps_, delay_;
+    double delta_, value_;
     bool up_;
 };
 
