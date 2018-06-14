@@ -17,7 +17,7 @@ public:
         Finished
     };
 
-    Voice(std::size_t noteID, double outputRate, bool percussion, const Sample& sample,
+    Voice(std::size_t noteID, double outputRate, const Sample& sample,
         const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity);
 
     std::size_t getNoteID() const;
@@ -26,6 +26,7 @@ public:
     const State& getStatus() const;
     StereoValue render() const;
 
+    void setPercussion(bool percussion);
     void updateSFController(sf::GeneralController controller, std::int16_t value);
     void updateMIDIController(std::uint8_t controller, std::uint8_t value);
     void updateFineTuning(double fineTuning);
@@ -49,13 +50,13 @@ private:
 
     const std::size_t noteID_;
     const std::uint8_t actualKey_;
-    const bool percussion_;
     const std::vector<std::int16_t>& sampleBuffer_;
     GeneratorSet generators_;
     RuntimeSample rtSample_;
     int keyScaling_;
     std::vector<Modulator> modulators_;
     std::array<double, NUM_GENERATORS> modulated_;
+    bool percussion_;
     double fineTuning_, coarseTuning_;
     double deltaPhaseFactor_;
     unsigned int steps_;

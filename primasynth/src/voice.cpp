@@ -4,13 +4,13 @@ namespace primasynth {
 
 static constexpr unsigned int CALC_INTERVAL = 32;
 
-Voice::Voice(std::size_t noteID, double outputRate, bool percussion, const Sample& sample,
+Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
-    percussion_(percussion),
     sampleBuffer_(sample.soundFont->getSampleBuffer()),
     generators_(generators),
     actualKey_(key),
+    percussion_(false),
     fineTuning_(0.0),
     coarseTuning_(0.0),
     steps_(0),
@@ -103,6 +103,10 @@ StereoValue Voice::render() const {
     return volEnv_.getValue()
         * conv::centibelToRatio(getModulatedGenerator(sf::Generator::modLfoToVolume) * modLFO_.getValue())
         * volume_ * (interpolated / INT16_MAX);
+}
+
+void Voice::setPercussion(bool percussion) {
+    percussion_ = percussion;
 }
 
 void Voice::updateSFController(sf::GeneralController controller, std::int16_t value) {

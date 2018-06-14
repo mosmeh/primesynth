@@ -2,11 +2,11 @@
 
 namespace primasynth {
 
-Synthesizer::Synthesizer(double outputRate, std::size_t numChannels, midi::Standard midiStandard, bool standardFixed) :
+Synthesizer::Synthesizer(double outputRate, std::size_t numChannels) :
     volume_(1.0),
-    midiStandard_(midiStandard),
-    initialMIDIStandard_(midiStandard),
-    standardFixed_(standardFixed) {
+    midiStd_(midi::Standard::GM),
+    defaultMIDIStd_(midi::Standard::GM),
+    stdFixed_(false) {
 
     conv::initialize();
 
@@ -32,6 +32,12 @@ void Synthesizer::setVolume(double volume) {
     volume_ = std::max(0.0, volume);
 }
 
+void Synthesizer::setMIDIStandard(midi::Standard midiStandard, bool fixed) {
+    midiStd_ = midiStandard;
+    defaultMIDIStd_ = midiStandard;
+    stdFixed_ = fixed;
+}
+
 void Synthesizer::processShortMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
     const std::uint8_t channelNum = msg[0] & 0xf;
@@ -50,7 +56,7 @@ void Synthesizer::processShortMessage(unsigned long param) {
     case midi::MessageStatus::ProgramChange: {
         const auto midiBank = channel->getBank();
         std::uint16_t sfBank = 0;
-        switch (midiStandard_) {
+        switch (midiStd_) {
         case midi::Standard::GM:
             break;
         case midi::Standard::GS:
@@ -100,17 +106,17 @@ void Synthesizer::processSysEx(const char* data, std::size_t length) {
     static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET2 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
     static constexpr std::array<unsigned char, 9>  XG_SYSTEM_ON        = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
 
-    if (standardFixed_) {
+    if (stdFixed_) {
         return;
     }
     if (matchSysEx(data, length, GM_SYSTEM_ON)) {
-        midiStandard_ = midi::Standard::GM;
+        midiStd_ = midi::Standard::GM;
     } else if (matchSysEx(data, length, GM_SYSTEM_OFF)) {
-        midiStandard_ = initialMIDIStandard_;
+        midiStd_ = defaultMIDIStd_;
     } else if (matchSysEx(data, length, GS_RESET) || matchSysEx(data, length, GS_SYSTEM_MODE_SET1) || matchSysEx(data, length, GS_SYSTEM_MODE_SET2)) {
-        midiStandard_ = midi::Standard::GS;
+        midiStd_ = midi::Standard::GS;
     } else if (matchSysEx(data, length, XG_SYSTEM_ON)) {
-        midiStandard_ = midi::Standard::XG;
+        midiStd_ = midi::Standard::XG;
     }
 }
 

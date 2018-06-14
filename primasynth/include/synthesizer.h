@@ -5,21 +5,18 @@ namespace primasynth {
 
 class Synthesizer {
 public:
-    Synthesizer(double outputRate = 44100,
-        std::size_t numChannels = 16,
-        midi::Standard midiStandard = midi::Standard::GM,
-        bool standardFixed = false);
+    Synthesizer(double outputRate = 44100, std::size_t numChannels = 16);
 
     void loadSoundFont(const std::string& filename);
     void setVolume(double volume);
+    void setMIDIStandard(midi::Standard midiStandard, bool fixed = false);
     void processShortMessage(unsigned long param);
     void processSysEx(const char* data, std::size_t length);
     StereoValue render() const;
 
 private:
-    const midi::Standard initialMIDIStandard_;
-    const bool standardFixed_;
-    midi::Standard midiStandard_;
+    midi::Standard midiStd_, defaultMIDIStd_;
+    bool stdFixed_;
     std::vector<std::unique_ptr<Channel>> channels_;
     std::vector<SoundFont> soundFonts_;
     double volume_;

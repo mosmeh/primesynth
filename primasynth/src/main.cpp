@@ -35,12 +35,13 @@ int main(int argc, char** argv) {
             midiStandard = midi::Standard::XG;
         }
 
-        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"), midiStandard, argparser.exist("fix-std"));
+        Synthesizer synth(sampleRate, argparser.get<unsigned int>("channels"));
+        synth.setMIDIStandard(midiStandard, argparser.exist("fix-std"));
+        synth.setVolume(argparser.get<double>("volume"));
         for (const std::string& filename : argparser.rest()) {
             std::cout << "loading " << filename << std::endl;
             synth.loadSoundFont(filename);
         }
-        synth.setVolume(argparser.get<double>("volume"));
 
         MIDIInput midiInput(synth, argparser.get<unsigned int>("in"), argparser.exist("print-midi"));
         AudioOutput audioOutput(synth, argparser.get<unsigned int>("buffer"),

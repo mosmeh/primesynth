@@ -52,8 +52,10 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
                     modparams.mergeAndAdd(presetZone.modulatorParameters);
                     modparams.merge(ModulatorParameterSet::getDefaultParameters());
 
-                    addVoice(std::make_unique<Voice>(
-                        currentNoteID_, outputRate_, preset_->bank == PERCUSSION_BANK, sample, generators, modparams, key, velocity));
+                    auto voice = std::make_unique<Voice>(
+                        currentNoteID_, outputRate_, sample, generators, modparams, key, velocity);
+                    voice->setPercussion(preset_->bank == PERCUSSION_BANK);
+                    addVoice(std::move(voice));
                 }
             }
         }
