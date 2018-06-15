@@ -17,7 +17,7 @@ public:
 
     void set(sf::Generator type, std::int16_t amount);
     void merge(const GeneratorSet& b);
-    void mergeAndAdd(const GeneratorSet& b);
+    void add(const GeneratorSet& b);
 
 private:
     struct Generator {

@@ -87,14 +87,11 @@ void GeneratorSet::merge(const GeneratorSet& b) {
     }
 }
 
-void GeneratorSet::mergeAndAdd(const GeneratorSet& b) {
+void GeneratorSet::add(const GeneratorSet& b) {
     for (std::size_t i = 0; i < NUM_GENERATORS; ++i) {
         if (b.generators_.at(i).used) {
-            if (generators_.at(i).used) {
-                generators_.at(i).amount += b.generators_.at(i).amount;
-            } else {
-                generators_.at(i) = b.generators_.at(i);
-            }
+            generators_.at(i).amount += b.generators_.at(i).amount;
+            generators_.at(i).used = true;
         }
     }
 }

@@ -46,7 +46,7 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
                     const auto& sample = soundFont->getSamples().at(sampleID);
 
                     auto generators = instZone.generators;
-                    generators.mergeAndAdd(presetZone.generators);
+                    generators.add(presetZone.generators);
 
                     auto modparams = instZone.modulatorParameters;
                     modparams.mergeAndAdd(presetZone.modulatorParameters);
