@@ -1,4 +1,5 @@
 #include "midi_input.h"
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -16,30 +17,38 @@ void checkMMResult(MMRESULT result) {
 
 void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
     const auto sp = reinterpret_cast<MIDIInput::SharedParam*>(dwInstance);
-    if (sp->running) {
-        switch (wMsg) {
-        case MIM_DATA:
-            sp->synth.processShortMessage(dwParam1);
-            break;
-        case MIM_LONGDATA: {
-            const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
-            sp->synth.processSysEx(mh->lpData, mh->dwBytesRecorded);
+    if (!sp->running) {
+        return;
+    }
 
-            // See https://msdn.microsoft.com/en-us/library/dd798460(v=vs.85).aspx
-            // "Applications should not call any multimedia functions from inside the callback function,
-            // as doing so can cause a deadlock"
-            std::unique_lock<std::mutex> uniqueLock(sp->mutex);
-            sp->addingBufferRequested = true;
-            sp->cv.notify_one();
+    switch (wMsg) {
+    case MIM_DATA:
+        sp->synth.processShortMessage(dwParam1);
+        break;
+    case MIM_LONGDATA: {
+        const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
+        sp->synth.processSysEx(mh->lpData, mh->dwBytesRecorded);
 
-            break;
-        }
-        }
+        // See https://msdn.microsoft.com/en-us/library/dd798460(v=vs.85).aspx
+        // "Applications should not call any multimedia functions from inside the callback function,
+        // as doing so can cause a deadlock"
+        std::unique_lock<std::mutex> uniqueLock(sp->mutex);
+        sp->addingBufferRequested = true;
+        sp->cv.notify_one();
+
+        break;
+    }
     }
 }
 
 void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2) {
-    if (wMsg == MIM_DATA) {
+    const auto sp = reinterpret_cast<MIDIInput::SharedParam*>(dwInstance);
+    if (!sp->running) {
+        return;
+    }
+
+    switch (wMsg) {
+    case MIM_DATA: {
         const auto msg = reinterpret_cast<std::uint8_t*>(&dwParam1);
         const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
         const auto channel = msg[0] & 0xf;
@@ -71,6 +80,19 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
                 << " value=" << conv::joinBytes(msg[2], msg[1]) << std::endl;
             break;
         }
+        break;
+    }
+    case MIM_LONGDATA: {
+        const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
+        std::cout << "SysEx: ";
+        const auto flags(std::cout.flags());
+        for (DWORD i = 0; i < mh->dwBytesRecorded; ++i) {
+            std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(static_cast<unsigned char>(mh->lpData[i])) << " ";
+        }
+        std::cout.flags(flags);
+        std::cout << std::endl;
+        break;
+    }
     }
 
     MidiInProc(hmi, wMsg, dwInstance, dwParam1, dwParam2);
