@@ -13,12 +13,12 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("out", 'o', "output audio device ID", false);
         argparser.add<double>("volume", 'v', "volume (1 = 100%)", false, 1.0);
         argparser.add<double>("samplerate", 's', "sample rate (Hz)", false);
-        argparser.add<unsigned int>("buffer", 'b', "buffer size", false, 1 << 12);
+        argparser.add<unsigned int>("buffer", 'b', "audio output buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
         argparser.add<std::string>("std", '\0', "MIDI standard, affects bank selection (gm, gs, xg)", false, "gs",
             cmdline::oneof<std::string>("gm", "gs", "xg"));
         argparser.add("fix-std", '\0', "do not respond to GM/XG System On, GS Reset, etc.");
-        argparser.add("print-midi", 'p', "print MIDI messages");
+        argparser.add("print-msg", 'p', "print received MIDI messages");
         argparser.footer("[soundfonts] ...");
         argparser.parse_check(argc, argv);
         if (argparser.rest().empty()) {
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
             synth.loadSoundFont(filename);
         }
 
-        MIDIInput midiInput(synth, argparser.get<unsigned int>("in"), argparser.exist("print-midi"));
+        MIDIInput midiInput(synth, argparser.get<unsigned int>("in"), argparser.exist("print-msg"));
         AudioOutput audioOutput(synth, argparser.get<unsigned int>("buffer"),
             argparser.exist("out") ? argparser.get<unsigned int>("out") : AudioOutput::getDefaultDeviceID(), sampleRate);
 
