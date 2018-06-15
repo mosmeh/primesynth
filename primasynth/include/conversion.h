@@ -5,7 +5,7 @@ namespace primasynth {
 namespace conv {
 
 void initialize();
-double centibelToRatio(double cb);
+double attenToAmp(double atten);
 double keyToHeltz(double key);
 double timecentToSecond(double tc);
 double absoluteCentToHeltz(double ac);

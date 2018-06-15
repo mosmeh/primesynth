@@ -4,7 +4,7 @@
 namespace primasynth {
 namespace conv {
 
-std::array<double, 1441> centibelToRatioTable;
+std::array<double, 1441> attenToAmpTable;
 std::array<double, 1200> centToHeltzTable;
 
 void initialize() {
@@ -12,9 +12,9 @@ void initialize() {
     if (!initialized) {
         initialized = true;
 
-        for (std::size_t i = 0; i < centibelToRatioTable.size(); ++i) {
+        for (std::size_t i = 0; i < attenToAmpTable.size(); ++i) {
             // -200 instead of -100 for compatibility
-            centibelToRatioTable.at(i) = std::pow(10.0, i / -200.0);
+            attenToAmpTable.at(i) = std::pow(10.0, i / -200.0);
         }
         for (std::size_t i = 0; i < centToHeltzTable.size(); i++) {
             centToHeltzTable.at(i) = 6.875 * std::exp2(i / 1200.0);
@@ -22,13 +22,13 @@ void initialize() {
     }
 }
 
-double centibelToRatio(double cb) {
-    if (cb <= 0) {
+double attenToAmp(double atten) {
+    if (atten <= 0) {
         return 1.0;
-    } else if (cb >= centibelToRatioTable.size()) {
+    } else if (atten >= attenToAmpTable.size()) {
         return 0.0;
     } else {
-        return centibelToRatioTable.at(static_cast<std::size_t>(cb));
+        return attenToAmpTable.at(static_cast<std::size_t>(atten));
     }
 }
 

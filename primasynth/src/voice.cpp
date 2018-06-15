@@ -101,7 +101,7 @@ StereoValue Voice::render() const {
     const double r = phase_.getFractionalPart();
     const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
     return volEnv_.getValue()
-        * conv::centibelToRatio(getModulatedGenerator(sf::Generator::modLfoToVolume) * modLFO_.getValue())
+        * conv::attenToAmp(getModulatedGenerator(sf::Generator::modLfoToVolume) * modLFO_.getValue())
         * volume_ * (interpolated / INT16_MAX);
 }
 
@@ -231,7 +231,7 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     switch (destination) {
     case sf::Generator::pan:
     case sf::Generator::initialAttenuation: {
-        volume_ = conv::centibelToRatio(getModulatedGenerator(sf::Generator::initialAttenuation))
+        volume_ = conv::attenToAmp(getModulatedGenerator(sf::Generator::initialAttenuation))
             * calculatePannedVolume(getModulatedGenerator(sf::Generator::pan));
         break;
     }

@@ -93,7 +93,7 @@ public:
             break;
         }
 
-        value_ = conv::centibelToRatio(960.0 * atten_);
+        value_ = conv::attenToAmp(960.0 * atten_);
     }
 
 private:
