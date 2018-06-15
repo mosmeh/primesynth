@@ -66,13 +66,16 @@ public:
         case Section::Delay:
         case Section::Finished:
             atten_ = 1.0;
-            break;
+            value_ = 0.0;
+            return;
         case Section::Attack:
-            atten_ = sectionSteps_ / params_.at(i);
-            break;
+            atten_ = 1.0 - sectionSteps_ / params_.at(i);
+            value_ = 1.0 - atten_;
+            return;
         case Section::Hold:
             atten_ = 0.0;
-            break;
+            value_ = 1.0;
+            return;
         case Section::Decay:
             atten_ = sectionSteps_ / params_.at(i);
             if (atten_ > sustain) {
@@ -90,11 +93,7 @@ public:
             break;
         }
 
-        if (section_ == Section::Attack) {
-            value_ = atten_;
-        } else {
-            value_ = conv::centibelToRatio(480.0 * atten_);
-        }
+        value_ = conv::centibelToRatio(960.0 * atten_);
     }
 
 private:
