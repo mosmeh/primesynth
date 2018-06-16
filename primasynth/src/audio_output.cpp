@@ -72,10 +72,9 @@ AudioOutput::AudioOutput(Synthesizer& synth, std::size_t bufferSize, int deviceI
 
     const UINT cp = GetConsoleCP();
     SetConsoleOutputCP(CP_UTF8);
-    printf("Audio: opening %s\n", deviceInfo->name);
+    printf("Audio: opening %s (%s, %.0fHz)\n", deviceInfo->name,
+        Pa_GetHostApiInfo(deviceInfo->hostApi)->name, sampleRate);
     SetConsoleOutputCP(cp);
-    std::cout << "API: " << Pa_GetHostApiInfo(deviceInfo->hostApi)->name << std::endl
-        << "sample rate: " << sampleRate << "Hz" << std::endl;
     checkPaError(Pa_OpenStream(&stream_, nullptr, &params, sampleRate,
         paFramesPerBufferUnspecified, paNoFlag, streamCallback, &buffer_));
 
