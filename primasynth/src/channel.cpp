@@ -207,7 +207,7 @@ void Channel::update() {
 
 StereoValue Channel::render() {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
-    StereoValue sum;
+    StereoValue sum{0.0, 0.0};
     for (const auto& voice : voices_) {
         if (voice->getStatus() != Voice::State::Finished) {
             sum += voice->render();

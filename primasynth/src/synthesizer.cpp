@@ -121,7 +121,7 @@ void Synthesizer::processSysEx(const char* data, std::size_t length) {
 }
 
 StereoValue Synthesizer::render() const {
-    StereoValue sum;
+    StereoValue sum{0.0, 0.0};
     for (const auto& channel : channels_) {
         channel->update();
         sum += channel->render();

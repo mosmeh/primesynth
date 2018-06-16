@@ -4,7 +4,7 @@ namespace primasynth {
 
 class FixedPoint {
 public:
-    FixedPoint() : raw_(0) {}
+    FixedPoint() = delete;
 
     explicit FixedPoint(std::uint32_t integer) :
         raw_(static_cast<std::uint64_t>(integer) << 32) {}
