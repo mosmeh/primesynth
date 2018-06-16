@@ -39,11 +39,11 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
     for (const Zone& presetZone : preset_->zones) {
         if (presetZone.isInRange(key, velocity)) {
             const std::int16_t instID = presetZone.generators.getOrDefault(sf::Generator::instrument);
-            const auto& inst = soundFont->getInstruments().at(instID);
+            const auto& inst = soundFont.getInstruments().at(instID);
             for (const Zone& instZone : inst.zones) {
                 if (instZone.isInRange(key, velocity)) {
                     const std::int16_t sampleID = instZone.generators.getOrDefault(sf::Generator::sampleID);
-                    const auto& sample = soundFont->getSamples().at(sampleID);
+                    const auto& sample = soundFont.getSamples().at(sampleID);
 
                     auto generators = instZone.generators;
                     generators.add(presetZone.generators);

@@ -9,6 +9,15 @@ namespace primasynth {
 static constexpr std::size_t NUM_GENERATORS = static_cast<std::size_t>(sf::Generator::endOper);
 static constexpr std::uint16_t PERCUSSION_BANK = 128;
 
+struct Sample {
+    std::string name;
+    std::uint32_t start, end, startLoop, endLoop, sampleRate;
+    std::int8_t key, correction;
+    const std::vector<std::int16_t>& buffer;
+
+    explicit Sample(const std::vector<std::int16_t>& buf) : buffer(buf) {}
+};
+
 class GeneratorSet {
 public:
     GeneratorSet();
@@ -68,17 +77,12 @@ struct Instrument {
 class SoundFont;
 
 struct Preset {
-    const SoundFont* soundFont;
     std::string name;
     std::uint16_t bank, presetNum;
     std::vector<Zone> zones;
-};
+    const SoundFont& soundFont;
 
-struct Sample {
-    const SoundFont* soundFont;
-    std::string name;
-    std::uint32_t start, end, startLoop, endLoop, sampleRate;
-    std::int8_t key, correction;
+    explicit Preset(const SoundFont& sfont) : soundFont(sfont) {}
 };
 
 class SoundFont {
@@ -86,7 +90,6 @@ public:
     explicit SoundFont(const std::string& filename);
 
     const std::string& getName() const;
-    const std::vector<std::int16_t>& getSampleBuffer() const;
     const std::vector<Sample>& getSamples() const;
     const std::vector<Instrument>& getInstruments() const;
     const std::vector<std::shared_ptr<const Preset>>& getPresetPtrs() const;

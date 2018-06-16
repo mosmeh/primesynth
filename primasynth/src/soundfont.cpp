@@ -379,10 +379,6 @@ const std::string& SoundFont::getName() const {
     return name_;
 }
 
-const std::vector<std::int16_t>& SoundFont::getSampleBuffer() const {
-    return sampleBuffer_;
-}
-
 const std::vector<Sample>& SoundFont::getSamples() const {
     return samples_;
 }
@@ -581,8 +577,7 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
 
     presets_.reserve(phdr.size() - 1);
     for (auto it_phdr = phdr.begin(); it_phdr != std::prev(phdr.end()); ++it_phdr) {
-        const auto preset = std::make_shared<Preset>();
-        preset->soundFont = this;
+        const auto preset = std::make_shared<Preset>(*this);
         preset->name = achToString(it_phdr->achPresetName);
         preset->bank = it_phdr->wBank;
         preset->presetNum = it_phdr->wPreset;
@@ -596,17 +591,16 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
 
     samples_.reserve(shdr.size() - 1);
     for (auto it_shdr = shdr.begin(); it_shdr < std::prev(shdr.end()); ++it_shdr) {
-        samples_.emplace_back<Sample>({
-            this,
-            achToString(it_shdr->achSampleName),
-            it_shdr->dwStart,
-            it_shdr->dwEnd,
-            it_shdr->dwStartloop,
-            it_shdr->dwEndloop,
-            it_shdr->dwSampleRate,
-            it_shdr->byOriginalKey,
-            it_shdr->chCorrection
-        });
+        samples_.emplace_back(sampleBuffer_);
+        auto& sample = samples_.back();
+        sample.name = achToString(it_shdr->achSampleName);
+        sample.start = it_shdr->dwStart;
+        sample.end = it_shdr->dwEnd;
+        sample.startLoop = it_shdr->dwStartloop;
+        sample.endLoop = it_shdr->dwEndloop;
+        sample.sampleRate = it_shdr->dwSampleRate;
+        sample.key = it_shdr->byOriginalKey;
+        sample.correction = it_shdr->chCorrection;
     }
 }
 

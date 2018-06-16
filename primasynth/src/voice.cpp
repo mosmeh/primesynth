@@ -7,7 +7,7 @@ static constexpr unsigned int CALC_INTERVAL = 32;
 Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
-    sampleBuffer_(sample.soundFont->getSampleBuffer()),
+    sampleBuffer_(sample.buffer),
     generators_(generators),
     actualKey_(key),
     percussion_(false),
