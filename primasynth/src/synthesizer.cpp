@@ -17,7 +17,7 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels) :
 }
 
 void Synthesizer::loadSoundFont(const std::string& filename) {
-    soundFonts_.emplace_back(filename);
+    soundFonts_.emplace_back(std::make_unique<SoundFont>(filename));
 
     if (soundFonts_.size() == 1) {
         defaultPreset_ = findPreset(0, 0);
@@ -131,7 +131,7 @@ StereoValue Synthesizer::render() const {
 
 std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint8_t presetNum) const {
     for (const auto& sf : soundFonts_) {
-        for (const auto& preset : sf.getPresetPtrs()) {
+        for (const auto& preset : sf->getPresetPtrs()) {
             if (preset->bank == bank && preset->presetNum == presetNum) {
                 return preset;
             }

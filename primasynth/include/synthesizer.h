@@ -18,7 +18,7 @@ private:
     midi::Standard midiStd_, defaultMIDIStd_;
     bool stdFixed_;
     std::vector<std::unique_ptr<Channel>> channels_;
-    std::vector<SoundFont> soundFonts_;
+    std::vector<std::unique_ptr<SoundFont>> soundFonts_;
     double volume_;
     std::shared_ptr<const Preset> defaultPreset_, defaultPercussionPreset_;
 
