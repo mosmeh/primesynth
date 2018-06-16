@@ -67,7 +67,7 @@ static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES =
 
 GeneratorSet::GeneratorSet() {
     for (std::size_t i = 0; i < NUM_GENERATORS; ++i) {
-        generators_.at(i).amount = DEFAULT_GENERATOR_VALUES.at(i);
+        generators_.at(i) = {false, DEFAULT_GENERATOR_VALUES.at(i)};
     }
 }
 

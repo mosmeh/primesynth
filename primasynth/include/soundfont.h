@@ -30,8 +30,8 @@ public:
 
 private:
     struct Generator {
-        bool used = false;
-        std::int16_t amount = 0;
+        bool used;
+        std::int16_t amount;
     };
     std::array<Generator, NUM_GENERATORS> generators_;
 };
