@@ -7,9 +7,7 @@ struct StereoValue {
 
     StereoValue() = delete;
 
-    StereoValue operator+(const StereoValue& b) const;
     StereoValue operator*(double b) const;
-    StereoValue operator*(const StereoValue& b) const;
     StereoValue& operator+=(const StereoValue& b);
 };
 

@@ -2,6 +2,8 @@
 
 namespace primasynth {
 
+// 64 bit fixed-point number
+// 32 bit for each of integer and fractional part
 class FixedPoint {
 public:
     FixedPoint() = delete;
@@ -11,19 +13,14 @@ public:
 
     explicit FixedPoint(double value) :
         raw_((static_cast<std::uint64_t>(value) << 32)
-            | static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value))
-                * (static_cast<double>(UINT32_MAX) + 1.0))) {}
-
-    std::uint64_t getRaw() const {
-        return raw_;
-    }
+            | static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value)) * (UINT32_MAX + 1.0))) {}
 
     std::uint32_t getIntegerPart() const {
         return raw_ >> 32;
     }
 
     double getFractionalPart() const {
-        return (raw_ & UINT32_MAX) / (static_cast<double>(UINT32_MAX) + 1.0);
+        return (raw_ & UINT32_MAX) / (UINT32_MAX + 1.0);
     }
 
     double getReal() const {
@@ -39,21 +36,9 @@ public:
         return *this;
     }
 
-    FixedPoint operator+(const FixedPoint& b) const {
-        auto x = *this;
-        x += b;
-        return x;
-    }
-
     FixedPoint& operator-=(const FixedPoint& b) {
         raw_ -= b.raw_;
         return *this;
-    }
-
-    FixedPoint operator-(const FixedPoint& b) const {
-        auto x = *this;
-        x -= b;
-        return x;
     }
 
 private:

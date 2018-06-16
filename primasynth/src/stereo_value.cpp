@@ -2,16 +2,8 @@
 
 namespace primasynth {
 
-StereoValue StereoValue::operator+(const StereoValue& b) const {
-    return {left + b.left, right + b.right};
-}
-
 StereoValue StereoValue::operator*(double b) const {
     return {left * b, right * b};
-}
-
-StereoValue StereoValue::operator*(const StereoValue& b) const {
-    return {left * b.left, right * b.right};
 }
 
 StereoValue& StereoValue::operator+=(const StereoValue& b) {
