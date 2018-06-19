@@ -1,4 +1,5 @@
 #include "soundfont.h"
+#include "conversion.h"
 
 namespace primasynth {
 
@@ -606,7 +607,7 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         for (std::size_t i = sample.start; i < sample.end; ++i) {
             sampleMax = std::max(sampleMax, std::abs(sampleBuffer_.at(i)));
         }
-        sample.minAtten = -2.0 / 9.6 * std::log10(static_cast<double>(sampleMax) / INT16_MAX);
+        sample.minAtten = conv::ampToNormedAtten(static_cast<double>(sampleMax) / INT16_MAX);
     }
 }
 

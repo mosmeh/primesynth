@@ -32,6 +32,10 @@ double attenToAmp(double atten) {
     }
 }
 
+double ampToNormedAtten(double amp) {
+    return -20.0 / 96.0 * std::log10(amp);
+}
+
 double keyToHeltz(double key) {
     if (key < 0.0) {
         return 1.0;

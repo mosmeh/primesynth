@@ -6,6 +6,7 @@ namespace conv {
 
 void initialize();
 double attenToAmp(double atten);
+double ampToNormedAtten(double amp);
 double keyToHeltz(double key);
 double timecentToSecond(double tc);
 double absoluteCentToHeltz(double ac);

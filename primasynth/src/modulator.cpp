@@ -1,6 +1,6 @@
 #include "modulator.h"
-#include <cmath>
 #include <stdexcept>
+#include "conversion.h"
 
 namespace primasynth {
 
@@ -38,7 +38,7 @@ double concave(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return -4.0 / 9.6 * std::log10(1.0 - x);
+        return 2.0 * conv::ampToNormedAtten(1.0 - x);
     }
 }
 
@@ -48,7 +48,7 @@ double convex(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return 1 + 4.0 / 9.6 * std::log10(x);
+        return 1 - 2.0 * conv::ampToNormedAtten(x);
     }
 }
 
