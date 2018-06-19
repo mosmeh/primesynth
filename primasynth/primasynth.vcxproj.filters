@@ -44,6 +44,9 @@
     <ClCompile Include="src\audio_output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\envelope.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\channel.h">
