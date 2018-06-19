@@ -17,7 +17,9 @@ public:
 
     Envelope(double outputRate, unsigned int interval);
 
+    Section getSection() const;
     double getValue() const;
+    double getAtten() const;
     bool isFinished() const;
 
     void setParameter(Section section, double param);

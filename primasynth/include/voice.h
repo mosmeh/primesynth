@@ -55,6 +55,7 @@ private:
     RuntimeSample rtSample_;
     int keyScaling_;
     std::vector<Modulator> modulators_;
+    double minAtten_;
     std::array<double, NUM_GENERATORS> modulated_;
     bool percussion_;
     double fineTuning_, coarseTuning_;

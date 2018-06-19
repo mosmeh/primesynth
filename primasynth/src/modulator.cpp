@@ -24,6 +24,10 @@ sf::Generator Modulator::getDestination() const {
     return param_.sfModDestOper;
 }
 
+std::int16_t Modulator::getAmount() const {
+    return param_.modAmount;
+}
+
 double Modulator::getValue() const {
     return value_;
 }

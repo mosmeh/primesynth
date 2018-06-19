@@ -11,8 +11,16 @@ Envelope::Envelope(double outputRate, unsigned int interval) :
     atten_(1.0),
     value_(1.0) {}
 
+Envelope::Section Envelope::getSection() const {
+    return section_;
+}
+
 double Envelope::getValue() const {
     return value_;
+}
+
+double Envelope::getAtten() const {
+    return atten_;
 }
 
 bool Envelope::isFinished() const {

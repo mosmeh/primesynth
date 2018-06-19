@@ -54,6 +54,14 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     keyScaling_ = 60 - overriddenKey;
     updateSFController(sf::GeneralController::noteOnKeyNumber, overriddenKey);
 
+    int unnormedMinAtten = generators_.getOrDefault(sf::Generator::initialAttenuation);
+    for (const auto& mod : modulators_) {
+        if (mod.getDestination() == sf::Generator::initialAttenuation) {
+            unnormedMinAtten -= std::abs(mod.getAmount());
+        }
+    }
+    minAtten_ = std::max(0, unnormedMinAtten) / 960.0;
+
     for (int i = 0; i < NUM_GENERATORS; ++i) {
         modulated_.at(i) = generators.getOrDefault(static_cast<sf::Generator>(i));
     }
@@ -161,7 +169,9 @@ void Voice::update() {
     if (calc) {
         volEnv_.update();
 
-        if (volEnv_.isFinished()) {
+        if (volEnv_.isFinished()
+            || (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAtten() >= 1.0)) {
+
             status_ = State::Finished;
             return;
         }
