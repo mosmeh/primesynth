@@ -28,6 +28,29 @@ std::int16_t Modulator::getAmount() const {
     return param_.modAmount;
 }
 
+bool Modulator::isAlwaysNonNegative() const {
+    if (param_.sfModTransOper == sf::Transform::absoluteValue
+        || param_.modAmount == 0) {
+
+        return true;
+    }
+
+    if (param_.modAmount > 0) {
+        const bool noSrc = param_.sfModSrcOper.palette == sf::ControllerPalette::generalController
+            && param_.sfModSrcOper.index.general == sf::GeneralController::noController;
+        const bool uniSrc = param_.sfModSrcOper.polarity == sf::ControllerPolarity::unipolar;
+        const bool noAmt = param_.sfModAmtSrcOper.palette == sf::ControllerPalette::generalController
+            && param_.sfModAmtSrcOper.index.general == sf::GeneralController::noController;
+        const bool uniAmt = param_.sfModAmtSrcOper.polarity == sf::ControllerPolarity::unipolar;
+
+        if ((uniSrc && uniAmt) || (uniSrc && noAmt) || (noSrc && uniAmt) || (noSrc && noAmt)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 double Modulator::getValue() const {
     return value_;
 }

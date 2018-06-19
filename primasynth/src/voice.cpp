@@ -56,7 +56,8 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
 
     int unnormedMinAtten = generators_.getOrDefault(sf::Generator::initialAttenuation);
     for (const auto& mod : modulators_) {
-        if (mod.getDestination() == sf::Generator::initialAttenuation) {
+        if (mod.getDestination() == sf::Generator::initialAttenuation && !mod.isAlwaysNonNegative()) {
+            // !isAlywaysNonNegative() means mod may increase volume
             unnormedMinAtten -= std::abs(mod.getAmount());
         }
     }
