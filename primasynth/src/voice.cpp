@@ -2,7 +2,7 @@
 
 namespace primasynth {
 
-static constexpr unsigned int CALC_INTERVAL = 32;
+static constexpr unsigned int CALC_INTERVAL = 64;
 
 Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
@@ -18,10 +18,11 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     phase_(sample.start),
     deltaPhase_(0u),
     volume_({1.0, 1.0}),
-    volEnv_(outputRate, 1),
+    envLFOVolume_({1.0, 1.0}),
+    volEnv_(outputRate, CALC_INTERVAL),
     modEnv_(outputRate, CALC_INTERVAL),
     vibLFO_(outputRate, CALC_INTERVAL),
-    modLFO_(outputRate, 1) {
+    modLFO_(outputRate, CALC_INTERVAL) {
 
     rtSample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::sampleModes));
     const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::overridingRootKey);
@@ -101,9 +102,7 @@ StereoValue Voice::render() const {
     const std::uint32_t i = phase_.getIntegerPart();
     const double r = phase_.getFractionalPart();
     const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
-    return volEnv_.getValue()
-        * conv::attenToAmp(getModulatedGenerator(sf::Generator::modLfoToVolume) * modLFO_.getValue())
-        * volume_ * (interpolated / INT16_MAX);
+    return envLFOVolume_ * (interpolated / INT16_MAX);
 }
 
 void Voice::setPercussion(bool percussion) {
@@ -157,6 +156,17 @@ void Voice::release(bool sustained) {
 }
 
 void Voice::update() {
+    const bool calc = steps_++ % CALC_INTERVAL == 0;
+
+    if (calc) {
+        volEnv_.update();
+
+        if (volEnv_.isFinished()) {
+            status_ = State::Finished;
+            return;
+        }
+    }
+
     phase_ += deltaPhase_;
 
     switch (rtSample_.mode) {
@@ -186,22 +196,19 @@ void Voice::update() {
         throw std::runtime_error("unknown sample mode");
     }
 
-    modLFO_.update();
-    volEnv_.update();
-
-    if (volEnv_.isFinished()) {
-        status_ = State::Finished;
-        return;
-    }
-
-    if (steps_++ % CALC_INTERVAL == 0) {
-        vibLFO_.update();
+    if (calc) {
         modEnv_.update();
+        modLFO_.update();
+        vibLFO_.update();
 
         deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(voicePitch_
             + 0.01 * getModulatedGenerator(sf::Generator::modEnvToPitch) * modEnv_.getValue()
             + 0.01 * getModulatedGenerator(sf::Generator::vibLfoToPitch) * vibLFO_.getValue()
             + 0.01 * getModulatedGenerator(sf::Generator::modLfoToPitch) * modLFO_.getValue()));
+
+        envLFOVolume_ = (volEnv_.getValue()
+            * conv::attenToAmp(getModulatedGenerator(sf::Generator::modLfoToVolume) * modLFO_.getValue()))
+            * volume_;
     }
 }
 
