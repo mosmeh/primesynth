@@ -60,7 +60,7 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
             unnormedMinAtten -= std::abs(mod.getAmount());
         }
     }
-    minAtten_ = std::max(0, unnormedMinAtten) / 960.0;
+    minAtten_ = sample.minAtten + std::max(0, unnormedMinAtten) / 960.0;
 
     for (int i = 0; i < NUM_GENERATORS; ++i) {
         modulated_.at(i) = generators.getOrDefault(static_cast<sf::Generator>(i));

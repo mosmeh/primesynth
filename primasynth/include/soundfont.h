@@ -13,6 +13,7 @@ struct Sample {
     std::string name;
     std::uint32_t start, end, startLoop, endLoop, sampleRate;
     std::int8_t key, correction;
+    double minAtten;
     const std::vector<std::int16_t>& buffer;
 
     explicit Sample(const std::vector<std::int16_t>& buf) : buffer(buf) {}

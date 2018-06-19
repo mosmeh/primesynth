@@ -601,6 +601,12 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         sample.sampleRate = it_shdr->dwSampleRate;
         sample.key = it_shdr->byOriginalKey;
         sample.correction = it_shdr->chCorrection;
+
+        int sampleMax = 0;
+        for (std::size_t i = sample.start; i < sample.end; ++i) {
+            sampleMax = std::max(sampleMax, std::abs(sampleBuffer_.at(i)));
+        }
+        sample.minAtten = -2.0 / 9.6 * std::log10(static_cast<double>(sampleMax) / INT16_MAX);
     }
 }
 
