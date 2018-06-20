@@ -84,24 +84,24 @@ enum class GeneralController : std::uint8_t {
 };
 
 enum class ControllerPalette {
-    generalController = 0,
-    midiController = 1
+    general = 0,
+    midi = 1
 };
 
-enum class ControllerDirection {
-    increase = 0,
-    decrease = 1
+enum class SourceDirection {
+    positive = 0,
+    negative = 1
 };
 
-enum class ControllerPolarity {
+enum class SourcePolarity {
     unipolar = 0,
     bipolar = 1
 };
 
-enum class ControllerType {
-    linearType = 0,
-    concaveType = 1,
-    convexType = 2,
+enum class SourceType {
+    linear = 0,
+    concave = 1,
+    convex = 2,
     switchType = 3
 };
 
@@ -111,9 +111,9 @@ struct Modulator {
         std::uint8_t midi;
     } index;
     ControllerPalette palette;
-    ControllerDirection direction;
-    ControllerPolarity polarity;
-    ControllerType type;
+    SourceDirection direction;
+    SourcePolarity polarity;
+    SourceType type;
 };
 
 enum class Transform : std::uint16_t {
