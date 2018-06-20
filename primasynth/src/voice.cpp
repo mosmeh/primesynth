@@ -24,7 +24,7 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     vibLFO_(outputRate, CALC_INTERVAL),
     modLFO_(outputRate, CALC_INTERVAL) {
 
-    rtSample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::SampleModes));
+    rtSample_.mode = static_cast<SampleMode>(0b11 & generators.getOrDefault(sf::Generator::SampleModes));
     const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::OverridingRootKey);
     rtSample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
 
