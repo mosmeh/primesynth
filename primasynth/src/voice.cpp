@@ -27,17 +27,19 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     rtSample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::SampleModes));
     const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::OverridingRootKey);
     rtSample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
+
+    static constexpr std::uint32_t COARSE_UNIT = 32768;
     rtSample_.start = sample.start
-        + 32768 * generators.getOrDefault(sf::Generator::StartAddrsCoarseOffset)
+        + COARSE_UNIT * generators.getOrDefault(sf::Generator::StartAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::StartAddrsOffset);
     rtSample_.end = sample.end
-        + 32768 * generators.getOrDefault(sf::Generator::EndAddrsCoarseOffset)
+        + COARSE_UNIT * generators.getOrDefault(sf::Generator::EndAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::EndAddrsOffset);
     rtSample_.startLoop = sample.startLoop
-        + 32768 * generators.getOrDefault(sf::Generator::StartloopAddrsCoarseOffset)
+        + COARSE_UNIT * generators.getOrDefault(sf::Generator::StartloopAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::StartloopAddrsOffset);
     rtSample_.endLoop = sample.endLoop
-        + 32768 * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset)
+        + COARSE_UNIT * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset)
         + generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
 
     deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(rtSample_.pitch) * sample.sampleRate / outputRate;
