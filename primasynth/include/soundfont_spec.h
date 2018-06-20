@@ -72,7 +72,7 @@ enum class Generator : std::uint16_t {
     endOper = 60
 };
 
-enum class GeneralController {
+enum class GeneralController : std::uint8_t {
     noController = 0,
     noteOnVelocity = 2,
     noteOnKeyNumber = 3,
