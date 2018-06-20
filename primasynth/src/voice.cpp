@@ -168,14 +168,13 @@ void Voice::update() {
     const bool calc = steps_++ % CALC_INTERVAL == 0;
 
     if (calc) {
-        volEnv_.update();
-
         if (volEnv_.isFinished()
             || (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAtten() >= 1.0)) {
 
             status_ = State::Finished;
             return;
         }
+        volEnv_.update();
     }
 
     phase_ += deltaPhase_;
@@ -209,8 +208,8 @@ void Voice::update() {
 
     if (calc) {
         modEnv_.update();
-        modLFO_.update();
         vibLFO_.update();
+        modLFO_.update();
 
         deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(voicePitch_
             + 0.01 * getModulatedGenerator(sf::Generator::modEnvToPitch) * modEnv_.getValue()
