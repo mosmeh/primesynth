@@ -52,11 +52,11 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
     const auto& soundFont = preset_->soundFont;
     for (const Zone& presetZone : preset_->zones) {
         if (presetZone.isInRange(key, velocity)) {
-            const std::int16_t instID = presetZone.generators.getOrDefault(sf::Generator::instrument);
+            const std::int16_t instID = presetZone.generators.getOrDefault(sf::Generator::Instrument);
             const auto& inst = soundFont.getInstruments().at(instID);
             for (const Zone& instZone : inst.zones) {
                 if (instZone.isInRange(key, velocity)) {
-                    const std::int16_t sampleID = instZone.generators.getOrDefault(sf::Generator::sampleID);
+                    const std::int16_t sampleID = instZone.generators.getOrDefault(sf::Generator::SampleID);
                     const auto& sample = soundFont.getSamples().at(sampleID);
 
                     auto generators = instZone.generators;
@@ -83,7 +83,7 @@ void Channel::keyPressure(std::uint8_t key, std::uint8_t value) {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
-            voice->updateSFController(sf::GeneralController::polyPressure, value);
+            voice->updateSFController(sf::GeneralController::PolyPressure, value);
         }
     }
 }
@@ -105,7 +105,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             case midi::RPN::PitchBendSensitivity:
                 pitchBendSensitivity_ = value;
                 for (const auto& voice : voices_) {
-                    voice->updateSFController(sf::GeneralController::pitchWheelSensitivity, value);
+                    voice->updateSFController(sf::GeneralController::PitchWheelSensitivity, value);
                 }
                 break;
             case midi::RPN::FineTuning: {
@@ -151,8 +151,8 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         channelPressure_ = 0;
         pitchBend_ = 1 << 13;
         for (const auto& voice : voices_) {
-            voice->updateSFController(sf::GeneralController::channelPressure, channelPressure_);
-            voice->updateSFController(sf::GeneralController::pitchWheel, pitchBend_);
+            voice->updateSFController(sf::GeneralController::ChannelPressure, channelPressure_);
+            voice->updateSFController(sf::GeneralController::PitchWheel, pitchBend_);
         }
         for (std::uint8_t i = 1; i < 122; ++i) {
             if ((91 <= i && i <= 95) || (70 <= i && i <= 79)) {
@@ -198,7 +198,7 @@ void Channel::channelPressure(std::uint8_t value) {
     channelPressure_ = value;
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
-        voice->updateSFController(sf::GeneralController::channelPressure, value);
+        voice->updateSFController(sf::GeneralController::ChannelPressure, value);
     }
 }
 
@@ -206,7 +206,7 @@ void Channel::pitchBend(std::uint16_t value) {
     pitchBend_ = value;
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
-        voice->updateSFController(sf::GeneralController::pitchWheel, value);
+        voice->updateSFController(sf::GeneralController::PitchWheel, value);
     }
 }
 
@@ -235,10 +235,10 @@ StereoValue Channel::render() {
 }
 
 void Channel::addVoice(std::unique_ptr<Voice> voice) {
-    voice->updateSFController(sf::GeneralController::polyPressure, keyPressures_.at(voice->getActualKey()));
-    voice->updateSFController(sf::GeneralController::channelPressure, channelPressure_);
-    voice->updateSFController(sf::GeneralController::pitchWheel, pitchBend_);
-    voice->updateSFController(sf::GeneralController::pitchWheelSensitivity, pitchBendSensitivity_);
+    voice->updateSFController(sf::GeneralController::PolyPressure, keyPressures_.at(voice->getActualKey()));
+    voice->updateSFController(sf::GeneralController::ChannelPressure, channelPressure_);
+    voice->updateSFController(sf::GeneralController::PitchWheel, pitchBend_);
+    voice->updateSFController(sf::GeneralController::PitchWheelSensitivity, pitchBendSensitivity_);
     voice->updateFineTuning(fineTuning_);
     voice->updateCoarseTuning(coarseTuning_);
     for (std::uint8_t i = 0; i < midi::NUM_CONTROLLERS; ++i) {

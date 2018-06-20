@@ -24,21 +24,21 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     vibLFO_(outputRate, CALC_INTERVAL),
     modLFO_(outputRate, CALC_INTERVAL) {
 
-    rtSample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::sampleModes));
-    const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::overridingRootKey);
+    rtSample_.mode = static_cast<SampleMode>(generators.getOrDefault(sf::Generator::SampleModes));
+    const std::int16_t overriddenSampleKey = generators.getOrDefault(sf::Generator::OverridingRootKey);
     rtSample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
     rtSample_.start = sample.start
-        + 32768 * generators.getOrDefault(sf::Generator::startAddrsCoarseOffset)
-        + generators.getOrDefault(sf::Generator::startAddrsOffset);
+        + 32768 * generators.getOrDefault(sf::Generator::StartAddrsCoarseOffset)
+        + generators.getOrDefault(sf::Generator::StartAddrsOffset);
     rtSample_.end = sample.end
-        + 32768 * generators.getOrDefault(sf::Generator::endAddrsCoarseOffset)
-        + generators.getOrDefault(sf::Generator::endAddrsOffset);
+        + 32768 * generators.getOrDefault(sf::Generator::EndAddrsCoarseOffset)
+        + generators.getOrDefault(sf::Generator::EndAddrsOffset);
     rtSample_.startLoop = sample.startLoop
-        + 32768 * generators.getOrDefault(sf::Generator::startloopAddrsCoarseOffset)
-        + generators.getOrDefault(sf::Generator::startloopAddrsOffset);
+        + 32768 * generators.getOrDefault(sf::Generator::StartloopAddrsCoarseOffset)
+        + generators.getOrDefault(sf::Generator::StartloopAddrsOffset);
     rtSample_.endLoop = sample.endLoop
-        + 32768 * generators.getOrDefault(sf::Generator::endloopAddrsCoarseOffset)
-        + generators.getOrDefault(sf::Generator::endloopAddrsOffset);
+        + 32768 * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset)
+        + generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
 
     deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(rtSample_.pitch) * sample.sampleRate / outputRate;
 
@@ -46,17 +46,17 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
         modulators_.emplace_back(mp);
     }
 
-    const std::int16_t genVelocity = generators.getOrDefault(sf::Generator::velocity);
-    updateSFController(sf::GeneralController::noteOnVelocity, genVelocity > 0 ? genVelocity : velocity);
+    const std::int16_t genVelocity = generators.getOrDefault(sf::Generator::Velocity);
+    updateSFController(sf::GeneralController::NoteOnVelocity, genVelocity > 0 ? genVelocity : velocity);
 
-    const std::int16_t genKey = generators.getOrDefault(sf::Generator::keynum);
+    const std::int16_t genKey = generators.getOrDefault(sf::Generator::Keynum);
     const std::int16_t overriddenKey = genKey > 0 ? genKey : key;
     keyScaling_ = 60 - overriddenKey;
-    updateSFController(sf::GeneralController::noteOnKeyNumber, overriddenKey);
+    updateSFController(sf::GeneralController::NoteOnKeyNumber, overriddenKey);
 
-    int unnormedMinAtten = generators_.getOrDefault(sf::Generator::initialAttenuation);
+    int unnormedMinAtten = generators_.getOrDefault(sf::Generator::InitialAttenuation);
     for (const auto& mod : modulators_) {
-        if (mod.getDestination() == sf::Generator::initialAttenuation && !mod.isAlwaysNonNegative()) {
+        if (mod.getDestination() == sf::Generator::InitialAttenuation && !mod.isAlwaysNonNegative()) {
             // !isAlywaysNonNegative() means mod may increase volume
             unnormedMinAtten -= std::abs(mod.getAmount());
         }
@@ -67,24 +67,24 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
         modulated_.at(i) = generators.getOrDefault(static_cast<sf::Generator>(i));
     }
     static const auto INIT_GENERATORS = {
-        sf::Generator::pan,
-        sf::Generator::delayModLFO,
-        sf::Generator::freqModLFO,
-        sf::Generator::delayVibLFO,
-        sf::Generator::freqVibLFO,
-        sf::Generator::delayModEnv,
-        sf::Generator::attackModEnv,
-        sf::Generator::holdModEnv,
-        sf::Generator::decayModEnv,
-        sf::Generator::sustainModEnv,
-        sf::Generator::releaseModEnv,
-        sf::Generator::delayVolEnv,
-        sf::Generator::attackVolEnv,
-        sf::Generator::holdVolEnv,
-        sf::Generator::decayVolEnv,
-        sf::Generator::sustainVolEnv,
-        sf::Generator::releaseVolEnv,
-        sf::Generator::coarseTune
+        sf::Generator::Pan,
+        sf::Generator::DelayModLFO,
+        sf::Generator::FreqModLFO,
+        sf::Generator::DelayVibLFO,
+        sf::Generator::FreqVibLFO,
+        sf::Generator::DelayModEnv,
+        sf::Generator::AttackModEnv,
+        sf::Generator::HoldModEnv,
+        sf::Generator::DecayModEnv,
+        sf::Generator::SustainModEnv,
+        sf::Generator::ReleaseModEnv,
+        sf::Generator::DelayVolEnv,
+        sf::Generator::AttackVolEnv,
+        sf::Generator::HoldVolEnv,
+        sf::Generator::DecayVolEnv,
+        sf::Generator::SustainVolEnv,
+        sf::Generator::ReleaseVolEnv,
+        sf::Generator::CoarseTune
     };
     for (const auto& generator : INIT_GENERATORS) {
         updateModulatedParams(generator);
@@ -100,7 +100,7 @@ std::uint8_t Voice::getActualKey() const {
 }
 
 std::int16_t Voice::getExclusiveClass() const {
-    return generators_.getOrDefault(sf::Generator::exclusiveClass);
+    return generators_.getOrDefault(sf::Generator::ExclusiveClass);
 }
 
 const Voice::State& Voice::getStatus() const {
@@ -138,12 +138,12 @@ void Voice::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
 
 void Voice::updateFineTuning(double fineTuning) {
     fineTuning_ = fineTuning;
-    updateModulatedParams(sf::Generator::fineTune);
+    updateModulatedParams(sf::Generator::FineTune);
 }
 
 void Voice::updateCoarseTuning(double coarseTuning) {
     coarseTuning_ = coarseTuning;
-    updateModulatedParams(sf::Generator::coarseTune);
+    updateModulatedParams(sf::Generator::CoarseTune);
 }
 
 void Voice::release(bool sustained) {
@@ -216,12 +216,12 @@ void Voice::update() {
         modLFO_.update();
 
         deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(voicePitch_
-            + 0.01 * getModulatedGenerator(sf::Generator::modEnvToPitch) * modEnv_.getValue()
-            + 0.01 * getModulatedGenerator(sf::Generator::vibLfoToPitch) * vibLFO_.getValue()
-            + 0.01 * getModulatedGenerator(sf::Generator::modLfoToPitch) * modLFO_.getValue()));
+            + 0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnv_.getValue()
+            + 0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue()
+            + 0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
 
         envLFOVolume_ = (volEnv_.getValue()
-            * conv::attenToAmp(getModulatedGenerator(sf::Generator::modLfoToVolume) * modLFO_.getValue()))
+            * conv::attenToAmp(getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue()))
             * volume_;
     }
 }
@@ -243,7 +243,7 @@ StereoValue calculatePannedVolume(double pan) {
 
 void Voice::updateModulatedParams(sf::Generator destination) {
     double& modulated = modulated_.at(static_cast<std::size_t>(destination));
-    modulated = (destination == sf::Generator::initialAttenuation ? 0.4 : 1)
+    modulated = (destination == sf::Generator::InitialAttenuation ? 0.4 : 1)
         * generators_.getOrDefault(destination);
     for (auto& mod : modulators_) {
         if (mod.getDestination() == destination) {
@@ -251,77 +251,77 @@ void Voice::updateModulatedParams(sf::Generator destination) {
         }
     }
     switch (destination) {
-    case sf::Generator::pan:
-    case sf::Generator::initialAttenuation: {
-        volume_ = conv::attenToAmp(getModulatedGenerator(sf::Generator::initialAttenuation))
-            * calculatePannedVolume(getModulatedGenerator(sf::Generator::pan));
+    case sf::Generator::Pan:
+    case sf::Generator::InitialAttenuation: {
+        volume_ = conv::attenToAmp(getModulatedGenerator(sf::Generator::InitialAttenuation))
+            * calculatePannedVolume(getModulatedGenerator(sf::Generator::Pan));
         break;
     }
-    case sf::Generator::delayModLFO:
+    case sf::Generator::DelayModLFO:
         modLFO_.setDelay(modulated);
         break;
-    case sf::Generator::freqModLFO:
+    case sf::Generator::FreqModLFO:
         modLFO_.setFrequency(modulated);
         break;
-    case sf::Generator::delayVibLFO:
+    case sf::Generator::DelayVibLFO:
         vibLFO_.setDelay(modulated);
         break;
-    case sf::Generator::freqVibLFO:
+    case sf::Generator::FreqVibLFO:
         vibLFO_.setFrequency(modulated);
         break;
-    case sf::Generator::delayModEnv:
+    case sf::Generator::DelayModEnv:
         modEnv_.setParameter(Envelope::Section::Delay, modulated);
         break;
-    case sf::Generator::attackModEnv:
+    case sf::Generator::AttackModEnv:
         modEnv_.setParameter(Envelope::Section::Attack, modulated);
         break;
-    case sf::Generator::holdModEnv:
-    case sf::Generator::keynumToModEnvHold:
+    case sf::Generator::HoldModEnv:
+    case sf::Generator::KeynumToModEnvHold:
         modEnv_.setParameter(Envelope::Section::Hold,
-            getModulatedGenerator(sf::Generator::holdModEnv) + getModulatedGenerator(sf::Generator::keynumToModEnvHold) * keyScaling_);
+            getModulatedGenerator(sf::Generator::HoldModEnv) + getModulatedGenerator(sf::Generator::KeynumToModEnvHold) * keyScaling_);
         break;
-    case sf::Generator::decayModEnv:
-    case sf::Generator::keynumToModEnvDecay:
+    case sf::Generator::DecayModEnv:
+    case sf::Generator::KeynumToModEnvDecay:
         modEnv_.setParameter(Envelope::Section::Decay,
-            getModulatedGenerator(sf::Generator::decayModEnv) + getModulatedGenerator(sf::Generator::keynumToModEnvDecay) * keyScaling_);
+            getModulatedGenerator(sf::Generator::DecayModEnv) + getModulatedGenerator(sf::Generator::KeynumToModEnvDecay) * keyScaling_);
         break;
-    case sf::Generator::sustainModEnv:
+    case sf::Generator::SustainModEnv:
         modEnv_.setParameter(Envelope::Section::Sustain, modulated);
         break;
-    case sf::Generator::releaseModEnv:
+    case sf::Generator::ReleaseModEnv:
         modEnv_.setParameter(Envelope::Section::Release, modulated);
         break;
-    case sf::Generator::delayVolEnv:
+    case sf::Generator::DelayVolEnv:
         volEnv_.setParameter(Envelope::Section::Delay, modulated);
         break;
-    case sf::Generator::attackVolEnv:
+    case sf::Generator::AttackVolEnv:
         volEnv_.setParameter(Envelope::Section::Attack, modulated);
         break;
-    case sf::Generator::holdVolEnv:
-    case sf::Generator::keynumToVolEnvHold:
+    case sf::Generator::HoldVolEnv:
+    case sf::Generator::KeynumToVolEnvHold:
         volEnv_.setParameter(Envelope::Section::Hold,
-            getModulatedGenerator(sf::Generator::holdVolEnv) + getModulatedGenerator(sf::Generator::keynumToVolEnvHold) * keyScaling_);
+            getModulatedGenerator(sf::Generator::HoldVolEnv) + getModulatedGenerator(sf::Generator::KeynumToVolEnvHold) * keyScaling_);
         break;
-    case sf::Generator::decayVolEnv:
-    case sf::Generator::keynumToVolEnvDecay:
+    case sf::Generator::DecayVolEnv:
+    case sf::Generator::KeynumToVolEnvDecay:
         volEnv_.setParameter(Envelope::Section::Decay,
-            getModulatedGenerator(sf::Generator::decayVolEnv) + getModulatedGenerator(sf::Generator::keynumToVolEnvDecay) * keyScaling_);
+            getModulatedGenerator(sf::Generator::DecayVolEnv) + getModulatedGenerator(sf::Generator::KeynumToVolEnvDecay) * keyScaling_);
         break;
-    case sf::Generator::sustainVolEnv:
+    case sf::Generator::SustainVolEnv:
         volEnv_.setParameter(Envelope::Section::Sustain, modulated);
         break;
-    case sf::Generator::releaseVolEnv:
+    case sf::Generator::ReleaseVolEnv:
         volEnv_.setParameter(Envelope::Section::Release, modulated);
         break;
-    case sf::Generator::coarseTune:
-    case sf::Generator::fineTune:
-    case sf::Generator::scaleTuning:
-    case sf::Generator::pitch:
+    case sf::Generator::CoarseTune:
+    case sf::Generator::FineTune:
+    case sf::Generator::ScaleTuning:
+    case sf::Generator::Pitch:
         voicePitch_ = rtSample_.pitch
-            + 0.01 * getModulatedGenerator(sf::Generator::pitch)
-            + 0.01 * generators_.getOrDefault(sf::Generator::scaleTuning) * (actualKey_ - rtSample_.pitch)
-            + coarseTuning_ + getModulatedGenerator(sf::Generator::coarseTune)
-            + 0.01 * (fineTuning_ + getModulatedGenerator(sf::Generator::fineTune));
+            + 0.01 * getModulatedGenerator(sf::Generator::Pitch)
+            + 0.01 * generators_.getOrDefault(sf::Generator::ScaleTuning) * (actualKey_ - rtSample_.pitch)
+            + coarseTuning_ + getModulatedGenerator(sf::Generator::CoarseTune)
+            + 0.01 * (fineTuning_ + getModulatedGenerator(sf::Generator::FineTune));
         break;
     }
 }

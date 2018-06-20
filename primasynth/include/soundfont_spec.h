@@ -5,10 +5,10 @@ namespace primasynth {
 namespace sf {
 
 enum class SampleLink : std::uint16_t {
-    monoSample = 1,
-    rightSample = 2,
-    leftSample = 4,
-    linkedSample = 8,
+    MonoSample = 1,
+    RightSample = 2,
+    LeftSample = 4,
+    LinkedSample = 8,
     RomMonoSample = 0x8001,
     RomRightSample = 0x8002,
     RomLeftSample = 0x8004,
@@ -16,93 +16,93 @@ enum class SampleLink : std::uint16_t {
 };
 
 enum class Generator : std::uint16_t {
-    startAddrsOffset = 0,
-    endAddrsOffset = 1,
-    startloopAddrsOffset = 2,
-    endloopAddrsOffset = 3,
-    startAddrsCoarseOffset = 4,
-    modLfoToPitch = 5,
-    vibLfoToPitch = 6,
-    modEnvToPitch = 7,
-    initialFilterFc = 8,
-    initialFilterQ = 9,
-    modLfoToFilterFc = 10,
-    modEnvToFilterFc = 11,
-    endAddrsCoarseOffset = 12,
-    modLfoToVolume = 13,
-    chorusEffectsSend = 15,
-    reverbEffectsSend = 16,
-    pan = 17,
-    delayModLFO = 21,
-    freqModLFO = 22,
-    delayVibLFO = 23,
-    freqVibLFO = 24,
-    delayModEnv = 25,
-    attackModEnv = 26,
-    holdModEnv = 27,
-    decayModEnv = 28,
-    sustainModEnv = 29,
-    releaseModEnv = 30,
-    keynumToModEnvHold = 31,
-    keynumToModEnvDecay = 32,
-    delayVolEnv = 33,
-    attackVolEnv = 34,
-    holdVolEnv = 35,
-    decayVolEnv = 36,
-    sustainVolEnv = 37,
-    releaseVolEnv = 38,
-    keynumToVolEnvHold = 39,
-    keynumToVolEnvDecay = 40,
-    instrument = 41,
-    keyRange = 43,
-    velRange = 44,
-    startloopAddrsCoarseOffset = 45,
-    keynum = 46,
-    velocity = 47,
-    initialAttenuation = 48,
-    endloopAddrsCoarseOffset = 50,
-    coarseTune = 51,
-    fineTune = 52,
-    sampleID = 53,
-    sampleModes = 54,
-    scaleTuning = 56,
-    exclusiveClass = 57,
-    overridingRootKey = 58,
-    pitch = 59,
-    endOper = 60
+    StartAddrsOffset = 0,
+    EndAddrsOffset = 1,
+    StartloopAddrsOffset = 2,
+    EndloopAddrsOffset = 3,
+    StartAddrsCoarseOffset = 4,
+    ModLfoToPitch = 5,
+    VibLfoToPitch = 6,
+    ModEnvToPitch = 7,
+    InitialFilterFc = 8,
+    InitialFilterQ = 9,
+    ModLfoToFilterFc = 10,
+    ModEnvToFilterFc = 11,
+    EndAddrsCoarseOffset = 12,
+    ModLfoToVolume = 13,
+    ChorusEffectsSend = 15,
+    ReverbEffectsSend = 16,
+    Pan = 17,
+    DelayModLFO = 21,
+    FreqModLFO = 22,
+    DelayVibLFO = 23,
+    FreqVibLFO = 24,
+    DelayModEnv = 25,
+    AttackModEnv = 26,
+    HoldModEnv = 27,
+    DecayModEnv = 28,
+    SustainModEnv = 29,
+    ReleaseModEnv = 30,
+    KeynumToModEnvHold = 31,
+    KeynumToModEnvDecay = 32,
+    DelayVolEnv = 33,
+    AttackVolEnv = 34,
+    HoldVolEnv = 35,
+    DecayVolEnv = 36,
+    SustainVolEnv = 37,
+    ReleaseVolEnv = 38,
+    KeynumToVolEnvHold = 39,
+    KeynumToVolEnvDecay = 40,
+    Instrument = 41,
+    KeyRange = 43,
+    VelRange = 44,
+    StartloopAddrsCoarseOffset = 45,
+    Keynum = 46,
+    Velocity = 47,
+    InitialAttenuation = 48,
+    EndloopAddrsCoarseOffset = 50,
+    CoarseTune = 51,
+    FineTune = 52,
+    SampleID = 53,
+    SampleModes = 54,
+    ScaleTuning = 56,
+    ExclusiveClass = 57,
+    OverridingRootKey = 58,
+    Pitch = 59,
+    EndOper = 60
 };
 
 enum class GeneralController : std::uint8_t {
-    noController = 0,
-    noteOnVelocity = 2,
-    noteOnKeyNumber = 3,
-    polyPressure = 10,
-    channelPressure = 13,
-    pitchWheel = 14,
-    pitchWheelSensitivity = 16,
-    link = 127
+    NoController = 0,
+    NoteOnVelocity = 2,
+    NoteOnKeyNumber = 3,
+    PolyPressure = 10,
+    ChannelPressure = 13,
+    PitchWheel = 14,
+    PitchWheelSensitivity = 16,
+    Link = 127
 };
 
 enum class ControllerPalette {
-    general = 0,
-    midi = 1
+    General = 0,
+    MIDI = 1
 };
 
 enum class SourceDirection {
-    positive = 0,
-    negative = 1
+    Positive = 0,
+    Negative = 1
 };
 
 enum class SourcePolarity {
-    unipolar = 0,
-    bipolar = 1
+    Unipolar = 0,
+    Bipolar = 1
 };
 
 enum class SourceType {
-    linear = 0,
-    concave = 1,
-    convex = 2,
-    switchType = 3
+    Linear = 0,
+    Concave = 1,
+    Convex = 2,
+    Switch = 3
 };
 
 struct Modulator {
@@ -117,8 +117,8 @@ struct Modulator {
 };
 
 enum class Transform : std::uint16_t {
-    linear = 0,
-    absoluteValue = 2
+    Linear = 0,
+    AbsoluteValue = 2
 };
 
 struct RangesType {
