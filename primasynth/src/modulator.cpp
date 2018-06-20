@@ -11,17 +11,17 @@ Modulator::Modulator(const sf::ModList& param) :
     value_(0.0) {}
 
 bool Modulator::isSourceSFController(sf::GeneralController controller) const {
-    return (param_.sfModSrcOper.palette == sf::ControllerPalette::General && controller == param_.sfModSrcOper.index.general)
-        || (param_.sfModAmtSrcOper.palette == sf::ControllerPalette::General && controller == param_.sfModAmtSrcOper.index.general);
+    return (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general)
+        || (param_.modAmtSrcOper.palette == sf::ControllerPalette::General && controller == param_.modAmtSrcOper.index.general);
 }
 
 bool Modulator::isSourceMIDIController(std::uint8_t controller) const {
-    return (param_.sfModSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.sfModSrcOper.index.midi)
-        || (param_.sfModAmtSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.sfModAmtSrcOper.index.midi);
+    return (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi)
+        || (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modAmtSrcOper.index.midi);
 }
 
 sf::Generator Modulator::getDestination() const {
-    return param_.sfModDestOper;
+    return param_.modDestOper;
 }
 
 std::int16_t Modulator::getAmount() const {
@@ -29,19 +29,19 @@ std::int16_t Modulator::getAmount() const {
 }
 
 bool Modulator::isAlwaysNonNegative() const {
-    if (param_.sfModTransOper == sf::Transform::AbsoluteValue
+    if (param_.modTransOper == sf::Transform::AbsoluteValue
         || param_.modAmount == 0) {
 
         return true;
     }
 
     if (param_.modAmount > 0) {
-        const bool noSrc = param_.sfModSrcOper.palette == sf::ControllerPalette::General
-            && param_.sfModSrcOper.index.general == sf::GeneralController::NoController;
-        const bool uniSrc = param_.sfModSrcOper.polarity == sf::SourcePolarity::Unipolar;
-        const bool noAmt = param_.sfModAmtSrcOper.palette == sf::ControllerPalette::General
-            && param_.sfModAmtSrcOper.index.general == sf::GeneralController::NoController;
-        const bool uniAmt = param_.sfModAmtSrcOper.polarity == sf::SourcePolarity::Unipolar;
+        const bool noSrc = param_.modSrcOper.palette == sf::ControllerPalette::General
+            && param_.modSrcOper.index.general == sf::GeneralController::NoController;
+        const bool uniSrc = param_.modSrcOper.polarity == sf::SourcePolarity::Unipolar;
+        const bool noAmt = param_.modAmtSrcOper.palette == sf::ControllerPalette::General
+            && param_.modAmtSrcOper.index.general == sf::GeneralController::NoController;
+        const bool uniAmt = param_.modAmtSrcOper.polarity == sf::SourcePolarity::Unipolar;
 
         if ((uniSrc && uniAmt) || (uniSrc && noAmt) || (noSrc && uniAmt) || (noSrc && noAmt)) {
             return true;
@@ -114,21 +114,21 @@ double map(double value, sf::Modulator mod) {
 }
 
 void Modulator::updateSFController(sf::GeneralController controller, std::int16_t value) {
-    if (param_.sfModSrcOper.palette == sf::ControllerPalette::General && controller == param_.sfModSrcOper.index.general) {
-        source_ = map(value, param_.sfModSrcOper);
+    if (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general) {
+        source_ = map(value, param_.modSrcOper);
     }
-    if (param_.sfModAmtSrcOper.palette == sf::ControllerPalette::General && controller == param_.sfModAmtSrcOper.index.general) {
-        amountSource_ = map(value, param_.sfModAmtSrcOper);
+    if (param_.modAmtSrcOper.palette == sf::ControllerPalette::General && controller == param_.modAmtSrcOper.index.general) {
+        amountSource_ = map(value, param_.modAmtSrcOper);
     }
     calculateValue();
 }
 
 void Modulator::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
-    if (param_.sfModSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.sfModSrcOper.index.midi) {
-        source_ = map(value, param_.sfModSrcOper);
+    if (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi) {
+        source_ = map(value, param_.modSrcOper);
     }
-    if (param_.sfModAmtSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.sfModAmtSrcOper.index.midi) {
-        amountSource_ = map(value, param_.sfModAmtSrcOper);
+    if (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modAmtSrcOper.index.midi) {
+        amountSource_ = map(value, param_.modAmtSrcOper);
     }
     calculateValue();
 }
@@ -144,7 +144,7 @@ double transform(double value, sf::Transform transform) {
 }
 
 void Modulator::calculateValue() {
-    value_ = transform(param_.modAmount * source_ * amountSource_, param_.sfModTransOper);
+    value_ = transform(param_.modAmount * source_ * amountSource_, param_.modTransOper);
 }
 
 }

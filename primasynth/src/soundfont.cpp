@@ -105,154 +105,154 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
         {
             // MIDI Note-On Velocity to Initial Attenuation
             sf::ModList mp;
-            mp.sfModSrcOper.index.general = sf::GeneralController::NoteOnVelocity;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Negative;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Concave;
-            mp.sfModDestOper = sf::Generator::InitialAttenuation;
+            mp.modSrcOper.index.general = sf::GeneralController::NoteOnVelocity;
+            mp.modSrcOper.palette = sf::ControllerPalette::General;
+            mp.modSrcOper.direction = sf::SourceDirection::Negative;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Concave;
+            mp.modDestOper = sf::Generator::InitialAttenuation;
             mp.modAmount = 960;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Note-On Velocity to Filter Cutoff
             sf::ModList mp;
-            mp.sfModSrcOper.index.general = sf::GeneralController::NoteOnVelocity;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Negative;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::InitialFilterFc;
+            mp.modSrcOper.index.general = sf::GeneralController::NoteOnVelocity;
+            mp.modSrcOper.palette = sf::ControllerPalette::General;
+            mp.modSrcOper.direction = sf::SourceDirection::Negative;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::InitialFilterFc;
             mp.modAmount = -2400;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Channel Pressure to Vibrato LFO Pitch Depth
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 13;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::VibLfoToPitch;
+            mp.modSrcOper.index.midi = 13;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::VibLfoToPitch;
             mp.modAmount = 50;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Continuous Controller 1 to Vibrato LFO Pitch Depth
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 1;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::VibLfoToPitch;
+            mp.modSrcOper.index.midi = 1;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::VibLfoToPitch;
             mp.modAmount = 50;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Continuous Controller 7 to Initial Attenuation Source
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 7;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Negative;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Concave;
-            mp.sfModDestOper = sf::Generator::InitialAttenuation;
+            mp.modSrcOper.index.midi = 7;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Negative;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Concave;
+            mp.modDestOper = sf::Generator::InitialAttenuation;
             mp.modAmount = 960;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Continuous Controller 10 to Pan Position
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 10;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Bipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::Pan;
+            mp.modSrcOper.index.midi = 10;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Bipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::Pan;
             mp.modAmount = 500;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Continuous Controller 11 to Initial Attenuation
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 11;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Negative;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Concave;
-            mp.sfModDestOper = sf::Generator::InitialAttenuation;
+            mp.modSrcOper.index.midi = 11;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Negative;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Concave;
+            mp.modDestOper = sf::Generator::InitialAttenuation;
             mp.modAmount = 960;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Continuous Controller 91 to Reverb Effects Send
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 91;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::ReverbEffectsSend;
+            mp.modSrcOper.index.midi = 91;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::ReverbEffectsSend;
             mp.modAmount = 200;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Continuous Controller 93 to Reverb Effects Send
             sf::ModList mp;
-            mp.sfModSrcOper.index.midi = 93;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::MIDI;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::ChorusEffectsSend;
+            mp.modSrcOper.index.midi = 93;
+            mp.modSrcOper.palette = sf::ControllerPalette::MIDI;
+            mp.modSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::ChorusEffectsSend;
             mp.modAmount = 200;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::NoController;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::NoController;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
         {
             // MIDI Pitch Wheel to Initial Pitch Controlled by MIDI Pitch Wheel Sensitivity
             sf::ModList mp;
-            mp.sfModSrcOper.index.general = sf::GeneralController::PitchWheel;
-            mp.sfModSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModSrcOper.polarity = sf::SourcePolarity::Bipolar;
-            mp.sfModSrcOper.type = sf::SourceType::Linear;
-            mp.sfModDestOper = sf::Generator::Pitch;
+            mp.modSrcOper.index.general = sf::GeneralController::PitchWheel;
+            mp.modSrcOper.palette = sf::ControllerPalette::General;
+            mp.modSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modSrcOper.polarity = sf::SourcePolarity::Bipolar;
+            mp.modSrcOper.type = sf::SourceType::Linear;
+            mp.modDestOper = sf::Generator::Pitch;
             mp.modAmount = 12700;
-            mp.sfModAmtSrcOper.index.general = sf::GeneralController::PitchWheelSensitivity;
-            mp.sfModAmtSrcOper.palette = sf::ControllerPalette::General;
-            mp.sfModAmtSrcOper.direction = sf::SourceDirection::Positive;
-            mp.sfModAmtSrcOper.polarity = sf::SourcePolarity::Unipolar;
-            mp.sfModAmtSrcOper.type = sf::SourceType::Linear;
-            mp.sfModTransOper = sf::Transform::Linear;
+            mp.modAmtSrcOper.index.general = sf::GeneralController::PitchWheelSensitivity;
+            mp.modAmtSrcOper.palette = sf::ControllerPalette::General;
+            mp.modAmtSrcOper.direction = sf::SourceDirection::Positive;
+            mp.modAmtSrcOper.polarity = sf::SourcePolarity::Unipolar;
+            mp.modAmtSrcOper.type = sf::SourceType::Linear;
+            mp.modTransOper = sf::Transform::Linear;
             params.append(mp);
         }
     }
@@ -272,10 +272,10 @@ bool operator==(const sf::Modulator& a, const sf::Modulator& b) {
 }
 
 bool modulatorsAreIdentical(const sf::ModList& a, const sf::ModList& b) {
-    return a.sfModSrcOper == b.sfModSrcOper
-        && a.sfModDestOper == b.sfModDestOper
-        && a.sfModAmtSrcOper == b.sfModAmtSrcOper
-        && a.sfModTransOper == b.sfModTransOper;
+    return a.modSrcOper == b.modSrcOper
+        && a.modDestOper == b.modDestOper
+        && a.modAmtSrcOper == b.modAmtSrcOper
+        && a.modTransOper == b.modTransOper;
 }
 
 void ModulatorParameterSet::append(const sf::ModList& modparam) {
@@ -400,7 +400,7 @@ void SoundFont::readInfoChunk(std::ifstream& ifs, std::size_t size) {
         case toFourCC("ifil"): {
             sf::VersionTag ver;
             ifs.read(reinterpret_cast<char*>(&ver), subchunkHeader.size);
-            if (ver.wMajor > 2 || ver.wMinor > 4) {
+            if (ver.major > 2 || ver.minor > 4) {
                 throw std::runtime_error("SoundFont later than 2.04 not supported");
             }
             break;
@@ -468,11 +468,11 @@ void readModList(std::ifstream& ifs, std::vector<sf::ModList>& list, std::uint32
     list.reserve(totalSize / STRUCT_SIZE);
     for (std::size_t i = 0; i < totalSize / STRUCT_SIZE; ++i) {
         sf::ModList mod;
-        readModulator(ifs, mod.sfModSrcOper);
-        ifs.read(reinterpret_cast<char*>(&mod.sfModDestOper), 2);
+        readModulator(ifs, mod.modSrcOper);
+        ifs.read(reinterpret_cast<char*>(&mod.modDestOper), 2);
         ifs.read(reinterpret_cast<char*>(&mod.modAmount), 2);
-        readModulator(ifs, mod.sfModAmtSrcOper);
-        ifs.read(reinterpret_cast<char*>(&mod.sfModTransOper), 2);
+        readModulator(ifs, mod.modAmtSrcOper);
+        ifs.read(reinterpret_cast<char*>(&mod.modTransOper), 2);
         list.push_back(mod);
     }
 }
@@ -484,31 +484,31 @@ void readBags(std::vector<Zone>& zones, const ItBag& bagBegin, const ItBag& bagE
     Zone globalZone;
     for (auto it_bag = bagBegin; it_bag != bagEnd; ++it_bag) {
         Zone zone;
-        const auto& beginGen = genBegin + it_bag->wGenNdx;
-        const auto& endGen = genBegin + std::next(it_bag)->wGenNdx;
+        const auto& beginGen = genBegin + it_bag->genNdx;
+        const auto& endGen = genBegin + std::next(it_bag)->genNdx;
         for (auto it_gen = beginGen; it_gen != endGen; ++it_gen) {
-            switch (it_gen->sfGenOper) {
+            switch (it_gen->genOper) {
             case sf::Generator::KeyRange: {
                 const auto& range = it_gen->genAmount.ranges;
-                zone.keyRange = {range.byLo, range.byHi};
+                zone.keyRange = {range.lo, range.hi};
                 break;
             }
             case sf::Generator::VelRange: {
                 const auto& range = it_gen->genAmount.ranges;
-                zone.velocityRange = {range.byLo, range.byHi};
+                zone.velocityRange = {range.lo, range.hi};
                 break;
             }
             default:
-                zone.generators.set(it_gen->sfGenOper, it_gen->genAmount.shAmount);
+                zone.generators.set(it_gen->genOper, it_gen->genAmount.shAmount);
                 break;
             }
         }
-        const auto& beginMod = modBegin + it_bag->wModNdx;
-        const auto& endMod = modBegin + std::next(it_bag)->wModNdx;
+        const auto& beginMod = modBegin + it_bag->modNdx;
+        const auto& endMod = modBegin + std::next(it_bag)->modNdx;
         for (auto it_mod = beginMod; it_mod != endMod; ++it_mod) {
             zone.modulatorParameters.append(*it_mod);
         }
-        if (beginGen != endGen && std::prev(endGen)->sfGenOper == indexGen) {
+        if (beginGen != endGen && std::prev(endGen)->genOper == indexGen) {
             zones.push_back(zone);
         } else if (it_bag == bagBegin && (beginGen != endGen || beginMod != endMod)) {
             globalZone = zone;
@@ -569,22 +569,22 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
     for (auto it_inst = inst.begin(); it_inst != std::prev(inst.end()); ++it_inst) {
         instruments_.emplace_back();
         auto& instrument = instruments_.back();
-        instrument.name = achToString(it_inst->achInstName);
+        instrument.name = achToString(it_inst->instName);
 
-        const auto& bagBegin = ibag.begin() + it_inst->wInstBagNdx;
-        const auto& bagEnd = ibag.begin() + std::next(it_inst)->wInstBagNdx;
+        const auto& bagBegin = ibag.begin() + it_inst->instBagNdx;
+        const auto& bagEnd = ibag.begin() + std::next(it_inst)->instBagNdx;
         readBags(instrument.zones, bagBegin, bagEnd, igen.begin(), imod.begin(), sf::Generator::SampleID);
     }
 
     presets_.reserve(phdr.size() - 1);
     for (auto it_phdr = phdr.begin(); it_phdr != std::prev(phdr.end()); ++it_phdr) {
         const auto preset = std::make_shared<Preset>(*this);
-        preset->name = achToString(it_phdr->achPresetName);
-        preset->bank = it_phdr->wBank;
-        preset->presetID = it_phdr->wPreset;
+        preset->name = achToString(it_phdr->presetName);
+        preset->bank = it_phdr->bank;
+        preset->presetID = it_phdr->preset;
 
-        const auto& bagBegin = pbag.begin() + it_phdr->wPresetBagNdx;
-        const auto& bagEnd = pbag.begin() + std::next(it_phdr)->wPresetBagNdx;
+        const auto& bagBegin = pbag.begin() + it_phdr->presetBagNdx;
+        const auto& bagEnd = pbag.begin() + std::next(it_phdr)->presetBagNdx;
         readBags(preset->zones, bagBegin, bagEnd, pgen.begin(), pmod.begin(), sf::Generator::Instrument);
 
         presets_.push_back(preset);
@@ -594,14 +594,14 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
     for (auto it_shdr = shdr.begin(); it_shdr < std::prev(shdr.end()); ++it_shdr) {
         samples_.emplace_back(sampleBuffer_);
         auto& sample = samples_.back();
-        sample.name = achToString(it_shdr->achSampleName);
-        sample.start = it_shdr->dwStart;
-        sample.end = it_shdr->dwEnd;
-        sample.startLoop = it_shdr->dwStartloop;
-        sample.endLoop = it_shdr->dwEndloop;
-        sample.sampleRate = it_shdr->dwSampleRate;
-        sample.key = it_shdr->byOriginalKey;
-        sample.correction = it_shdr->chCorrection;
+        sample.name = achToString(it_shdr->sampleName);
+        sample.start = it_shdr->start;
+        sample.end = it_shdr->end;
+        sample.startLoop = it_shdr->startloop;
+        sample.endLoop = it_shdr->endloop;
+        sample.sampleRate = it_shdr->sampleRate;
+        sample.key = it_shdr->originalKey;
+        sample.correction = it_shdr->correction;
 
         int sampleMax = 0;
         for (std::size_t i = sample.start; i < sample.end; ++i) {

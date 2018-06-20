@@ -122,8 +122,8 @@ enum class Transform : std::uint16_t {
 };
 
 struct RangesType {
-    std::int8_t byLo;
-    std::int8_t byHi;
+    std::int8_t lo;
+    std::int8_t hi;
 };
 
 union GenAmountType {
@@ -133,54 +133,54 @@ union GenAmountType {
 };
 
 struct VersionTag {
-    std::uint16_t wMajor;
-    std::uint16_t wMinor;
+    std::uint16_t major;
+    std::uint16_t minor;
 };
 
 struct PresetHeader {
-    char achPresetName[20];
-    std::uint16_t wPreset;
-    std::uint16_t wBank;
-    std::uint16_t wPresetBagNdx;
-    std::uint32_t dwLibrary;
-    std::uint32_t dwGenre;
-    std::uint32_t dwMorphology;
+    char presetName[20];
+    std::uint16_t preset;
+    std::uint16_t bank;
+    std::uint16_t presetBagNdx;
+    std::uint32_t library;
+    std::uint32_t genre;
+    std::uint32_t morphology;
 };
 
 struct Bag {
-    std::uint16_t wGenNdx;
-    std::uint16_t wModNdx;
+    std::uint16_t genNdx;
+    std::uint16_t modNdx;
 };
 
 struct ModList {
-    Modulator sfModSrcOper;
-    Generator sfModDestOper;
+    Modulator modSrcOper;
+    Generator modDestOper;
     std::int16_t modAmount;
-    Modulator sfModAmtSrcOper;
-    Transform sfModTransOper;
+    Modulator modAmtSrcOper;
+    Transform modTransOper;
 };
 
 struct GenList {
-    Generator sfGenOper;
+    Generator genOper;
     GenAmountType genAmount;
 };
 
 struct Inst {
-    char achInstName[20];
-    std::uint16_t wInstBagNdx;
+    char instName[20];
+    std::uint16_t instBagNdx;
 };
 
 struct Sample {
-    char achSampleName[20];
-    std::uint32_t dwStart;
-    std::uint32_t dwEnd;
-    std::uint32_t dwStartloop;
-    std::uint32_t dwEndloop;
-    std::uint32_t dwSampleRate;
-    std::int8_t byOriginalKey;
-    std::int8_t chCorrection;
-    std::uint16_t wSampleLink;
-    SampleLink sfSampleType;
+    char sampleName[20];
+    std::uint32_t start;
+    std::uint32_t end;
+    std::uint32_t startloop;
+    std::uint32_t endloop;
+    std::uint32_t sampleRate;
+    std::int8_t originalKey;
+    std::int8_t correction;
+    std::uint16_t sampleLink;
+    SampleLink sampleType;
 };
 
 }
