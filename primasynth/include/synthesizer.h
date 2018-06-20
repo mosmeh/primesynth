@@ -22,7 +22,7 @@ private:
     double volume_;
     std::shared_ptr<const Preset> defaultPreset_, defaultPercussionPreset_;
 
-    std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetNum) const;
+    std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetID) const;
 };
 
 }

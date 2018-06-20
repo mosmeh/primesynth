@@ -79,7 +79,7 @@ class SoundFont;
 
 struct Preset {
     std::string name;
-    std::uint16_t bank, presetNum;
+    std::uint16_t bank, presetID;
     std::vector<Zone> zones;
     const SoundFont& soundFont;
 

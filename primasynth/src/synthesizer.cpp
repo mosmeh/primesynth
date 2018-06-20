@@ -40,8 +40,8 @@ void Synthesizer::setMIDIStandard(midi::Standard midiStandard, bool fixed) {
 
 void Synthesizer::processShortMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
-    const std::uint8_t channelNum = msg[0] & 0xf;
-    const auto& channel = channels_.at(channelNum);
+    const std::uint8_t channelID = msg[0] & 0xf;
+    const auto& channel = channels_.at(channelID);
     const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
     switch (status) {
     case midi::MessageStatus::NoteOff:
@@ -70,7 +70,7 @@ void Synthesizer::processShortMessage(unsigned long param) {
         default:
             throw std::runtime_error("unknown MIDI standard");
         }
-        channel->setPreset(findPreset(channelNum == midi::PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
+        channel->setPreset(findPreset(channelID == midi::PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
         break;
     }
     case midi::MessageStatus::ChannelPressure:
@@ -129,10 +129,10 @@ StereoValue Synthesizer::render() const {
     return volume_ * sum;
 }
 
-std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint8_t presetNum) const {
+std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint8_t presetID) const {
     for (const auto& sf : soundFonts_) {
         for (const auto& preset : sf->getPresetPtrs()) {
-            if (preset->bank == bank && preset->presetNum == presetNum) {
+            if (preset->bank == bank && preset->presetID == presetID) {
                 return preset;
             }
         }
@@ -141,14 +141,14 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
     // fallback
     if (bank == PERCUSSION_BANK) {
         // if percussion bank
-        if (presetNum != 0 && defaultPercussionPreset_) {
+        if (presetID != 0 && defaultPercussionPreset_) {
             return defaultPercussionPreset_;
         } else {
             throw std::runtime_error("failed to find preset 128:0 (GM Percussion)");
         }
     } else if (bank != 0) {
         // fall back to GM bank
-        return findPreset(0, presetNum);
+        return findPreset(0, presetID);
     } else if (defaultPreset_) {
         // preset not found even in GM bank, fall back to Piano
         return defaultPreset_;

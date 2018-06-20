@@ -581,7 +581,7 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         const auto preset = std::make_shared<Preset>(*this);
         preset->name = achToString(it_phdr->achPresetName);
         preset->bank = it_phdr->wBank;
-        preset->presetNum = it_phdr->wPreset;
+        preset->presetID = it_phdr->wPreset;
 
         const auto& bagBegin = pbag.begin() + it_phdr->wPresetBagNdx;
         const auto& bagEnd = pbag.begin() + std::next(it_phdr)->wPresetBagNdx;
