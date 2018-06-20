@@ -147,6 +147,10 @@ void Voice::updateCoarseTuning(double coarseTuning) {
 }
 
 void Voice::release(bool sustained) {
+    if (status_ != State::Playing && status_ != State::Sustained) {
+        return;
+    }
+
     if (percussion_) {
         // cf. General MIDI System Level 1 Developer Guidelines Second Revision p.15
         // Response to Note-off on Channel 10 (Percussion)
