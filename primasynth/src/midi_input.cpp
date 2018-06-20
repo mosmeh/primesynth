@@ -62,6 +62,11 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
                 << " key=" << static_cast<int>(msg[1])
                 << " velocity=" << static_cast<int>(msg[2]) << std::endl;
             break;
+        case midi::MessageStatus::KeyPressure:
+            std::cout << "Key pressure: channel=" << channel
+                << " key=" << static_cast<int>(msg[1])
+                << " value=" << static_cast<int>(msg[2]) << std::endl;
+            break;
         case midi::MessageStatus::ControlChange:
             std::cout << "Control change: channel=" << channel
                 << " controller=" << static_cast<int>(msg[1])

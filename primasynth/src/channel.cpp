@@ -5,9 +5,10 @@ namespace primasynth {
 Channel::Channel(double outputRate) :
     outputRate_(outputRate),
     controllers_(),
-    dataEntryMode_(DataEntryMode::RPN),
-    pitchBend_(1 << 13),
+    keyPressures_(),
     channelPressure_(0),
+    pitchBend_(1 << 13),
+    dataEntryMode_(DataEntryMode::RPN),
     pitchBendSensitivity_(2),
     fineTuning_(0.0),
     coarseTuning_(0.0),
@@ -26,6 +27,15 @@ midi::Bank Channel::getBank() const {
         controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectMSB)),
         controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectLSB))
     };
+}
+
+void Channel::noteOff(std::uint8_t key) {
+    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    for (const auto& voice : voices_) {
+        if (voice->getActualKey() == key) {
+            voice->release(controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64);
+        }
+    }
 }
 
 void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
@@ -63,11 +73,13 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
     ++currentNoteID_;
 }
 
-void Channel::noteOff(std::uint8_t key) {
+void Channel::keyPressure(std::uint8_t key, std::uint8_t value) {
+    keyPressures_.at(key) = value;
+
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
-            voice->release(controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64);
+            voice->updateSFController(sf::GeneralController::polyPressure, value);
         }
     }
 }
@@ -128,13 +140,15 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         voices_.clear();
         break;
     case midi::ControlChange::ResetAllControllers:
+        keyPressures_ = {};
+
         // cf. General MIDI System Level 1 Developer Guidelines Second Revision p.5
         // Response to "Reset All Controllers" Message
-        pitchBend_ = 1 << 13;
         channelPressure_ = 0;
+        pitchBend_ = 1 << 13;
         for (const auto& voice : voices_) {
-            voice->updateSFController(sf::GeneralController::pitchWheel, pitchBend_);
             voice->updateSFController(sf::GeneralController::channelPressure, channelPressure_);
+            voice->updateSFController(sf::GeneralController::pitchWheel, pitchBend_);
         }
         for (std::uint8_t i = 1; i < 122; ++i) {
             if ((91 <= i && i <= 95) || (70 <= i && i <= 79)) {
@@ -176,19 +190,19 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     }
 }
 
-void Channel::pitchBend(std::uint16_t value) {
-    pitchBend_ = value;
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
-    for (const auto& voice : voices_) {
-        voice->updateSFController(sf::GeneralController::pitchWheel, value);
-    }
-}
-
 void Channel::channelPressure(std::uint8_t value) {
     channelPressure_ = value;
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {
         voice->updateSFController(sf::GeneralController::channelPressure, value);
+    }
+}
+
+void Channel::pitchBend(std::uint16_t value) {
+    pitchBend_ = value;
+    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    for (const auto& voice : voices_) {
+        voice->updateSFController(sf::GeneralController::pitchWheel, value);
     }
 }
 
@@ -217,8 +231,9 @@ StereoValue Channel::render() {
 }
 
 void Channel::addVoice(std::unique_ptr<Voice> voice) {
-    voice->updateSFController(sf::GeneralController::pitchWheel, pitchBend_);
+    voice->updateSFController(sf::GeneralController::polyPressure, keyPressures_.at(voice->getActualKey()));
     voice->updateSFController(sf::GeneralController::channelPressure, channelPressure_);
+    voice->updateSFController(sf::GeneralController::pitchWheel, pitchBend_);
     voice->updateSFController(sf::GeneralController::pitchWheelSensitivity, pitchBendSensitivity_);
     voice->updateFineTuning(fineTuning_);
     voice->updateCoarseTuning(coarseTuning_);

@@ -50,6 +50,9 @@ void Synthesizer::processShortMessage(unsigned long param) {
     case midi::MessageStatus::NoteOn:
         channel->noteOn(msg[1], msg[2]);
         break;
+    case midi::MessageStatus::KeyPressure:
+        channel->keyPressure(msg[1], msg[2]);
+        break;
     case midi::MessageStatus::ControlChange:
         channel->controlChange(msg[1], msg[2]);
         break;

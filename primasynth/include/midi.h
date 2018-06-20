@@ -5,6 +5,7 @@ namespace midi {
 
 static constexpr std::uint8_t PERCUSSION_CHANNEL = 9;
 static constexpr std::size_t NUM_CONTROLLERS = 128;
+static constexpr std::uint8_t MAX_KEY = 127;
 
 enum class Standard {
     GM,
