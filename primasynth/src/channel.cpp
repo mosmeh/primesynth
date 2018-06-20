@@ -29,6 +29,10 @@ midi::Bank Channel::getBank() const {
     };
 }
 
+bool Channel::hasPreset() const {
+    return static_cast<bool>(preset_);
+}
+
 void Channel::noteOff(std::uint8_t key) {
     std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     for (const auto& voice : voices_) {

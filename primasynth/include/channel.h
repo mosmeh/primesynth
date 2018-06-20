@@ -11,6 +11,7 @@ public:
     explicit Channel(double outputRate);
 
     midi::Bank getBank() const;
+    bool hasPreset() const;
 
     void noteOff(std::uint8_t key);
     void noteOn(std::uint8_t key, std::uint8_t velocity);

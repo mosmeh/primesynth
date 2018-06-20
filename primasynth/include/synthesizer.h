@@ -20,7 +20,6 @@ private:
     std::vector<std::unique_ptr<Channel>> channels_;
     std::vector<std::unique_ptr<SoundFont>> soundFonts_;
     double volume_;
-    std::shared_ptr<const Preset> defaultPreset_, defaultPercussionPreset_;
 
     std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetID) const;
 };
