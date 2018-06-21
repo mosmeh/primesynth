@@ -50,10 +50,9 @@ void Envelope::update() {
 
     ++sectionSteps_;
 
-    auto i = static_cast<int>(section_);
-    if (section_ != Section::Sustain && sectionSteps_ >= params_.at(i)) {
-        ++i;
-        changeSection(static_cast<Section>(i));
+    auto i = static_cast<std::size_t>(section_);
+    while (section_ < Section::Finished && section_ != Section::Sustain && sectionSteps_ >= params_.at(i)) {
+        changeSection(static_cast<Section>(++i));
     }
 
     const double& sustain = params_.at(static_cast<std::size_t>(Section::Sustain));
@@ -73,7 +72,8 @@ void Envelope::update() {
         return;
     case Section::Decay:
         atten_ = sectionSteps_ / params_.at(i);
-        if (atten_ > sustain) {
+        if (atten_ >= sustain) {
+            atten_ = sustain;
             changeSection(Section::Sustain);
         }
         break;
@@ -82,7 +82,8 @@ void Envelope::update() {
         break;
     case Section::Release:
         atten_ += 1.0 / params_.at(i);
-        if (atten_ > 1.0) {
+        if (atten_ >= 1.0) {
+            atten_ = 1.0;
             changeSection(Section::Finished);
         }
         break;
