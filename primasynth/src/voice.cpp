@@ -4,6 +4,9 @@ namespace primasynth {
 
 static constexpr unsigned int CALC_INTERVAL = 64;
 
+// for compatibility
+static constexpr double ATTEN_FACTOR = 0.4;
+
 Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity) :
     noteID_(noteID),
@@ -56,14 +59,14 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     keyScaling_ = 60 - overriddenKey;
     updateSFController(sf::GeneralController::NoteOnKeyNumber, overriddenKey);
 
-    int unnormedMinAtten = generators_.getOrDefault(sf::Generator::InitialAttenuation);
+    double unnormedMinAtten = ATTEN_FACTOR * generators_.getOrDefault(sf::Generator::InitialAttenuation);
     for (const auto& mod : modulators_) {
         if (mod.getDestination() == sf::Generator::InitialAttenuation && !mod.isAlwaysNonNegative()) {
             // !isAlywaysNonNegative() means mod may increase volume
             unnormedMinAtten -= std::abs(mod.getAmount());
         }
     }
-    minAtten_ = sample.minAtten + std::max(0, unnormedMinAtten) / 960.0;
+    minAtten_ = sample.minAtten + std::max(0.0, unnormedMinAtten) / 960.0;
 
     for (int i = 0; i < NUM_GENERATORS; ++i) {
         modulated_.at(i) = generators.getOrDefault(static_cast<sf::Generator>(i));
@@ -174,13 +177,13 @@ void Voice::update() {
     const bool calc = steps_++ % CALC_INTERVAL == 0;
 
     if (calc) {
+        volEnv_.update();
         if (volEnv_.isFinished()
             || (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAtten() >= 1.0)) {
 
             status_ = State::Finished;
             return;
         }
-        volEnv_.update();
     }
 
     phase_ += deltaPhase_;
@@ -245,8 +248,10 @@ StereoValue calculatePannedVolume(double pan) {
 
 void Voice::updateModulatedParams(sf::Generator destination) {
     double& modulated = modulated_.at(static_cast<std::size_t>(destination));
-    modulated = (destination == sf::Generator::InitialAttenuation ? 0.4 : 1)
-        * generators_.getOrDefault(destination);
+    modulated = generators_.getOrDefault(destination);
+    if (destination == sf::Generator::InitialAttenuation) {
+        modulated *= ATTEN_FACTOR;
+    }
     for (auto& mod : modulators_) {
         if (mod.getDestination() == destination) {
             modulated += mod.getValue();
