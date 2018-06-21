@@ -64,7 +64,8 @@ private:
     State status_;
     double voicePitch_;
     FixedPoint phase_, deltaPhase_;
-    StereoValue volume_, envLFOVolume_;
+    StereoValue volume_;
+    double amp_, deltaAmp_;
     Envelope volEnv_, modEnv_;
     LFO vibLFO_, modLFO_;
 

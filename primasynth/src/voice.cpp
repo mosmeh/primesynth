@@ -21,7 +21,8 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample,
     phase_(sample.start),
     deltaPhase_(0u),
     volume_({1.0, 1.0}),
-    envLFOVolume_({1.0, 1.0}),
+    amp_(0.0),
+    deltaAmp_(0.0),
     volEnv_(outputRate, CALC_INTERVAL),
     modEnv_(outputRate, CALC_INTERVAL),
     vibLFO_(outputRate, CALC_INTERVAL),
@@ -116,7 +117,7 @@ StereoValue Voice::render() const {
     const std::uint32_t i = phase_.getIntegerPart();
     const double r = phase_.getFractionalPart();
     const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
-    return envLFOVolume_ * (interpolated / INT16_MAX);
+    return amp_ * volume_ * (interpolated / INT16_MAX);
 }
 
 void Voice::setPercussion(bool percussion) {
@@ -215,6 +216,8 @@ void Voice::update() {
         throw std::runtime_error("unknown sample mode");
     }
 
+    amp_ += deltaAmp_;
+
     if (calc) {
         modEnv_.update();
         vibLFO_.update();
@@ -225,9 +228,9 @@ void Voice::update() {
             + 0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue()
             + 0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
 
-        envLFOVolume_ = (volEnv_.getValue()
-            * conv::attenToAmp(getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue()))
-            * volume_;
+        const double targetAmp = volEnv_.getValue()
+            * conv::attenToAmp(getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue());
+        deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
     }
 }
 
