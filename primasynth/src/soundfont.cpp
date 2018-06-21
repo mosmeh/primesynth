@@ -18,13 +18,13 @@ static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES =
     0,      // modEnvToFilterFc
     0,      // endAddrsCoarseOffset
     0,      // modLfoToVolume
-    0,      // unused
+    0,      // unused1
     0,      // chorusEffectsSend
     0,      // reverbEffectsSend
     0,      // pan
-    0,      // unused
-    0,      // unused
-    0,      // unused
+    0,      // unused2
+    0,      // unused3
+    0,      // unused4
     -12000, // delayModLFO
     0,      // freqModLFO
     -12000, // delayVibLFO
@@ -46,20 +46,20 @@ static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES =
     0,      // keynumToVolEnvHold
     0,      // keynumToVolEnvDecay
     0,      // instrument 
-    0,      // reserved
-    0,      // keyRange, N/A
-    0,      // velRange, N/A
+    0,      // reserved1
+    0,      // keyRange
+    0,      // velRange
     0,      // startloopAddrsCoarseOffset
     -1,     // keynum
     -1,     // velocity
     0,      // initialAttenuation
-    0,      // reserved
+    0,      // reserved2
     0,      // endloopAddrsCoarseOffset
     0,      // coarseTune
     0,      // fineTune
     0,      // sampleID
     0,      // sampleModes
-    0,      // reserved
+    0,      // reserved3
     100,    // scaleTuning
     0,      // exclusiveClass
     -1,     // overridingRootKey

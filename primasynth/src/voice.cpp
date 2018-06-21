@@ -192,23 +192,23 @@ void Voice::update() {
     switch (rtSample_.mode) {
     case SampleMode::UnLooped:
     case SampleMode::UnUsed:
-        if (phase_.getIntegerPart() > rtSample_.end - 1) {
+        if (phase_.getIntegerPart() >= rtSample_.end) {
             status_ = State::Finished;
             return;
         }
         break;
     case SampleMode::Looped:
-        if (phase_.getIntegerPart() > rtSample_.endLoop - 1) {
+        if (phase_.getIntegerPart() >= rtSample_.endLoop) {
             phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
     case SampleMode::LoopedWithRemainder:
         if (status_ == State::Released) {
-            if (phase_.getIntegerPart() > rtSample_.end - 1) {
+            if (phase_.getIntegerPart() >= rtSample_.end) {
                 status_ = State::Finished;
                 return;
             }
-        } else if (phase_.getIntegerPart() > rtSample_.endLoop - 1) {
+        } else if (phase_.getIntegerPart() >= rtSample_.endLoop) {
             phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
@@ -255,18 +255,18 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     if (destination == sf::Generator::InitialAttenuation) {
         modulated *= ATTEN_FACTOR;
     }
-    for (auto& mod : modulators_) {
+    for (const auto& mod : modulators_) {
         if (mod.getDestination() == destination) {
             modulated += mod.getValue();
         }
     }
+
     switch (destination) {
     case sf::Generator::Pan:
-    case sf::Generator::InitialAttenuation: {
+    case sf::Generator::InitialAttenuation:
         volume_ = conv::attenToAmp(getModulatedGenerator(sf::Generator::InitialAttenuation))
             * calculatePannedVolume(getModulatedGenerator(sf::Generator::Pan));
         break;
-    }
     case sf::Generator::DelayModLFO:
         modLFO_.setDelay(modulated);
         break;
