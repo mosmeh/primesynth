@@ -487,18 +487,18 @@ void readBags(std::vector<Zone>& zones, const ItBag& bagBegin, const ItBag& bagE
         const auto& beginGen = genBegin + it_bag->genNdx;
         const auto& endGen = genBegin + std::next(it_bag)->genNdx;
         for (auto it_gen = beginGen; it_gen != endGen; ++it_gen) {
+            const auto& range = it_gen->genAmount.ranges;
             switch (it_gen->genOper) {
-            case sf::Generator::KeyRange: {
-                const auto& range = it_gen->genAmount.ranges;
+            case sf::Generator::KeyRange:
                 zone.keyRange = {range.lo, range.hi};
                 break;
-            }
-            case sf::Generator::VelRange: {
-                const auto& range = it_gen->genAmount.ranges;
+            case sf::Generator::VelRange:
                 zone.velocityRange = {range.lo, range.hi};
                 break;
-            }
             default:
+                if (it_gen->genOper >= sf::Generator::EndOper) {
+                    throw std::runtime_error("unknown generator");
+                }
                 zone.generators.set(it_gen->genOper, it_gen->genAmount.shAmount);
                 break;
             }
