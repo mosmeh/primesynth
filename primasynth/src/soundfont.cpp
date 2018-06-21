@@ -603,6 +603,11 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         sample.key = it_shdr->originalKey;
         sample.correction = it_shdr->correction;
 
+        sample.end = std::max(sample.end, sample.start + 1);
+        sample.startLoop = std::max(sample.startLoop, sample.start);
+        sample.endLoop = std::min(sample.endLoop, sample.end);
+        sample.endLoop = std::max(sample.endLoop, sample.startLoop);
+
         int sampleMax = 0;
         for (std::size_t i = sample.start; i < sample.end; ++i) {
             sampleMax = std::max(sampleMax, std::abs(sampleBuffer_.at(i)));
