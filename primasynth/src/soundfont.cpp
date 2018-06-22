@@ -63,6 +63,8 @@ static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES =
     100,    // scaleTuning
     0,      // exclusiveClass
     -1,     // overridingRootKey
+    0,      // unused5
+    0,      // endOper
     0       // pitch
 };
 
@@ -496,8 +498,8 @@ void readBags(std::vector<Zone>& zones, const ItBag& bagBegin, const ItBag& bagE
                 zone.velocityRange = {range.lo, range.hi};
                 break;
             default:
-                if (it_gen->genOper >= sf::Generator::EndOper) {
-                    throw std::runtime_error("unknown generator");
+                if (it_gen->genOper > sf::Generator::EndOper) {
+                    throw std::out_of_range("generator out of range");
                 }
                 zone.generators.set(it_gen->genOper, it_gen->genAmount.shAmount);
                 break;

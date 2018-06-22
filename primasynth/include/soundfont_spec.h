@@ -68,8 +68,8 @@ enum class Generator : std::uint16_t {
     ScaleTuning = 56,
     ExclusiveClass = 57,
     OverridingRootKey = 58,
-    Pitch = 59,
-    EndOper = 60
+    EndOper = 60,
+    Pitch // non-standard generator, used as a destination of default pitch bend modulator
 };
 
 enum class GeneralController : std::uint8_t {
