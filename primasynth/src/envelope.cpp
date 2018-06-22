@@ -9,14 +9,14 @@ Envelope::Envelope(double outputRate, unsigned int interval) :
     section_(Section::Delay),
     sectionSteps_(0),
     atten_(1.0),
-    value_(1.0) {}
+    amp_(1.0) {}
 
 Envelope::Section Envelope::getSection() const {
     return section_;
 }
 
-double Envelope::getValue() const {
-    return value_;
+double Envelope::getAmp() const {
+    return amp_;
 }
 
 double Envelope::getAtten() const {
@@ -60,15 +60,15 @@ void Envelope::update() {
     case Section::Delay:
     case Section::Finished:
         atten_ = 1.0;
-        value_ = 0.0;
+        amp_ = 0.0;
         return;
     case Section::Attack:
         atten_ = 1.0 - sectionSteps_ / params_.at(i);
-        value_ = 1.0 - atten_;
+        amp_ = 1.0 - atten_;
         return;
     case Section::Hold:
         atten_ = 0.0;
-        value_ = 1.0;
+        amp_ = 1.0;
         return;
     case Section::Decay:
         atten_ = sectionSteps_ / params_.at(i);
@@ -89,7 +89,7 @@ void Envelope::update() {
         break;
     }
 
-    value_ = conv::attenToAmp(960.0 * atten_);
+    amp_ = conv::attenToAmp(960.0 * atten_);
 }
 
 void Envelope::changeSection(Section section) {

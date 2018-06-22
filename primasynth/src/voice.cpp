@@ -224,11 +224,11 @@ void Voice::update() {
         modLFO_.update();
 
         deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(voicePitch_
-            + 0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnv_.getValue()
+            + 0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch) * (1.0 - modEnv_.getAtten())
             + 0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue()
             + 0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
 
-        const double targetAmp = volEnv_.getValue()
+        const double targetAmp = volEnv_.getAmp()
             * conv::attenToAmp(getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue());
         deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
     }

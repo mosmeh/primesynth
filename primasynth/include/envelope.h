@@ -18,7 +18,7 @@ public:
     Envelope(double outputRate, unsigned int interval);
 
     Section getSection() const;
-    double getValue() const;
+    double getAmp() const;
     double getAtten() const;
     bool isFinished() const;
 
@@ -31,7 +31,7 @@ private:
     std::array<double, 6> params_;
     Section section_;
     unsigned int sectionSteps_;
-    double atten_, value_;
+    double atten_, amp_;
 
     void changeSection(Section section);
 };
