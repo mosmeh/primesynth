@@ -57,7 +57,7 @@ double concave(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return 2.0 * conv::ampToNormedAtten(1.0 - x);
+        return 2.0 * conv::amplitudeToAttenuation(1.0 - x);
     }
 }
 
@@ -67,7 +67,7 @@ double convex(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return 1 - 2.0 * conv::ampToNormedAtten(x);
+        return 1 - 2.0 * conv::amplitudeToAttenuation(x);
     }
 }
 

@@ -21,17 +21,17 @@ void initialize() {
     }
 }
 
-double attenToAmp(double atten) {
+double attenuationToAmplitude(double atten) {
     if (atten <= 0) {
         return 1.0;
     } else if (atten >= attenToAmpTable.size()) {
         return 0.0;
     } else {
-        return attenToAmpTable.at(static_cast<std::size_t>(atten));
+        return attenToAmpTable.at(static_cast<std::size_t>(960.0 * atten));
     }
 }
 
-double ampToNormedAtten(double amp) {
+double amplitudeToAttenuation(double amp) {
     return -20.0 / 96.0 * std::log10(amp);
 }
 

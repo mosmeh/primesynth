@@ -607,7 +607,7 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         for (std::size_t i = sample.start; i < sample.end; ++i) {
             sampleMax = std::max(sampleMax, std::abs(sampleBuffer_.at(i)));
         }
-        sample.minAtten = conv::ampToNormedAtten(static_cast<double>(sampleMax) / INT16_MAX);
+        sample.minAtten = conv::amplitudeToAttenuation(static_cast<double>(sampleMax) / INT16_MAX);
     }
 }
 }

@@ -9,8 +9,8 @@ public:
     Envelope(double outputRate, unsigned int interval);
 
     Section getSection() const;
-    double getAmp() const;
-    double getAtten() const;
+    double getAmplitude() const;
+    double getAttenuation() const;
     bool isFinished() const;
 
     void setParameter(Section section, double param);

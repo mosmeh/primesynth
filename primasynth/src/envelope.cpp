@@ -14,11 +14,11 @@ Envelope::Section Envelope::getSection() const {
     return section_;
 }
 
-double Envelope::getAmp() const {
+double Envelope::getAmplitude() const {
     return amp_;
 }
 
-double Envelope::getAtten() const {
+double Envelope::getAttenuation() const {
     return atten_;
 }
 
@@ -88,7 +88,7 @@ void Envelope::update() {
         break;
     }
 
-    amp_ = conv::attenToAmp(960.0 * atten_);
+    amp_ = conv::attenuationToAmplitude(atten_);
 }
 
 void Envelope::changeSection(Section section) {

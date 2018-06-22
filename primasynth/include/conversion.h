@@ -4,8 +4,8 @@
 namespace primasynth {
 namespace conv {
 void initialize();
-double attenToAmp(double atten);
-double ampToNormedAtten(double amp);
+double attenuationToAmplitude(double atten);
+double amplitudeToAttenuation(double amp);
 double keyToHeltz(double key);
 double timecentToSecond(double tc);
 double absoluteCentToHeltz(double ac);

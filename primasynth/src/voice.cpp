@@ -55,14 +55,14 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
     keyScaling_ = 60 - overriddenKey;
     updateSFController(sf::GeneralController::NoteOnKeyNumber, overriddenKey);
 
-    double unnormedMinAtten = ATTEN_FACTOR * generators_.getOrDefault(sf::Generator::InitialAttenuation);
+    double minActualAtten = ATTEN_FACTOR * generators_.getOrDefault(sf::Generator::InitialAttenuation);
     for (const auto& mod : modulators_) {
         if (mod.getDestination() == sf::Generator::InitialAttenuation && !mod.isAlwaysNonNegative()) {
             // !isAlywaysNonNegative() means mod may increase volume
-            unnormedMinAtten -= std::abs(mod.getAmount());
+            minActualAtten -= std::abs(mod.getAmount());
         }
     }
-    minAtten_ = sample.minAtten + std::max(0.0, unnormedMinAtten) / 960.0;
+    minAtten_ = sample.minAtten + std::max(0.0, minActualAtten) / 960.0;
 
     for (int i = 0; i < NUM_GENERATORS; ++i) {
         modulated_.at(i) = generators.getOrDefault(static_cast<sf::Generator>(i));
@@ -162,7 +162,7 @@ void Voice::update() {
     if (calc) {
         volEnv_.update();
         if (volEnv_.isFinished()
-            || (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAtten() >= 1.0)) {
+            || (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAttenuation() >= 1.0)) {
             status_ = State::Finished;
             return;
         }
@@ -207,13 +207,14 @@ void Voice::update() {
         deltaPhase_ = FixedPoint(
             deltaPhaseFactor_
             * conv::keyToHeltz(voicePitch_
-                               + 0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch) * (1.0 - modEnv_.getAtten())
+                               + 0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch)
+                                     * (1.0 - modEnv_.getAttenuation())
                                + 0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue()
                                + 0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
 
-        const double targetAmp =
-            volEnv_.getAmp()
-            * conv::attenToAmp(getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue());
+        const double targetAmp = volEnv_.getAmplitude()
+                                 * conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::ModLfoToVolume)
+                                                                * modLFO_.getValue() / 960.0);
         deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
     }
 }
@@ -248,7 +249,7 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     switch (destination) {
     case sf::Generator::Pan:
     case sf::Generator::InitialAttenuation:
-        volume_ = conv::attenToAmp(getModulatedGenerator(sf::Generator::InitialAttenuation))
+        volume_ = conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::InitialAttenuation) / 960.0)
                   * calculatePannedVolume(getModulatedGenerator(sf::Generator::Pan));
         break;
     case sf::Generator::DelayModLFO:
