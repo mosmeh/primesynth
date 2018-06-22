@@ -22,12 +22,13 @@ void initialize() {
 }
 
 double attenuationToAmplitude(double atten) {
-    if (atten <= 0) {
+    atten *= 960.0;
+    if (atten <= 0.0) {
         return 1.0;
     } else if (atten >= attenToAmpTable.size()) {
         return 0.0;
     } else {
-        return attenToAmpTable.at(static_cast<std::size_t>(960.0 * atten));
+        return attenToAmpTable.at(static_cast<std::size_t>(atten));
     }
 }
 
