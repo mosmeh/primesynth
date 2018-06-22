@@ -1,7 +1,6 @@
 #pragma once
 #include "soundfont_spec.h"
 #include <array>
-#include <fstream>
 #include <vector>
 
 namespace primasynth {

@@ -1,7 +1,7 @@
 #pragma once
+#include "synthesizer.h"
 #include <atomic>
 #define NOMINMAX
-#include "synthesizer.h"
 #include <Windows.h>
 
 namespace primasynth {

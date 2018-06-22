@@ -1,5 +1,6 @@
 #include "conversion.h"
 #include "soundfont.h"
+#include <fstream>
 
 namespace primasynth {
 static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES = {

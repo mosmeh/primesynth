@@ -2,7 +2,6 @@
 #include "midi.h"
 #include "voice.h"
 #include <mutex>
-#include <vector>
 
 namespace primasynth {
 class Channel {

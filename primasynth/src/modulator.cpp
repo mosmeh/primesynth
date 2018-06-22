@@ -67,7 +67,7 @@ double convex(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return 1 - 2.0 * conv::amplitudeToAttenuation(x);
+        return 1.0 - 2.0 * conv::amplitudeToAttenuation(x);
     }
 }
 

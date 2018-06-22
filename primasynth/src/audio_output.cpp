@@ -1,5 +1,4 @@
 #include "audio_output.h"
-#include <iostream>
 #include <sstream>
 #define NOMINMAX
 #include <Windows.h>
