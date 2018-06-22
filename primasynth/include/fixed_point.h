@@ -10,8 +10,8 @@ public:
     explicit FixedPoint(std::uint32_t integer) : raw_(static_cast<std::uint64_t>(integer) << 32) {}
 
     explicit FixedPoint(double value)
-        : raw_((static_cast<std::uint64_t>(value) << 32)
-               | static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value)) * (UINT32_MAX + 1.0))) {}
+        : raw_((static_cast<std::uint64_t>(value) << 32) |
+               static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value)) * (UINT32_MAX + 1.0))) {}
 
     std::uint32_t getIntegerPart() const {
         return raw_ >> 32;

@@ -110,8 +110,8 @@ void Synthesizer::processSysEx(const char* data, std::size_t length) {
         midiStd_ = midi::Standard::GM;
     } else if (matchSysEx(data, length, GM_SYSTEM_OFF)) {
         midiStd_ = defaultMIDIStd_;
-    } else if (matchSysEx(data, length, GS_RESET) || matchSysEx(data, length, GS_SYSTEM_MODE_SET1)
-               || matchSysEx(data, length, GS_SYSTEM_MODE_SET2)) {
+    } else if (matchSysEx(data, length, GS_RESET) || matchSysEx(data, length, GS_SYSTEM_MODE_SET1) ||
+               matchSysEx(data, length, GS_SYSTEM_MODE_SET2)) {
         midiStd_ = midi::Standard::GS;
     } else if (matchSysEx(data, length, XG_SYSTEM_ON)) {
         midiStd_ = midi::Standard::XG;

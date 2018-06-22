@@ -6,16 +6,16 @@ namespace primasynth {
 Modulator::Modulator(const sf::ModList& param) : param_(param), source_(0.0), amountSource_(1.0), value_(0.0) {}
 
 bool Modulator::isSourceSFController(sf::GeneralController controller) const {
-    return (param_.modSrcOper.palette == sf::ControllerPalette::General
-            && controller == param_.modSrcOper.index.general)
-           || (param_.modAmtSrcOper.palette == sf::ControllerPalette::General
-               && controller == param_.modAmtSrcOper.index.general);
+    return (param_.modSrcOper.palette == sf::ControllerPalette::General &&
+            controller == param_.modSrcOper.index.general) ||
+           (param_.modAmtSrcOper.palette == sf::ControllerPalette::General &&
+            controller == param_.modAmtSrcOper.index.general);
 }
 
 bool Modulator::isSourceMIDIController(std::uint8_t controller) const {
-    return (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi)
-           || (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI
-               && controller == param_.modAmtSrcOper.index.midi);
+    return (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi) ||
+           (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI &&
+            controller == param_.modAmtSrcOper.index.midi);
 }
 
 sf::Generator Modulator::getDestination() const {
@@ -32,11 +32,11 @@ bool Modulator::isAlwaysNonNegative() const {
     }
 
     if (param_.modAmount > 0) {
-        const bool noSrc = param_.modSrcOper.palette == sf::ControllerPalette::General
-                           && param_.modSrcOper.index.general == sf::GeneralController::NoController;
+        const bool noSrc = param_.modSrcOper.palette == sf::ControllerPalette::General &&
+                           param_.modSrcOper.index.general == sf::GeneralController::NoController;
         const bool uniSrc = param_.modSrcOper.polarity == sf::SourcePolarity::Unipolar;
-        const bool noAmt = param_.modAmtSrcOper.palette == sf::ControllerPalette::General
-                           && param_.modAmtSrcOper.index.general == sf::GeneralController::NoController;
+        const bool noAmt = param_.modAmtSrcOper.palette == sf::ControllerPalette::General &&
+                           param_.modAmtSrcOper.index.general == sf::GeneralController::NoController;
         const bool uniAmt = param_.modAmtSrcOper.polarity == sf::SourcePolarity::Unipolar;
 
         if ((uniSrc && uniAmt) || (uniSrc && noAmt) || (noSrc && uniAmt) || (noSrc && noAmt)) {
@@ -112,8 +112,8 @@ void Modulator::updateSFController(sf::GeneralController controller, std::int16_
     if (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general) {
         source_ = map(value, param_.modSrcOper);
     }
-    if (param_.modAmtSrcOper.palette == sf::ControllerPalette::General
-        && controller == param_.modAmtSrcOper.index.general) {
+    if (param_.modAmtSrcOper.palette == sf::ControllerPalette::General &&
+        controller == param_.modAmtSrcOper.index.general) {
         amountSource_ = map(value, param_.modAmtSrcOper);
     }
     calculateValue();

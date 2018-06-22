@@ -31,15 +31,16 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
     rtSample_.pitch = (overriddenSampleKey > 0 ? overriddenSampleKey : sample.key) - 0.01 * sample.correction;
 
     static constexpr std::uint32_t COARSE_UNIT = 32768;
-    rtSample_.start = sample.start + COARSE_UNIT * generators.getOrDefault(sf::Generator::StartAddrsCoarseOffset)
-                      + generators.getOrDefault(sf::Generator::StartAddrsOffset);
-    rtSample_.end = sample.end + COARSE_UNIT * generators.getOrDefault(sf::Generator::EndAddrsCoarseOffset)
-                    + generators.getOrDefault(sf::Generator::EndAddrsOffset);
-    rtSample_.startLoop = sample.startLoop
-                          + COARSE_UNIT * generators.getOrDefault(sf::Generator::StartloopAddrsCoarseOffset)
-                          + generators.getOrDefault(sf::Generator::StartloopAddrsOffset);
-    rtSample_.endLoop = sample.endLoop + COARSE_UNIT * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset)
-                        + generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
+    rtSample_.start = sample.start + COARSE_UNIT * generators.getOrDefault(sf::Generator::StartAddrsCoarseOffset) +
+                      generators.getOrDefault(sf::Generator::StartAddrsOffset);
+    rtSample_.end = sample.end + COARSE_UNIT * generators.getOrDefault(sf::Generator::EndAddrsCoarseOffset) +
+                    generators.getOrDefault(sf::Generator::EndAddrsOffset);
+    rtSample_.startLoop = sample.startLoop +
+                          COARSE_UNIT * generators.getOrDefault(sf::Generator::StartloopAddrsCoarseOffset) +
+                          generators.getOrDefault(sf::Generator::StartloopAddrsOffset);
+    rtSample_.endLoop = sample.endLoop +
+                        COARSE_UNIT * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset) +
+                        generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
 
     deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(rtSample_.pitch) * sample.sampleRate / outputRate;
 
@@ -161,8 +162,8 @@ void Voice::update() {
 
     if (calc) {
         volEnv_.update();
-        if (volEnv_.isFinished()
-            || (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAttenuation() >= 1.0)) {
+        if (volEnv_.isFinished() ||
+            (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAttenuation() >= 1.0)) {
             status_ = State::Finished;
             return;
         }
@@ -205,16 +206,16 @@ void Voice::update() {
         modLFO_.update();
 
         deltaPhase_ = FixedPoint(
-            deltaPhaseFactor_
-            * conv::keyToHeltz(voicePitch_
-                               + 0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch)
-                                     * (1.0 - modEnv_.getAttenuation())
-                               + 0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue()
-                               + 0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
+            deltaPhaseFactor_ *
+            conv::keyToHeltz(voicePitch_ +
+                             0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch) *
+                                 (1.0 - modEnv_.getAttenuation()) +
+                             0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
+                             0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
 
-        const double targetAmp = volEnv_.getAmplitude()
-                                 * conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::ModLfoToVolume)
-                                                                * modLFO_.getValue() / 960.0);
+        const double targetAmp =
+            volEnv_.getAmplitude() * conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::ModLfoToVolume) *
+                                                                  modLFO_.getValue() / 960.0);
         deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
     }
 }
@@ -249,8 +250,8 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     switch (destination) {
     case sf::Generator::Pan:
     case sf::Generator::InitialAttenuation:
-        volume_ = conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::InitialAttenuation) / 960.0)
-                  * calculatePannedVolume(getModulatedGenerator(sf::Generator::Pan));
+        volume_ = conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::InitialAttenuation) / 960.0) *
+                  calculatePannedVolume(getModulatedGenerator(sf::Generator::Pan));
         break;
     case sf::Generator::DelayModLFO:
         modLFO_.setDelay(modulated);
@@ -273,14 +274,14 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     case sf::Generator::HoldModEnv:
     case sf::Generator::KeynumToModEnvHold:
         modEnv_.setParameter(Envelope::Section::Hold,
-                             getModulatedGenerator(sf::Generator::HoldModEnv)
-                                 + getModulatedGenerator(sf::Generator::KeynumToModEnvHold) * keyScaling_);
+                             getModulatedGenerator(sf::Generator::HoldModEnv) +
+                                 getModulatedGenerator(sf::Generator::KeynumToModEnvHold) * keyScaling_);
         break;
     case sf::Generator::DecayModEnv:
     case sf::Generator::KeynumToModEnvDecay:
         modEnv_.setParameter(Envelope::Section::Decay,
-                             getModulatedGenerator(sf::Generator::DecayModEnv)
-                                 + getModulatedGenerator(sf::Generator::KeynumToModEnvDecay) * keyScaling_);
+                             getModulatedGenerator(sf::Generator::DecayModEnv) +
+                                 getModulatedGenerator(sf::Generator::KeynumToModEnvDecay) * keyScaling_);
         break;
     case sf::Generator::SustainModEnv:
         modEnv_.setParameter(Envelope::Section::Sustain, modulated);
@@ -297,14 +298,14 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     case sf::Generator::HoldVolEnv:
     case sf::Generator::KeynumToVolEnvHold:
         volEnv_.setParameter(Envelope::Section::Hold,
-                             getModulatedGenerator(sf::Generator::HoldVolEnv)
-                                 + getModulatedGenerator(sf::Generator::KeynumToVolEnvHold) * keyScaling_);
+                             getModulatedGenerator(sf::Generator::HoldVolEnv) +
+                                 getModulatedGenerator(sf::Generator::KeynumToVolEnvHold) * keyScaling_);
         break;
     case sf::Generator::DecayVolEnv:
     case sf::Generator::KeynumToVolEnvDecay:
         volEnv_.setParameter(Envelope::Section::Decay,
-                             getModulatedGenerator(sf::Generator::DecayVolEnv)
-                                 + getModulatedGenerator(sf::Generator::KeynumToVolEnvDecay) * keyScaling_);
+                             getModulatedGenerator(sf::Generator::DecayVolEnv) +
+                                 getModulatedGenerator(sf::Generator::KeynumToVolEnvDecay) * keyScaling_);
         break;
     case sf::Generator::SustainVolEnv:
         volEnv_.setParameter(Envelope::Section::Sustain, modulated);
@@ -316,10 +317,10 @@ void Voice::updateModulatedParams(sf::Generator destination) {
     case sf::Generator::FineTune:
     case sf::Generator::ScaleTuning:
     case sf::Generator::Pitch:
-        voicePitch_ = rtSample_.pitch + 0.01 * getModulatedGenerator(sf::Generator::Pitch)
-                      + 0.01 * generators_.getOrDefault(sf::Generator::ScaleTuning) * (actualKey_ - rtSample_.pitch)
-                      + coarseTuning_ + getModulatedGenerator(sf::Generator::CoarseTune)
-                      + 0.01 * (fineTuning_ + getModulatedGenerator(sf::Generator::FineTune));
+        voicePitch_ = rtSample_.pitch + 0.01 * getModulatedGenerator(sf::Generator::Pitch) +
+                      0.01 * generators_.getOrDefault(sf::Generator::ScaleTuning) * (actualKey_ - rtSample_.pitch) +
+                      coarseTuning_ + getModulatedGenerator(sf::Generator::CoarseTune) +
+                      0.01 * (fineTuning_ + getModulatedGenerator(sf::Generator::FineTune));
         break;
     }
 }

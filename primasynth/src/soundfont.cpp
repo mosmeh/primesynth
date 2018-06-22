@@ -266,13 +266,13 @@ const std::vector<sf::ModList>& ModulatorParameterSet::getParameters() const {
 }
 
 bool operator==(const sf::Modulator& a, const sf::Modulator& b) {
-    return a.index.midi == b.index.midi && a.palette == b.palette && a.direction == b.direction
-           && a.polarity == b.polarity && a.type == b.type;
+    return a.index.midi == b.index.midi && a.palette == b.palette && a.direction == b.direction &&
+           a.polarity == b.polarity && a.type == b.type;
 }
 
 bool modulatorsAreIdentical(const sf::ModList& a, const sf::ModList& b) {
-    return a.modSrcOper == b.modSrcOper && a.modDestOper == b.modDestOper && a.modAmtSrcOper == b.modAmtSrcOper
-           && a.modTransOper == b.modTransOper;
+    return a.modSrcOper == b.modSrcOper && a.modDestOper == b.modDestOper && a.modAmtSrcOper == b.modAmtSrcOper &&
+           a.modTransOper == b.modTransOper;
 }
 
 void ModulatorParameterSet::append(const sf::ModList& modparam) {
