@@ -1,23 +1,21 @@
+#include "conversion.h"
 #include "modulator.h"
 #include <stdexcept>
-#include "conversion.h"
 
 namespace primasynth {
-
-Modulator::Modulator(const sf::ModList& param) :
-    param_(param),
-    source_(0.0),
-    amountSource_(1.0),
-    value_(0.0) {}
+Modulator::Modulator(const sf::ModList& param) : param_(param), source_(0.0), amountSource_(1.0), value_(0.0) {}
 
 bool Modulator::isSourceSFController(sf::GeneralController controller) const {
-    return (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general)
-        || (param_.modAmtSrcOper.palette == sf::ControllerPalette::General && controller == param_.modAmtSrcOper.index.general);
+    return (param_.modSrcOper.palette == sf::ControllerPalette::General
+            && controller == param_.modSrcOper.index.general)
+           || (param_.modAmtSrcOper.palette == sf::ControllerPalette::General
+               && controller == param_.modAmtSrcOper.index.general);
 }
 
 bool Modulator::isSourceMIDIController(std::uint8_t controller) const {
     return (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi)
-        || (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modAmtSrcOper.index.midi);
+           || (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI
+               && controller == param_.modAmtSrcOper.index.midi);
 }
 
 sf::Generator Modulator::getDestination() const {
@@ -29,18 +27,16 @@ std::int16_t Modulator::getAmount() const {
 }
 
 bool Modulator::isAlwaysNonNegative() const {
-    if (param_.modTransOper == sf::Transform::AbsoluteValue
-        || param_.modAmount == 0) {
-
+    if (param_.modTransOper == sf::Transform::AbsoluteValue || param_.modAmount == 0) {
         return true;
     }
 
     if (param_.modAmount > 0) {
         const bool noSrc = param_.modSrcOper.palette == sf::ControllerPalette::General
-            && param_.modSrcOper.index.general == sf::GeneralController::NoController;
+                           && param_.modSrcOper.index.general == sf::GeneralController::NoController;
         const bool uniSrc = param_.modSrcOper.polarity == sf::SourcePolarity::Unipolar;
         const bool noAmt = param_.modAmtSrcOper.palette == sf::ControllerPalette::General
-            && param_.modAmtSrcOper.index.general == sf::GeneralController::NoController;
+                           && param_.modAmtSrcOper.index.general == sf::GeneralController::NoController;
         const bool uniAmt = param_.modAmtSrcOper.polarity == sf::SourcePolarity::Unipolar;
 
         if ((uniSrc && uniAmt) || (uniSrc && noAmt) || (noSrc && uniAmt) || (noSrc && noAmt)) {
@@ -76,8 +72,7 @@ double convex(double x) {
 }
 
 double map(double value, sf::Modulator mod) {
-    if (mod.palette == sf::ControllerPalette::General
-        && mod.index.general == sf::GeneralController::PitchWheel) {
+    if (mod.palette == sf::ControllerPalette::General && mod.index.general == sf::GeneralController::PitchWheel) {
         value /= 1 << 14;
     } else {
         value /= 1 << 7;
@@ -117,7 +112,8 @@ void Modulator::updateSFController(sf::GeneralController controller, std::int16_
     if (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general) {
         source_ = map(value, param_.modSrcOper);
     }
-    if (param_.modAmtSrcOper.palette == sf::ControllerPalette::General && controller == param_.modAmtSrcOper.index.general) {
+    if (param_.modAmtSrcOper.palette == sf::ControllerPalette::General
+        && controller == param_.modAmtSrcOper.index.general) {
         amountSource_ = map(value, param_.modAmtSrcOper);
     }
     calculateValue();
@@ -146,5 +142,4 @@ double transform(double value, sf::Transform transform) {
 void Modulator::calculateValue() {
     value_ = transform(param_.modAmount * source_ * amountSource_, param_.modTransOper);
 }
-
 }

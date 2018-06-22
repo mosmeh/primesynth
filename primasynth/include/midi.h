@@ -2,16 +2,11 @@
 
 namespace primasynth {
 namespace midi {
-
 static constexpr std::uint8_t PERCUSSION_CHANNEL = 9;
 static constexpr std::size_t NUM_CONTROLLERS = 128;
 static constexpr std::uint8_t MAX_KEY = 127;
 
-enum class Standard {
-    GM,
-    GS,
-    XG
-};
+enum class Standard { GM, GS, XG };
 
 enum class MessageStatus {
     NoteOff = 0x80,
@@ -44,15 +39,10 @@ enum class ControlChange {
 };
 
 // GM RPNs
-enum class RPN {
-    PitchBendSensitivity = 0,
-    FineTuning = 1,
-    CoarseTuning = 2
-};
+enum class RPN { PitchBendSensitivity = 0, FineTuning = 1, CoarseTuning = 2 };
 
 struct Bank {
     std::uint8_t msb, lsb;
 };
-
 }
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 namespace primasynth {
-
 struct StereoValue {
     double left, right;
 
@@ -12,5 +11,4 @@ struct StereoValue {
 };
 
 StereoValue operator*(double a, const StereoValue& b);
-
 }

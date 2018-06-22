@@ -3,7 +3,6 @@
 
 namespace primasynth {
 namespace conv {
-
 std::array<double, 1441> attenToAmpTable;
 std::array<double, 1200> centToHeltzTable;
 
@@ -67,6 +66,5 @@ double absoluteCentToHeltz(double ac) {
 std::uint16_t joinBytes(std::uint8_t msb, std::uint8_t lsb) {
     return (static_cast<std::uint16_t>(msb) << 7) + static_cast<std::uint16_t>(lsb);
 }
-
 }
 }

@@ -1,15 +1,14 @@
-#include "envelope.h"
 #include "conversion.h"
+#include "envelope.h"
 
 namespace primasynth {
-
-Envelope::Envelope(double outputRate, unsigned int interval) :
-    effectiveOutputRate_(outputRate / interval),
-    params_(),
-    section_(Section::Delay),
-    sectionSteps_(0),
-    atten_(1.0),
-    amp_(1.0) {}
+Envelope::Envelope(double outputRate, unsigned int interval)
+    : effectiveOutputRate_(outputRate / interval),
+      params_(),
+      section_(Section::Delay),
+      sectionSteps_(0),
+      atten_(1.0),
+      amp_(1.0) {}
 
 Envelope::Section Envelope::getSection() const {
     return section_;
@@ -96,5 +95,4 @@ void Envelope::changeSection(Section section) {
     section_ = section;
     sectionSteps_ = 0;
 }
-
 }

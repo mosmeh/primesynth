@@ -7,18 +7,12 @@
 #include "stereo_value.h"
 
 namespace primasynth {
-
 class Voice {
 public:
-    enum class State {
-        Playing,
-        Sustained,
-        Released,
-        Finished
-    };
+    enum class State { Playing, Sustained, Released, Finished };
 
-    Voice(std::size_t noteID, double outputRate, const Sample& sample,
-        const GeneratorSet& generators, const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity);
+    Voice(std::size_t noteID, double outputRate, const Sample& sample, const GeneratorSet& generators,
+          const ModulatorParameterSet& modparams, std::uint8_t key, std::uint8_t velocity);
 
     std::size_t getNoteID() const;
     std::uint8_t getActualKey() const;
@@ -35,12 +29,7 @@ public:
     void update();
 
 private:
-    enum class SampleMode {
-        UnLooped,
-        Looped,
-        UnUsed,
-        LoopedWithRemainder
-    };
+    enum class SampleMode { UnLooped, Looped, UnUsed, LoopedWithRemainder };
 
     struct RuntimeSample {
         SampleMode mode;
@@ -72,5 +61,4 @@ private:
     double getModulatedGenerator(sf::Generator type) const;
     void updateModulatedParams(sf::Generator destination);
 };
-
 }

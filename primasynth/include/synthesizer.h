@@ -2,7 +2,6 @@
 #include "channel.h"
 
 namespace primasynth {
-
 class Synthesizer {
 public:
     Synthesizer(double outputRate = 44100, std::size_t numChannels = 16);
@@ -23,5 +22,4 @@ private:
 
     std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetID) const;
 };
-
 }

@@ -1,19 +1,17 @@
 #pragma once
 
 namespace primasynth {
-
 // 64 bit fixed-point number
 // 32 bit for each of integer and fractional part
 class FixedPoint {
 public:
     FixedPoint() = delete;
 
-    explicit FixedPoint(std::uint32_t integer) :
-        raw_(static_cast<std::uint64_t>(integer) << 32) {}
+    explicit FixedPoint(std::uint32_t integer) : raw_(static_cast<std::uint64_t>(integer) << 32) {}
 
-    explicit FixedPoint(double value) :
-        raw_((static_cast<std::uint64_t>(value) << 32)
-            | static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value)) * (UINT32_MAX + 1.0))) {}
+    explicit FixedPoint(double value)
+        : raw_((static_cast<std::uint64_t>(value) << 32)
+               | static_cast<std::uint32_t>((value - static_cast<std::uint32_t>(value)) * (UINT32_MAX + 1.0))) {}
 
     std::uint32_t getIntegerPart() const {
         return raw_ >> 32;
@@ -44,6 +42,4 @@ public:
 private:
     std::uint64_t raw_;
 };
-
 }
-

@@ -2,12 +2,9 @@
 #include <vector>
 
 namespace primasynth {
-
 class RingBuffer {
 public:
-    explicit RingBuffer(std::size_t size) :
-        size_(size),
-        data_(size) {}
+    explicit RingBuffer(std::size_t size) : size_(size), data_(size) {}
 
     bool empty() const {
         return start_ >= end_;
@@ -24,7 +21,7 @@ public:
     std::size_t capacity() const {
         return size_ - size();
     }
-    
+
     void push(float t) {
         data_.at(mask(end_++)) = t;
     }
@@ -46,5 +43,4 @@ private:
         return i & (size_ - 1);
     }
 };
-
 }

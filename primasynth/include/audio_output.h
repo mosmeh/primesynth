@@ -1,14 +1,14 @@
 #pragma once
-#include <atomic>
-#include "third_party/portaudio.h"
 #include "ring_buffer.h"
 #include "synthesizer.h"
+#include "third_party/portaudio.h"
+#include <atomic>
 
 namespace primasynth {
-
 class AudioOutput {
 public:
-    AudioOutput(Synthesizer& synth, std::size_t bufferSize, int deviceID = getDefaultDeviceID(), double sampleRate = getDefaultSampleRate());
+    AudioOutput(Synthesizer& synth, std::size_t bufferSize, int deviceID = getDefaultDeviceID(),
+                double sampleRate = getDefaultSampleRate());
     ~AudioOutput();
 
     static int getDefaultDeviceID();
@@ -20,5 +20,4 @@ private:
     std::thread renderingThread;
     std::atomic_bool running_;
 };
-
 }

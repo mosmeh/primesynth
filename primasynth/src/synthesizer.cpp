@@ -1,13 +1,8 @@
 #include "synthesizer.h"
 
 namespace primasynth {
-
-Synthesizer::Synthesizer(double outputRate, std::size_t numChannels) :
-    volume_(1.0),
-    midiStd_(midi::Standard::GM),
-    defaultMIDIStd_(midi::Standard::GM),
-    stdFixed_(false) {
-
+Synthesizer::Synthesizer(double outputRate, std::size_t numChannels)
+    : volume_(1.0), midiStd_(midi::Standard::GM), defaultMIDIStd_(midi::Standard::GM), stdFixed_(false) {
     conv::initialize();
 
     channels_.reserve(numChannels);
@@ -41,7 +36,8 @@ void Synthesizer::processShortMessage(unsigned long param) {
         break;
     case midi::MessageStatus::NoteOn:
         if (!channel->hasPreset()) {
-            channel->setPreset(channelID == midi::PERCUSSION_CHANNEL ? findPreset(PERCUSSION_BANK, 0) : findPreset(0, 0));
+            channel->setPreset(channelID == midi::PERCUSSION_CHANNEL ? findPreset(PERCUSSION_BANK, 0)
+                                                                     : findPreset(0, 0));
         }
         channel->noteOn(msg[1], msg[2]);
         break;
@@ -97,12 +93,15 @@ bool matchSysEx(const char* data, std::size_t length, const std::array<unsigned 
 }
 
 void Synthesizer::processSysEx(const char* data, std::size_t length) {
-    static constexpr std::array<unsigned char, 6>  GM_SYSTEM_ON        = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
-    static constexpr std::array<unsigned char, 6>  GM_SYSTEM_OFF       = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
-    static constexpr std::array<unsigned char, 11> GS_RESET            = {0xf0, 0x41, 0, 0x42, 0x12, 0x40, 0x00, 0x7f, 0x00, 0x41, 0xf7};
-    static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET1 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x00, 0x01, 0xf7};
-    static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET2 = {0xf0, 0x41, 0, 0x42, 0x12, 0x00, 0x00, 0x7f, 0x01, 0x00, 0xf7};
-    static constexpr std::array<unsigned char, 9>  XG_SYSTEM_ON        = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
+    static constexpr std::array<unsigned char, 6> GM_SYSTEM_ON = {0xf0, 0x7e, 0, 0x09, 0x01, 0xf7};
+    static constexpr std::array<unsigned char, 6> GM_SYSTEM_OFF = {0xf0, 0x7e, 0, 0x09, 0x02, 0xf7};
+    static constexpr std::array<unsigned char, 11> GS_RESET = {0xf0, 0x41, 0,    0x42, 0x12, 0x40,
+                                                               0x00, 0x7f, 0x00, 0x41, 0xf7};
+    static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET1 = {0xf0, 0x41, 0,    0x42, 0x12, 0x00,
+                                                                          0x00, 0x7f, 0x00, 0x01, 0xf7};
+    static constexpr std::array<unsigned char, 11> GS_SYSTEM_MODE_SET2 = {0xf0, 0x41, 0,    0x42, 0x12, 0x00,
+                                                                          0x00, 0x7f, 0x01, 0x00, 0xf7};
+    static constexpr std::array<unsigned char, 9> XG_SYSTEM_ON = {0xf0, 0x43, 0, 0x4c, 0x00, 0x00, 0x7e, 0x00, 0xf7};
 
     if (stdFixed_) {
         return;
@@ -111,7 +110,8 @@ void Synthesizer::processSysEx(const char* data, std::size_t length) {
         midiStd_ = midi::Standard::GM;
     } else if (matchSysEx(data, length, GM_SYSTEM_OFF)) {
         midiStd_ = defaultMIDIStd_;
-    } else if (matchSysEx(data, length, GS_RESET) || matchSysEx(data, length, GS_SYSTEM_MODE_SET1) || matchSysEx(data, length, GS_SYSTEM_MODE_SET2)) {
+    } else if (matchSysEx(data, length, GS_RESET) || matchSysEx(data, length, GS_SYSTEM_MODE_SET1)
+               || matchSysEx(data, length, GS_SYSTEM_MODE_SET2)) {
         midiStd_ = midi::Standard::GS;
     } else if (matchSysEx(data, length, XG_SYSTEM_ON)) {
         midiStd_ = midi::Standard::XG;
@@ -155,5 +155,4 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
         throw std::runtime_error("failed to find preset 0:0 (GM Acoustic Grand Piano)");
     }
 }
-
 }

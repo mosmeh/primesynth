@@ -3,7 +3,6 @@
 
 namespace primasynth {
 namespace sf {
-
 enum class SampleLink : std::uint16_t {
     MonoSample = 1,
     RightSample = 2,
@@ -83,27 +82,13 @@ enum class GeneralController : std::uint8_t {
     Link = 127
 };
 
-enum class ControllerPalette {
-    General = 0,
-    MIDI = 1
-};
+enum class ControllerPalette { General = 0, MIDI = 1 };
 
-enum class SourceDirection {
-    Positive = 0,
-    Negative = 1
-};
+enum class SourceDirection { Positive = 0, Negative = 1 };
 
-enum class SourcePolarity {
-    Unipolar = 0,
-    Bipolar = 1
-};
+enum class SourcePolarity { Unipolar = 0, Bipolar = 1 };
 
-enum class SourceType {
-    Linear = 0,
-    Concave = 1,
-    Convex = 2,
-    Switch = 3
-};
+enum class SourceType { Linear = 0, Concave = 1, Convex = 2, Switch = 3 };
 
 struct Modulator {
     union {
@@ -116,10 +101,7 @@ struct Modulator {
     SourceType type;
 };
 
-enum class Transform : std::uint16_t {
-    Linear = 0,
-    AbsoluteValue = 2
-};
+enum class Transform : std::uint16_t { Linear = 0, AbsoluteValue = 2 };
 
 struct RangesType {
     std::int8_t lo;
@@ -182,6 +164,5 @@ struct Sample {
     std::uint16_t sampleLink;
     SampleLink sampleType;
 };
-
 }
 }

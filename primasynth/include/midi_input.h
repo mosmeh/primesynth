@@ -1,11 +1,10 @@
 #pragma once
 #include <atomic>
 #define NOMINMAX
-#include <Windows.h>
 #include "synthesizer.h"
+#include <Windows.h>
 
 namespace primasynth {
-
 class MIDIInput {
 public:
     struct SharedParam {
@@ -26,5 +25,4 @@ private:
     SharedParam sharedParam_;
     std::thread bufferAddingThread_;
 };
-
 }

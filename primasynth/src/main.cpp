@@ -1,7 +1,7 @@
-#include "third_party/cmdline.h"
 #include "audio_output.h"
 #include "midi_input.h"
 #include "synthesizer.h"
+#include "third_party/cmdline.h"
 
 int main(int argc, char** argv) {
     try {
@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
         argparser.add<unsigned int>("buffer", 'b', "audio output buffer size", false, 1 << 12);
         argparser.add<unsigned int>("channels", 'c', "number of MIDI channels", false, 16);
         argparser.add<std::string>("std", '\0', "MIDI standard, affects bank selection (gm, gs, xg)", false, "gs",
-            cmdline::oneof<std::string>("gm", "gs", "xg"));
+                                   cmdline::oneof<std::string>("gm", "gs", "xg"));
         argparser.add("fix-std", '\0', "do not respond to GM/XG System On, GS Reset, etc.");
         argparser.add("print-msg", 'p', "print received MIDI messages");
         argparser.footer("[soundfonts] ...");
@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
             throw std::runtime_error("SoundFont file required");
         }
 
-        const double sampleRate = argparser.exist("samplerate") ?
-            argparser.get<double>("samplerate") : AudioOutput::getDefaultSampleRate();
+        const double sampleRate =
+            argparser.exist("samplerate") ? argparser.get<double>("samplerate") : AudioOutput::getDefaultSampleRate();
 
         auto midiStandard = midi::Standard::GM;
         if (argparser.get<std::string>("std") == "gs") {
@@ -45,7 +45,9 @@ int main(int argc, char** argv) {
 
         MIDIInput midiInput(synth, argparser.get<unsigned int>("in"), argparser.exist("print-msg"));
         AudioOutput audioOutput(synth, argparser.get<unsigned int>("buffer"),
-            argparser.exist("out") ? argparser.get<unsigned int>("out") : AudioOutput::getDefaultDeviceID(), sampleRate);
+                                argparser.exist("out") ? argparser.get<unsigned int>("out")
+                                                       : AudioOutput::getDefaultDeviceID(),
+                                sampleRate);
 
         SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 

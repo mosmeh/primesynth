@@ -5,10 +5,8 @@
 #include <Windows.h>
 
 namespace primasynth {
-
-int streamCallback(const void*, void* output, unsigned long frameCount,
-    const PaStreamCallbackTimeInfo*, PaStreamCallbackFlags, void* userData) {
-
+int streamCallback(const void*, void* output, unsigned long frameCount, const PaStreamCallbackTimeInfo*,
+                   PaStreamCallbackFlags, void* userData) {
     const auto out = static_cast<float*>(output);
     const auto buffer = reinterpret_cast<RingBuffer*>(userData);
     for (unsigned long i = 0; i < 2 * frameCount; ++i) {
@@ -49,11 +47,8 @@ void checkPaError(PaError error) {
     }
 }
 
-
-AudioOutput::AudioOutput(Synthesizer& synth, std::size_t bufferSize, int deviceID, double sampleRate) :
-    buffer_(bufferSize),
-    running_(true) {
-
+AudioOutput::AudioOutput(Synthesizer& synth, std::size_t bufferSize, int deviceID, double sampleRate)
+    : buffer_(bufferSize), running_(true) {
     PaStreamParameters params = {};
     params.channelCount = 2;
     params.sampleFormat = paFloat32;
@@ -72,11 +67,11 @@ AudioOutput::AudioOutput(Synthesizer& synth, std::size_t bufferSize, int deviceI
 
     const UINT cp = GetConsoleCP();
     SetConsoleOutputCP(CP_UTF8);
-    printf("Audio: opening %s (%s, %.0fHz)\n", deviceInfo->name,
-        Pa_GetHostApiInfo(deviceInfo->hostApi)->name, sampleRate);
+    printf("Audio: opening %s (%s, %.0fHz)\n", deviceInfo->name, Pa_GetHostApiInfo(deviceInfo->hostApi)->name,
+           sampleRate);
     SetConsoleOutputCP(cp);
-    checkPaError(Pa_OpenStream(&stream_, nullptr, &params, sampleRate,
-        paFramesPerBufferUnspecified, paNoFlag, streamCallback, &buffer_));
+    checkPaError(Pa_OpenStream(&stream_, nullptr, &params, sampleRate, paFramesPerBufferUnspecified, paNoFlag,
+                               streamCallback, &buffer_));
 
     renderingThread = std::thread(doRenderingLoop, std::ref(running_), std::ref(synth), std::ref(buffer_), sampleRate);
 
@@ -110,5 +105,4 @@ public:
         checkPaError(Pa_Terminate());
     }
 } paInstance;
-
 }

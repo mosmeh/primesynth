@@ -1,11 +1,10 @@
 #pragma once
-#include <mutex>
-#include <vector>
 #include "midi.h"
 #include "voice.h"
+#include <mutex>
+#include <vector>
 
 namespace primasynth {
-
 class Channel {
 public:
     explicit Channel(double outputRate);
@@ -24,10 +23,7 @@ public:
     StereoValue render();
 
 private:
-    enum class DataEntryMode {
-        RPN,
-        NRPN
-    };
+    enum class DataEntryMode { RPN, NRPN };
 
     const double outputRate_;
     std::shared_ptr<const Preset> preset_;
@@ -44,5 +40,4 @@ private:
 
     void addVoice(std::unique_ptr<Voice> voice);
 };
-
 }

@@ -1,11 +1,10 @@
 #pragma once
+#include "soundfont_spec.h"
 #include <array>
 #include <fstream>
 #include <vector>
-#include "soundfont_spec.h"
 
 namespace primasynth {
-
 static constexpr std::size_t NUM_GENERATORS = static_cast<std::size_t>(sf::Generator::Pitch) + 1;
 static constexpr std::uint16_t PERCUSSION_BANK = 128;
 
@@ -106,5 +105,4 @@ private:
     void readSdtaChunk(std::ifstream& ifs, std::size_t size);
     void readPdtaChunk(std::ifstream& ifs, std::size_t size);
 };
-
 }

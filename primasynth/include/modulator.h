@@ -2,7 +2,6 @@
 #include "soundfont_spec.h"
 
 namespace primasynth {
-
 class Modulator {
 public:
     explicit Modulator(const sf::ModList& param);
@@ -23,5 +22,4 @@ private:
 
     void calculateValue();
 };
-
 }

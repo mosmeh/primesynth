@@ -1,8 +1,7 @@
-#include "soundfont.h"
 #include "conversion.h"
+#include "soundfont.h"
 
 namespace primasynth {
-
 static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES = {
     0,      // startAddrsOffset
     0,      // endAddrsOffset
@@ -45,7 +44,7 @@ static const std::array<std::int16_t, NUM_GENERATORS> DEFAULT_GENERATOR_VALUES =
     -12000, // releaseVolEnv
     0,      // keynumToVolEnvHold
     0,      // keynumToVolEnvDecay
-    0,      // instrument 
+    0,      // instrument
     0,      // reserved1
     0,      // keyRange
     0,      // velRange
@@ -266,18 +265,13 @@ const std::vector<sf::ModList>& ModulatorParameterSet::getParameters() const {
 }
 
 bool operator==(const sf::Modulator& a, const sf::Modulator& b) {
-    return a.index.midi == b.index.midi
-        && a.palette == b.palette
-        && a.direction == b.direction
-        && a.polarity == b.polarity
-        && a.type == b.type;
+    return a.index.midi == b.index.midi && a.palette == b.palette && a.direction == b.direction
+           && a.polarity == b.polarity && a.type == b.type;
 }
 
 bool modulatorsAreIdentical(const sf::ModList& a, const sf::ModList& b) {
-    return a.modSrcOper == b.modSrcOper
-        && a.modDestOper == b.modDestOper
-        && a.modAmtSrcOper == b.modAmtSrcOper
-        && a.modTransOper == b.modTransOper;
+    return a.modSrcOper == b.modSrcOper && a.modDestOper == b.modDestOper && a.modAmtSrcOper == b.modAmtSrcOper
+           && a.modTransOper == b.modTransOper;
 }
 
 void ModulatorParameterSet::append(const sf::ModList& modparam) {
@@ -480,9 +474,8 @@ void readModList(std::ifstream& ifs, std::vector<sf::ModList>& list, std::uint32
 }
 
 template <typename ItBag, typename ItGen, typename ItMod>
-void readBags(std::vector<Zone>& zones, const ItBag& bagBegin, const ItBag& bagEnd,
-    const ItGen& genBegin, const ItMod& modBegin, sf::Generator indexGen) {
-
+void readBags(std::vector<Zone>& zones, const ItBag& bagBegin, const ItBag& bagEnd, const ItGen& genBegin,
+              const ItMod& modBegin, sf::Generator indexGen) {
     Zone globalZone;
     for (auto it_bag = bagBegin; it_bag != bagEnd; ++it_bag) {
         Zone zone;
@@ -617,5 +610,4 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         sample.minAtten = conv::ampToNormedAtten(static_cast<double>(sampleMax) / INT16_MAX);
     }
 }
-
 }

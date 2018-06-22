@@ -2,18 +2,9 @@
 #include <array>
 
 namespace primasynth {
-
 class Envelope {
 public:
-    enum class Section {
-        Delay,
-        Attack,
-        Hold,
-        Decay,
-        Sustain,
-        Release,
-        Finished
-    };
+    enum class Section { Delay, Attack, Hold, Decay, Sustain, Release, Finished };
 
     Envelope(double outputRate, unsigned int interval);
 
@@ -35,5 +26,4 @@ private:
 
     void changeSection(Section section);
 };
-
 }

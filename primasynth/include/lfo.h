@@ -2,17 +2,10 @@
 #include "conversion.h"
 
 namespace primasynth {
-
 class LFO {
 public:
-    LFO(double outputRate, unsigned int interval) :
-        outputRate_(outputRate),
-        interval_(interval),
-        steps_(0),
-        delay_(0),
-        delta_(0.0),
-        value_(0.0),
-        up_(true) {}
+    LFO(double outputRate, unsigned int interval)
+        : outputRate_(outputRate), interval_(interval), steps_(0), delay_(0), delta_(0.0), value_(0.0), up_(true) {}
 
     double getValue() const {
         return value_;
@@ -53,5 +46,4 @@ private:
     double delta_, value_;
     bool up_;
 };
-
 }

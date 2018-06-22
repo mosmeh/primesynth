@@ -4,7 +4,6 @@
 #include <sstream>
 
 namespace primasynth {
-
 void checkMMResult(MMRESULT result) {
     if (result != MMSYSERR_NOERROR) {
         char msg[MAXERRORLENGTH];
@@ -54,35 +53,28 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
         const auto channel = msg[0] & 0xf;
         switch (status) {
         case midi::MessageStatus::NoteOff:
-            std::cout << "Note off: channel=" << channel
-                << " key=" << static_cast<int>(msg[1]) << std::endl;
+            std::cout << "Note off: channel=" << channel << " key=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case midi::MessageStatus::NoteOn:
-            std::cout << "Note on: channel=" << channel
-                << " key=" << static_cast<int>(msg[1])
-                << " velocity=" << static_cast<int>(msg[2]) << std::endl;
+            std::cout << "Note on: channel=" << channel << " key=" << static_cast<int>(msg[1])
+                      << " velocity=" << static_cast<int>(msg[2]) << std::endl;
             break;
         case midi::MessageStatus::KeyPressure:
-            std::cout << "Key pressure: channel=" << channel
-                << " key=" << static_cast<int>(msg[1])
-                << " value=" << static_cast<int>(msg[2]) << std::endl;
+            std::cout << "Key pressure: channel=" << channel << " key=" << static_cast<int>(msg[1])
+                      << " value=" << static_cast<int>(msg[2]) << std::endl;
             break;
         case midi::MessageStatus::ControlChange:
-            std::cout << "Control change: channel=" << channel
-                << " controller=" << static_cast<int>(msg[1])
-                << " value=" << static_cast<int>(msg[2]) << std::endl;
+            std::cout << "Control change: channel=" << channel << " controller=" << static_cast<int>(msg[1])
+                      << " value=" << static_cast<int>(msg[2]) << std::endl;
             break;
         case midi::MessageStatus::ProgramChange:
-            std::cout << "Program change: channel=" << channel
-                << " program=" << static_cast<int>(msg[1]) << std::endl;
+            std::cout << "Program change: channel=" << channel << " program=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case midi::MessageStatus::ChannelPressure:
-            std::cout << "Channel pressure: channel=" << channel
-                << " value=" << static_cast<int>(msg[1]) << std::endl;
+            std::cout << "Channel pressure: channel=" << channel << " value=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case midi::MessageStatus::PitchBend:
-            std::cout << "Pitch bend: channel=" << channel
-                << " value=" << conv::joinBytes(msg[2], msg[1]) << std::endl;
+            std::cout << "Pitch bend: channel=" << channel << " value=" << conv::joinBytes(msg[2], msg[1]) << std::endl;
             break;
         }
         break;
@@ -92,7 +84,8 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
         std::cout << "SysEx: ";
         const auto flags(std::cout.flags());
         for (DWORD i = 0; i < mh->dwBytesRecorded; ++i) {
-            std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(static_cast<unsigned char>(mh->lpData[i])) << " ";
+            std::cout << std::hex << std::setfill('0') << std::setw(2)
+                      << static_cast<int>(static_cast<unsigned char>(mh->lpData[i])) << " ";
         }
         std::cout.flags(flags);
         std::cout << std::endl;
@@ -103,17 +96,13 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
     MidiInProc(hmi, wMsg, dwInstance, dwParam1, dwParam2);
 }
 
-MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) :
-    sysExBuffer_(512),
-    mh_(),
-    sharedParam_{synth, true, false} {
-
+MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose)
+    : sysExBuffer_(512), mh_(), sharedParam_{synth, true, false} {
     MIDIINCAPS caps;
     checkMMResult(midiInGetDevCaps(deviceID, &caps, sizeof(caps)));
     std::wcout << "MIDI: opening " << caps.szPname << std::endl;
-    checkMMResult(midiInOpen(&hmi_, deviceID,
-        reinterpret_cast<DWORD_PTR>(verbose ? verboseMidiInProc : MidiInProc),
-        reinterpret_cast<DWORD_PTR>(&sharedParam_), CALLBACK_FUNCTION));
+    checkMMResult(midiInOpen(&hmi_, deviceID, reinterpret_cast<DWORD_PTR>(verbose ? verboseMidiInProc : MidiInProc),
+                             reinterpret_cast<DWORD_PTR>(&sharedParam_), CALLBACK_FUNCTION));
 
     mh_.lpData = sysExBuffer_.data();
     mh_.dwBufferLength = sysExBuffer_.size();
@@ -121,12 +110,10 @@ MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose) :
     checkMMResult(midiInPrepareHeader(hmi_, &mh_, sizeof(mh_)));
     checkMMResult(midiInAddBuffer(hmi_, &mh_, sizeof(mh_)));
 
-    bufferAddingThread_ = std::thread([&, &sp = sharedParam_] {
+    bufferAddingThread_ = std::thread([&, &sp = sharedParam_ ] {
         while (true) {
             std::unique_lock<std::mutex> uniqueLock(sp.mutex);
-            sp.cv.wait(uniqueLock, [&] {
-                return sp.addingBufferRequested || !sp.running;
-            });
+            sp.cv.wait(uniqueLock, [&] { return sp.addingBufferRequested || !sp.running; });
             if (sp.running) {
                 checkMMResult(midiInAddBuffer(hmi_, &mh_, sizeof(mh_)));
                 sp.addingBufferRequested = false;
@@ -153,5 +140,4 @@ MIDIInput::~MIDIInput() {
         checkMMResult(midiInClose(hmi_));
     }
 }
-
 }

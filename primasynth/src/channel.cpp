@@ -1,19 +1,17 @@
 #include "channel.h"
 
 namespace primasynth {
-
-Channel::Channel(double outputRate) :
-    outputRate_(outputRate),
-    controllers_(),
-    keyPressures_(),
-    channelPressure_(0),
-    pitchBend_(1 << 13),
-    dataEntryMode_(DataEntryMode::RPN),
-    pitchBendSensitivity_(2),
-    fineTuning_(0.0),
-    coarseTuning_(0.0),
-    currentNoteID_(0) {
-
+Channel::Channel(double outputRate)
+    : outputRate_(outputRate),
+      controllers_(),
+      keyPressures_(),
+      channelPressure_(0),
+      pitchBend_(1 << 13),
+      dataEntryMode_(DataEntryMode::RPN),
+      pitchBendSensitivity_(2),
+      fineTuning_(0.0),
+      coarseTuning_(0.0),
+      currentNoteID_(0) {
     controllers_.at(static_cast<std::size_t>(midi::ControlChange::Volume)) = 100;
     controllers_.at(static_cast<std::size_t>(midi::ControlChange::Pan)) = 64;
     controllers_.at(static_cast<std::size_t>(midi::ControlChange::Expression)) = 127;
@@ -23,10 +21,8 @@ Channel::Channel(double outputRate) :
 }
 
 midi::Bank Channel::getBank() const {
-    return {
-        controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectMSB)),
-        controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectLSB))
-    };
+    return {controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectMSB)),
+            controllers_.at(static_cast<std::size_t>(midi::ControlChange::BankSelectLSB))};
 }
 
 bool Channel::hasPreset() const {
@@ -66,8 +62,8 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
                     modparams.mergeAndAdd(presetZone.modulatorParameters);
                     modparams.merge(ModulatorParameterSet::getDefaultParameters());
 
-                    auto voice = std::make_unique<Voice>(
-                        currentNoteID_, outputRate_, sample, generators, modparams, key, velocity);
+                    auto voice = std::make_unique<Voice>(currentNoteID_, outputRate_, sample, generators, modparams,
+                                                         key, velocity);
                     voice->setPercussion(preset_->bank == PERCUSSION_BANK);
                     addVoice(std::move(voice));
                 }
@@ -95,11 +91,11 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     switch (static_cast<midi::ControlChange>(controller)) {
     case midi::ControlChange::DataEntryMSB:
         if (dataEntryMode_ == DataEntryMode::RPN) {
-            const std::uint16_t rpn = conv::joinBytes(
-                controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
-                controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)));
-            const auto data = static_cast<std::int32_t>(conv::joinBytes(
-                value, controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB))));
+            const std::uint16_t rpn =
+                conv::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
+                                controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)));
+            const auto data = static_cast<std::int32_t>(
+                conv::joinBytes(value, controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB))));
 
             switch (static_cast<midi::RPN>(rpn)) {
             case midi::RPN::PitchBendSensitivity:
@@ -262,5 +258,4 @@ void Channel::addVoice(std::unique_ptr<Voice> voice) {
     }
     voices_.emplace_back(std::move(voice));
 }
-
 }
