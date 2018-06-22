@@ -40,16 +40,14 @@ double keyToHeltz(double key) {
         return 1.0;
     }
 
-    std::size_t offset = 300;
-    int th = 900;
-    double r = 1.0;
-    while (th <= 14100) {
-        if (key * 100 < th) {
-            return r * centToHeltzTable.at(static_cast<std::size_t>(key * 100) + offset);
+    int offset = 300;
+    int ratio = 1;
+    for (int threshold = 900; threshold <= 14100; threshold += 1200) {
+        if (key * 100.0 < threshold) {
+            return ratio * centToHeltzTable.at(static_cast<int>(key * 100.0) + offset);
         }
-        th += 1200;
         offset -= 1200;
-        r *= 2.0;
+        ratio *= 2;
     }
 
     return 1.0;
