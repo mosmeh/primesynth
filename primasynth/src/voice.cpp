@@ -205,17 +205,16 @@ void Voice::update() {
         vibLFO_.update();
         modLFO_.update();
 
-        deltaPhase_ = FixedPoint(
-            deltaPhaseFactor_ *
-            conv::keyToHeltz(voicePitch_ +
-                             0.01 * getModulatedGenerator(sf::Generator::ModEnvToPitch) *
-                                 (1.0 - modEnv_.getAttenuation()) +
-                             0.01 * getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
-                             0.01 * getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue()));
+        const double key =
+            voicePitch_ +
+            0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * (1.0 - modEnv_.getAttenuation()) +
+                    getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
+                    getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue());
+        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(key));
 
-        const double targetAmp =
-            volEnv_.getAmplitude() * conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::ModLfoToVolume) *
-                                                                  modLFO_.getValue() / 960.0);
+        const double targetAmp = volEnv_.calculateAmplitude() *
+                                 conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::ModLfoToVolume) *
+                                                              modLFO_.getValue() / 960.0);
         deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
     }
 }

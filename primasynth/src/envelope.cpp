@@ -3,19 +3,10 @@
 
 namespace primasynth {
 Envelope::Envelope(double outputRate, unsigned int interval)
-    : effectiveOutputRate_(outputRate / interval),
-      params_(),
-      section_(Section::Delay),
-      sectionSteps_(0),
-      atten_(1.0),
-      amp_(1.0) {}
+    : effectiveOutputRate_(outputRate / interval), params_(), section_(Section::Delay), sectionSteps_(0), atten_(1.0) {}
 
 Envelope::Section Envelope::getSection() const {
     return section_;
-}
-
-double Envelope::getAmplitude() const {
-    return amp_;
 }
 
 double Envelope::getAttenuation() const {
@@ -24,6 +15,24 @@ double Envelope::getAttenuation() const {
 
 bool Envelope::isFinished() const {
     return section_ == Section::Finished;
+}
+
+double Envelope::calculateAmplitude() const {
+    switch (section_) {
+    case Section::Delay:
+    case Section::Finished:
+        return 0.0;
+    case Section::Attack:
+        return 1.0 - atten_;
+    case Section::Hold:
+        return 1.0;
+    case Section::Decay:
+    case Section::Sustain:
+    case Section::Release:
+        return conv::attenuationToAmplitude(atten_);
+    }
+
+    throw std::logic_error("unreachable");
 }
 
 void Envelope::setParameter(Section section, double param) {
@@ -59,15 +68,12 @@ void Envelope::update() {
     case Section::Delay:
     case Section::Finished:
         atten_ = 1.0;
-        amp_ = 0.0;
         return;
     case Section::Attack:
         atten_ = 1.0 - sectionSteps_ / params_.at(i);
-        amp_ = 1.0 - atten_;
         return;
     case Section::Hold:
         atten_ = 0.0;
-        amp_ = 1.0;
         return;
     case Section::Decay:
         atten_ = sectionSteps_ / params_.at(i);
@@ -75,20 +81,20 @@ void Envelope::update() {
             atten_ = sustain;
             changeSection(Section::Sustain);
         }
-        break;
+        return;
     case Section::Sustain:
         atten_ = sustain;
-        break;
+        return;
     case Section::Release:
         atten_ += 1.0 / params_.at(i);
         if (atten_ >= 1.0) {
             atten_ = 1.0;
             changeSection(Section::Finished);
         }
-        break;
+        return;
     }
 
-    amp_ = conv::attenuationToAmplitude(atten_);
+    throw std::logic_error("unreachable");
 }
 
 void Envelope::changeSection(Section section) {
