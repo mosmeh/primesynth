@@ -492,10 +492,9 @@ void readBags(std::vector<Zone>& zones, const ItBag& bagBegin, const ItBag& bagE
                 zone.velocityRange = {range.lo, range.hi};
                 break;
             default:
-                if (it_gen->genOper > sf::Generator::EndOper) {
-                    throw std::out_of_range("generator out of range");
+                if (it_gen->genOper < sf::Generator::EndOper) {
+                    zone.generators.set(it_gen->genOper, it_gen->genAmount.shAmount);
                 }
-                zone.generators.set(it_gen->genOper, it_gen->genAmount.shAmount);
                 break;
             }
         }
