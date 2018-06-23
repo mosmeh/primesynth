@@ -109,8 +109,7 @@ void Voice::setPercussion(bool percussion) {
 
 void Voice::updateSFController(sf::GeneralController controller, std::int16_t value) {
     for (auto& mod : modulators_) {
-        if (mod.isSourceSFController(controller)) {
-            mod.updateSFController(controller, value);
+        if (mod.updateSFController(controller, value)) {
             updateModulatedParams(mod.getDestination());
         }
     }
@@ -118,8 +117,7 @@ void Voice::updateSFController(sf::GeneralController controller, std::int16_t va
 
 void Voice::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
     for (auto& mod : modulators_) {
-        if (mod.isSourceMIDIController(controller)) {
-            mod.updateMIDIController(controller, value);
+        if (mod.updateMIDIController(controller, value)) {
             updateModulatedParams(mod.getDestination());
         }
     }

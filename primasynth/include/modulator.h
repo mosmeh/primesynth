@@ -6,15 +6,13 @@ class Modulator {
 public:
     explicit Modulator(const sf::ModList& param);
 
-    bool isSourceSFController(sf::GeneralController controller) const;
-    bool isSourceMIDIController(std::uint8_t controller) const;
     sf::Generator getDestination() const;
     std::int16_t getAmount() const;
     bool isAlwaysNonNegative() const;
     double getValue() const;
 
-    void updateSFController(sf::GeneralController controller, std::int16_t value);
-    void updateMIDIController(std::uint8_t controller, std::uint8_t value);
+    bool updateSFController(sf::GeneralController controller, std::int16_t value);
+    bool updateMIDIController(std::uint8_t controller, std::uint8_t value);
 
 private:
     const sf::ModList param_;

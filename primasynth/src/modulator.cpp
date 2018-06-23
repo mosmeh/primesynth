@@ -5,19 +5,6 @@
 namespace primasynth {
 Modulator::Modulator(const sf::ModList& param) : param_(param), source_(0.0), amountSource_(1.0), value_(0.0) {}
 
-bool Modulator::isSourceSFController(sf::GeneralController controller) const {
-    return (param_.modSrcOper.palette == sf::ControllerPalette::General &&
-            controller == param_.modSrcOper.index.general) ||
-           (param_.modAmtSrcOper.palette == sf::ControllerPalette::General &&
-            controller == param_.modAmtSrcOper.index.general);
-}
-
-bool Modulator::isSourceMIDIController(std::uint8_t controller) const {
-    return (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi) ||
-           (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI &&
-            controller == param_.modAmtSrcOper.index.midi);
-}
-
 sf::Generator Modulator::getDestination() const {
     return param_.modDestOper;
 }
@@ -108,25 +95,39 @@ double map(double value, sf::Modulator mod) {
     throw std::runtime_error("unknown modulator controller type");
 }
 
-void Modulator::updateSFController(sf::GeneralController controller, std::int16_t value) {
+bool Modulator::updateSFController(sf::GeneralController controller, std::int16_t value) {
+    bool updated = false;
     if (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general) {
         source_ = map(value, param_.modSrcOper);
+        updated = true;
     }
     if (param_.modAmtSrcOper.palette == sf::ControllerPalette::General &&
         controller == param_.modAmtSrcOper.index.general) {
         amountSource_ = map(value, param_.modAmtSrcOper);
+        updated = true;
     }
-    calculateValue();
+
+    if (updated) {
+        calculateValue();
+    }
+    return updated;
 }
 
-void Modulator::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
+bool Modulator::updateMIDIController(std::uint8_t controller, std::uint8_t value) {
+    bool updated = false;
     if (param_.modSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modSrcOper.index.midi) {
         source_ = map(value, param_.modSrcOper);
+        updated = true;
     }
     if (param_.modAmtSrcOper.palette == sf::ControllerPalette::MIDI && controller == param_.modAmtSrcOper.index.midi) {
         amountSource_ = map(value, param_.modAmtSrcOper);
+        updated = true;
     }
-    calculateValue();
+
+    if (updated) {
+        calculateValue();
+    }
+    return updated;
 }
 
 double transform(double value, sf::Transform transform) {
