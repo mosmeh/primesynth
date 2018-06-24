@@ -17,10 +17,10 @@ Sample::Sample(const sf::Sample& sample, const std::vector<std::int16_t>& sample
       key(sample.originalKey),
       correction(sample.correction),
       buffer(sampleBuffer) {
-    end = std::max(end, start + 1);
-    startLoop = std::max(startLoop, start);
-    endLoop = std::min(endLoop, end);
-    endLoop = std::max(endLoop, startLoop);
+    start = std::min(sampleBuffer.size() - 1, start);
+    end = std::max(start + 1, std::min(sampleBuffer.size(), end));
+    startLoop = std::max(start, std::min(sampleBuffer.size() - 1, startLoop));
+    endLoop = std::max(startLoop + 1, std::min(end, endLoop));
 
     int sampleMax = 0;
     for (std::size_t i = start; i < end; ++i) {
