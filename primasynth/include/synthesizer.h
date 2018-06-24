@@ -20,6 +20,6 @@ private:
     std::vector<std::unique_ptr<SoundFont>> soundFonts_;
     double volume_;
 
-    std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint8_t presetID) const;
+    std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint16_t presetID) const;
 };
 }

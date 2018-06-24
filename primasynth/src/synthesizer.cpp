@@ -127,7 +127,7 @@ StereoValue Synthesizer::render() const {
     return volume_ * sum;
 }
 
-std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint8_t presetID) const {
+std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint16_t presetID) const {
     for (const auto& sf : soundFonts_) {
         for (const auto& preset : sf->getPresetPtrs()) {
             if (preset->bank == bank && preset->presetID == presetID) {
@@ -138,7 +138,6 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
 
     // fallback
     if (bank == PERCUSSION_BANK) {
-        // if percussion bank
         if (presetID != 0) {
             return findPreset(bank, 0);
         } else {
