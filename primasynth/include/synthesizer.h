@@ -6,12 +6,13 @@ class Synthesizer {
 public:
     Synthesizer(double outputRate = 44100, std::size_t numChannels = 16);
 
+    StereoValue render() const;
+
     void loadSoundFont(const std::string& filename);
     void setVolume(double volume);
     void setMIDIStandard(midi::Standard midiStandard, bool fixed = false);
     void processShortMessage(unsigned long param);
     void processSysEx(const char* data, std::size_t length);
-    StereoValue render() const;
 
 private:
     midi::Standard midiStd_, defaultMIDIStd_;

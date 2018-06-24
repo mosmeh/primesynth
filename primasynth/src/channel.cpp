@@ -30,7 +30,7 @@ bool Channel::hasPreset() const {
 }
 
 void Channel::noteOff(std::uint8_t key) {
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
             voice->release(controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64);
@@ -44,16 +44,14 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
         return;
     }
 
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
-    const auto& soundFont = preset_->soundFont;
     for (const Zone& presetZone : preset_->zones) {
         if (presetZone.isInRange(key, velocity)) {
             const std::int16_t instID = presetZone.generators.getOrDefault(sf::Generator::Instrument);
-            const auto& inst = soundFont.getInstruments().at(instID);
+            const auto& inst = preset_->soundFont.getInstruments().at(instID);
             for (const Zone& instZone : inst.zones) {
                 if (instZone.isInRange(key, velocity)) {
                     const std::int16_t sampleID = instZone.generators.getOrDefault(sf::Generator::SampleID);
-                    const auto& sample = soundFont.getSamples().at(sampleID);
+                    const auto& sample = preset_->soundFont.getSamples().at(sampleID);
 
                     auto generators = instZone.generators;
                     generators.add(presetZone.generators);
@@ -76,7 +74,7 @@ void Channel::noteOn(std::uint8_t key, std::uint8_t velocity) {
 void Channel::keyPressure(std::uint8_t key, std::uint8_t value) {
     keyPressures_.at(key) = value;
 
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
             voice->updateSFController(sf::GeneralController::PolyPressure, value);
@@ -87,7 +85,7 @@ void Channel::keyPressure(std::uint8_t key, std::uint8_t value) {
 void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     controllers_.at(controller) = value;
 
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     switch (static_cast<midi::ControlChange>(controller)) {
     case midi::ControlChange::DataEntryMSB:
         if (dataEntryMode_ == DataEntryMode::RPN) {
@@ -192,7 +190,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
 
 void Channel::channelPressure(std::uint8_t value) {
     channelPressure_ = value;
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     for (const auto& voice : voices_) {
         voice->updateSFController(sf::GeneralController::ChannelPressure, value);
     }
@@ -200,7 +198,7 @@ void Channel::channelPressure(std::uint8_t value) {
 
 void Channel::pitchBend(std::uint16_t value) {
     pitchBend_ = value;
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     for (const auto& voice : voices_) {
         voice->updateSFController(sf::GeneralController::PitchWheel, value);
     }
@@ -210,22 +208,19 @@ void Channel::setPreset(const std::shared_ptr<const Preset>& preset) {
     preset_ = preset;
 }
 
-void Channel::update() {
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
-    for (const auto& voice : voices_) {
-        if (voice->getStatus() != Voice::State::Finished) {
-            voice->update();
-        }
-    }
-}
-
 StereoValue Channel::render() {
-    std::lock_guard<std::mutex> lockGuard(voiceMutex_);
     StereoValue sum{0.0, 0.0};
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     for (const auto& voice : voices_) {
-        if (voice->getStatus() != Voice::State::Finished) {
-            sum += voice->render();
+        if (voice->getStatus() == Voice::State::Finished) {
+            continue;
         }
+        voice->update();
+
+        if (voice->getStatus() == Voice::State::Finished) {
+            continue;
+        }
+        sum += voice->render();
     }
     return sum;
 }
@@ -242,6 +237,8 @@ void Channel::addVoice(std::unique_ptr<Voice> voice) {
     }
 
     const auto exclusiveClass = voice->getExclusiveClass();
+
+    std::lock_guard<std::mutex> lockGuard(mutex_);
     if (exclusiveClass != 0) {
         for (const auto& v : voices_) {
             if (v->getNoteID() != currentNoteID_ && v->getExclusiveClass() == exclusiveClass) {

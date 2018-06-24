@@ -18,7 +18,6 @@ public:
     void channelPressure(std::uint8_t value);
     void pitchBend(std::uint16_t value);
     void setPreset(const std::shared_ptr<const Preset>& preset);
-    void update();
     StereoValue render();
 
 private:
@@ -35,7 +34,7 @@ private:
     double fineTuning_, coarseTuning_;
     std::vector<std::unique_ptr<Voice>> voices_;
     std::size_t currentNoteID_;
-    std::mutex voiceMutex_;
+    std::mutex mutex_;
 
     void addVoice(std::unique_ptr<Voice> voice);
 };

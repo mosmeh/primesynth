@@ -11,6 +11,14 @@ Synthesizer::Synthesizer(double outputRate, std::size_t numChannels)
     }
 }
 
+StereoValue Synthesizer::render() const {
+    StereoValue sum{0.0, 0.0};
+    for (const auto& channel : channels_) {
+        sum += channel->render();
+    }
+    return volume_ * sum;
+}
+
 void Synthesizer::loadSoundFont(const std::string& filename) {
     soundFonts_.emplace_back(std::make_unique<SoundFont>(filename));
 }
@@ -116,15 +124,6 @@ void Synthesizer::processSysEx(const char* data, std::size_t length) {
     } else if (matchSysEx(data, length, XG_SYSTEM_ON)) {
         midiStd_ = midi::Standard::XG;
     }
-}
-
-StereoValue Synthesizer::render() const {
-    StereoValue sum{0.0, 0.0};
-    for (const auto& channel : channels_) {
-        channel->update();
-        sum += channel->render();
-    }
-    return volume_ * sum;
 }
 
 std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::uint16_t presetID) const {
