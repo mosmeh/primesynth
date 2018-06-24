@@ -14,7 +14,7 @@ struct Sample {
     double minAtten;
     const std::vector<std::int16_t>& buffer;
 
-    explicit Sample(const std::vector<std::int16_t>& buf) : buffer(buf) {}
+    Sample(const sf::Sample& sample, const std::vector<std::int16_t>& sampleBuffer);
 };
 
 class GeneratorSet {
@@ -41,36 +41,35 @@ public:
 
     const std::vector<sf::ModList>& getParameters() const;
 
-    void append(const sf::ModList& modparam);
-    void addOrAppend(const sf::ModList& modparam);
+    void append(const sf::ModList& param);
+    void addOrAppend(const sf::ModList& param);
     void merge(const ModulatorParameterSet& b);
     void mergeAndAdd(const ModulatorParameterSet& b);
 
 private:
-    std::vector<sf::ModList> modparams_;
+    std::vector<sf::ModList> params_;
 };
 
 struct Zone {
     struct Range {
         std::int8_t min = 0, max = 127;
 
-        bool contains(std::int8_t value) const {
-            return min <= value && value <= max;
-        }
+        bool contains(std::int8_t value) const;
     };
 
     Range keyRange, velocityRange;
     GeneratorSet generators;
     ModulatorParameterSet modulatorParameters;
 
-    bool isInRange(std::int8_t key, std::int8_t velocity) const {
-        return keyRange.contains(key) && velocityRange.contains(velocity);
-    }
+    bool isInRange(std::int8_t key, std::int8_t velocity) const;
 };
 
 struct Instrument {
     std::string name;
     std::vector<Zone> zones;
+
+    Instrument(std::vector<sf::Inst>::const_iterator instIter, const std::vector<sf::Bag>& ibag,
+               const std::vector<sf::ModList>& imod, const std::vector<sf::GenList>& igen);
 };
 
 class SoundFont;
@@ -81,7 +80,8 @@ struct Preset {
     std::vector<Zone> zones;
     const SoundFont& soundFont;
 
-    explicit Preset(const SoundFont& sfont) : soundFont(sfont) {}
+    Preset(std::vector<sf::PresetHeader>::const_iterator phdrIter, const std::vector<sf::Bag>& pbag,
+           const std::vector<sf::ModList>& pmod, const std::vector<sf::GenList>& pgen, const SoundFont& sfont);
 };
 
 class SoundFont {
