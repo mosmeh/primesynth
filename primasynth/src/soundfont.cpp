@@ -343,6 +343,10 @@ bool Zone::isInRange(std::int8_t key, std::int8_t velocity) const {
 void readBags(std::vector<Zone>& zones, std::vector<sf::Bag>::const_iterator bagBegin,
               std::vector<sf::Bag>::const_iterator bagEnd, const std::vector<sf::ModList>& mods,
               const std::vector<sf::GenList>& gens, sf::Generator indexGen) {
+    if (bagBegin > bagEnd) {
+        throw std::runtime_error("bag indices not monotonically increasing");
+    }
+
     Zone globalZone;
 
     for (auto it_bag = bagBegin; it_bag != bagEnd; ++it_bag) {
@@ -350,12 +354,18 @@ void readBags(std::vector<Zone>& zones, std::vector<sf::Bag>::const_iterator bag
 
         const auto& beginMod = mods.begin() + it_bag->modNdx;
         const auto& endMod = mods.begin() + std::next(it_bag)->modNdx;
+        if (beginMod > endMod) {
+            throw std::runtime_error("modulator indices not monotonically increasing");
+        }
         for (auto it_mod = beginMod; it_mod != endMod; ++it_mod) {
             zone.modulatorParameters.append(*it_mod);
         }
 
         const auto& beginGen = gens.begin() + it_bag->genNdx;
         const auto& endGen = gens.begin() + std::next(it_bag)->genNdx;
+        if (beginGen > endGen) {
+            throw std::runtime_error("generator indices not monotonically increasing");
+        }
         for (auto it_gen = beginGen; it_gen != endGen; ++it_gen) {
             const auto& range = it_gen->genAmount.ranges;
             switch (it_gen->genOper) {
@@ -609,11 +619,19 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         }
     }
 
+    // last records in inst, phdr, and shdr sub-chunks mean "end of records", and are ignored
+
+    if (inst.size() < 2) {
+        throw std::runtime_error("too few instruments");
+    }
     instruments_.reserve(inst.size() - 1);
     for (auto it_inst = inst.begin(); it_inst != std::prev(inst.end()); ++it_inst) {
         instruments_.emplace_back(it_inst, ibag, imod, igen);
     }
 
+    if (phdr.size() < 2) {
+        throw std::runtime_error("too few presets");
+    }
     presets_.reserve(phdr.size() - 1);
     for (auto it_phdr = phdr.begin(); it_phdr != std::prev(phdr.end()); ++it_phdr) {
         presets_.emplace_back(std::make_shared<Preset>(it_phdr, pbag, pmod, pgen, *this));
