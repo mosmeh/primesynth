@@ -92,6 +92,7 @@ bool matchSysEx(const char* data, std::size_t length, const std::array<unsigned 
 
     for (std::size_t i = 0; i < N; ++i) {
         if (i == 2) {
+            // respond to all device ID
             continue;
         } else if (data[i] != static_cast<char>(sysEx.at(i))) {
             return false;

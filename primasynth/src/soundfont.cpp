@@ -525,6 +525,9 @@ void SoundFont::readSdtaChunk(std::ifstream& ifs, std::size_t size) {
         s += sizeof(subchunkHeader) + subchunkHeader.size;
         switch (subchunkHeader.id) {
         case toFourCC("smpl"):
+            if (subchunkHeader.size == 0) {
+                throw std::runtime_error("no sample data found");
+            }
             sampleBuffer_.resize(subchunkHeader.size / sizeof(std::int16_t));
             ifs.read(reinterpret_cast<char*>(sampleBuffer_.data()), subchunkHeader.size);
             break;
@@ -619,10 +622,10 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
         }
     }
 
-    // last records in inst, phdr, and shdr sub-chunks mean "end of records", and are ignored
+    // last records of inst, phdr, and shdr sub-chunks indicate end of records, and are ignored
 
     if (inst.size() < 2) {
-        throw std::runtime_error("too few instruments");
+        throw std::runtime_error("no instrument found");
     }
     instruments_.reserve(inst.size() - 1);
     for (auto it_inst = inst.begin(); it_inst != std::prev(inst.end()); ++it_inst) {
@@ -630,13 +633,16 @@ void SoundFont::readPdtaChunk(std::ifstream& ifs, std::size_t size) {
     }
 
     if (phdr.size() < 2) {
-        throw std::runtime_error("too few presets");
+        throw std::runtime_error("no preset found");
     }
     presets_.reserve(phdr.size() - 1);
     for (auto it_phdr = phdr.begin(); it_phdr != std::prev(phdr.end()); ++it_phdr) {
         presets_.emplace_back(std::make_shared<Preset>(it_phdr, pbag, pmod, pgen, *this));
     }
 
+    if (shdr.size() < 2) {
+        throw std::runtime_error("no sample found");
+    }
     samples_.reserve(shdr.size() - 1);
     for (auto it_shdr = shdr.begin(); it_shdr != std::prev(shdr.end()); ++it_shdr) {
         samples_.emplace_back(*it_shdr, sampleBuffer_);
