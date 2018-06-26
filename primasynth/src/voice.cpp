@@ -203,8 +203,10 @@ void Voice::update() {
         vibLFO_.update();
         modLFO_.update();
 
+        const double modEnvValue =
+            modEnv_.getSection() == Envelope::Section::Attack ? conv::convex(modEnv_.getValue()) : modEnv_.getValue();
         const double pitch =
-            voicePitch_ + 0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnv_.getValue() +
+            voicePitch_ + 0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnvValue +
                                   getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
                                   getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue());
         deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(pitch));

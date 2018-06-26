@@ -38,26 +38,6 @@ double Modulator::getValue() const {
     return value_;
 }
 
-double concave(double x) {
-    if (x <= 0.0) {
-        return 0.0;
-    } else if (x >= 1.0) {
-        return 1.0;
-    } else {
-        return 2.0 * conv::amplitudeToAttenuation(1.0 - x);
-    }
-}
-
-double convex(double x) {
-    if (x <= 0.0) {
-        return 0.0;
-    } else if (x >= 1.0) {
-        return 1.0;
-    } else {
-        return 1.0 - 2.0 * conv::amplitudeToAttenuation(x);
-    }
-}
-
 double map(double value, sf::Modulator mod) {
     if (mod.palette == sf::ControllerPalette::General && mod.index.general == sf::GeneralController::PitchWheel) {
         value /= 1 << 14;
@@ -75,9 +55,9 @@ double map(double value, sf::Modulator mod) {
         case sf::SourceType::Linear:
             return x;
         case sf::SourceType::Concave:
-            return concave(x);
+            return conv::concave(x);
         case sf::SourceType::Convex:
-            return convex(x);
+            return conv::convex(x);
         }
     } else {
         const int dir = mod.direction == sf::SourceDirection::Positive ? 1 : -1;
@@ -87,9 +67,9 @@ double map(double value, sf::Modulator mod) {
         case sf::SourceType::Linear:
             return dir * x;
         case sf::SourceType::Concave:
-            return sign * dir * concave(sign * x);
+            return sign * dir * conv::concave(sign * x);
         case sf::SourceType::Convex:
-            return sign * dir * convex(sign * x);
+            return sign * dir * conv::convex(sign * x);
         }
     }
     throw std::runtime_error("unknown modulator controller type");

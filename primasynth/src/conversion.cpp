@@ -62,6 +62,26 @@ double absoluteCentToHeltz(double ac) {
     return 8.176 * std::exp2(ac / 1200.0);
 }
 
+double concave(double x) {
+    if (x <= 0.0) {
+        return 0.0;
+    } else if (x >= 1.0) {
+        return 1.0;
+    } else {
+        return 2.0 * conv::amplitudeToAttenuation(1.0 - x);
+    }
+}
+
+double convex(double x) {
+    if (x <= 0.0) {
+        return 0.0;
+    } else if (x >= 1.0) {
+        return 1.0;
+    } else {
+        return 1.0 - 2.0 * conv::amplitudeToAttenuation(x);
+    }
+}
+
 std::uint16_t joinBytes(std::uint8_t msb, std::uint8_t lsb) {
     return (static_cast<std::uint16_t>(msb) << 7) + static_cast<std::uint16_t>(lsb);
 }
