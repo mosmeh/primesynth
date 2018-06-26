@@ -10,9 +10,9 @@ void initialize();
 double attenuationToAmplitude(double atten);
 double amplitudeToAttenuation(double amp);
 
-double keyToHeltz(double key);
+double keyToHertz(double key);
 double timecentToSecond(double tc);
-double absoluteCentToHeltz(double ac);
+double absoluteCentToHertz(double ac);
 
 double concave(double x);
 double convex(double x);

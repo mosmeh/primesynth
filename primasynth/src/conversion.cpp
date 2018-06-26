@@ -4,7 +4,7 @@
 namespace primasynth {
 namespace conv {
 std::array<double, 1441> attenToAmpTable;
-std::array<double, 1200> centToHeltzTable;
+std::array<double, 1200> centToHertzTable;
 
 void initialize() {
     static bool initialized = false;
@@ -15,8 +15,8 @@ void initialize() {
             // -200 instead of -100 for compatibility
             attenToAmpTable.at(i) = std::pow(10.0, i / -200.0);
         }
-        for (std::size_t i = 0; i < centToHeltzTable.size(); i++) {
-            centToHeltzTable.at(i) = 6.875 * std::exp2(i / 1200.0);
+        for (std::size_t i = 0; i < centToHertzTable.size(); i++) {
+            centToHertzTable.at(i) = 6.875 * std::exp2(i / 1200.0);
         }
     }
 }
@@ -36,7 +36,7 @@ double amplitudeToAttenuation(double amp) {
     return -20.0 / 96.0 * std::log10(amp);
 }
 
-double keyToHeltz(double key) {
+double keyToHertz(double key) {
     if (key < 0.0) {
         return 1.0;
     }
@@ -45,7 +45,7 @@ double keyToHeltz(double key) {
     int ratio = 1;
     for (int threshold = 900; threshold <= 14100; threshold += 1200) {
         if (key * 100.0 < threshold) {
-            return ratio * centToHeltzTable.at(static_cast<int>(key * 100.0) + offset);
+            return ratio * centToHertzTable.at(static_cast<int>(key * 100.0) + offset);
         }
         offset -= 1200;
         ratio *= 2;
@@ -58,7 +58,7 @@ double timecentToSecond(double tc) {
     return std::exp2(tc / 1200.0);
 }
 
-double absoluteCentToHeltz(double ac) {
+double absoluteCentToHertz(double ac) {
     return 8.176 * std::exp2(ac / 1200.0);
 }
 

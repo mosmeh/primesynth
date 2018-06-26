@@ -42,7 +42,7 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
                         COARSE_UNIT * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset) +
                         generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
 
-    deltaPhaseFactor_ = 1.0 / conv::keyToHeltz(rtSample_.pitch) * sample.sampleRate / outputRate;
+    deltaPhaseFactor_ = 1.0 / conv::keyToHertz(rtSample_.pitch) * sample.sampleRate / outputRate;
 
     for (const auto& mp : modparams.getParameters()) {
         modulators_.emplace_back(mp);
@@ -209,7 +209,7 @@ void Voice::update() {
             voicePitch_ + 0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnvValue +
                                   getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
                                   getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue());
-        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(pitch));
+        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHertz(pitch));
 
         const double attenModLFO = getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue() / 960.0;
         const double targetAmp = volEnv_.getSection() == Envelope::Section::Attack

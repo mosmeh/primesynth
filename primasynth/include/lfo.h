@@ -16,7 +16,7 @@ public:
     }
 
     void setFrequency(double freq) {
-        delta_ = 4.0 * interval_ * conv::absoluteCentToHeltz(freq) / outputRate_;
+        delta_ = 4.0 * interval_ * conv::absoluteCentToHertz(freq) / outputRate_;
     }
 
     void update() {
