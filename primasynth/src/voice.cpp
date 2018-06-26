@@ -160,8 +160,8 @@ void Voice::update() {
 
     if (calc) {
         volEnv_.update();
-        if (volEnv_.isFinished() ||
-            (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + volEnv_.getAttenuation() >= 1.0)) {
+        if (volEnv_.getSection() == Envelope::Section::Finished ||
+            (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + (1.0 - volEnv_.getValue()) >= 1.0)) {
             status_ = State::Finished;
             return;
         }
@@ -203,16 +203,16 @@ void Voice::update() {
         vibLFO_.update();
         modLFO_.update();
 
-        const double key =
-            voicePitch_ +
-            0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * (1.0 - modEnv_.getAttenuation()) +
-                    getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
-                    getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue());
-        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(key));
+        const double pitch =
+            voicePitch_ + 0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnv_.getValue() +
+                                  getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
+                                  getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue());
+        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHeltz(pitch));
 
-        const double targetAmp = volEnv_.calculateAmplitude() *
-                                 conv::attenuationToAmplitude(getModulatedGenerator(sf::Generator::ModLfoToVolume) *
-                                                              modLFO_.getValue() / 960.0);
+        const double attenModLFO = getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue() / 960.0;
+        const double targetAmp = volEnv_.getSection() == Envelope::Section::Attack
+                                     ? volEnv_.getValue() * conv::attenuationToAmplitude(attenModLFO)
+                                     : conv::attenuationToAmplitude((1.0 - volEnv_.getValue()) + attenModLFO);
         deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
     }
 }

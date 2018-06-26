@@ -3,41 +3,19 @@
 
 namespace primasynth {
 Envelope::Envelope(double outputRate, unsigned int interval)
-    : effectiveOutputRate_(outputRate / interval), params_(), section_(Section::Delay), sectionSteps_(0), atten_(1.0) {}
+    : effectiveOutputRate_(outputRate / interval), params_(), section_(Section::Delay), sectionSteps_(0), value_(1.0) {}
 
 Envelope::Section Envelope::getSection() const {
     return section_;
 }
 
-double Envelope::getAttenuation() const {
-    return atten_;
-}
-
-bool Envelope::isFinished() const {
-    return section_ == Section::Finished;
-}
-
-double Envelope::calculateAmplitude() const {
-    switch (section_) {
-    case Section::Delay:
-    case Section::Finished:
-        return 0.0;
-    case Section::Attack:
-        return 1.0 - atten_;
-    case Section::Hold:
-        return 1.0;
-    case Section::Decay:
-    case Section::Sustain:
-    case Section::Release:
-        return conv::attenuationToAmplitude(atten_);
-    }
-
-    throw std::logic_error("unreachable");
+double Envelope::getValue() const {
+    return value_;
 }
 
 void Envelope::setParameter(Section section, double param) {
     if (section == Section::Sustain) {
-        params_.at(static_cast<std::size_t>(Section::Sustain)) = 0.001 * param;
+        params_.at(static_cast<std::size_t>(Section::Sustain)) = 1.0 - 0.001 * param;
     } else if (section < Section::Finished) {
         params_.at(static_cast<std::size_t>(section)) = effectiveOutputRate_ * conv::timecentToSecond(param);
     } else {
@@ -67,28 +45,28 @@ void Envelope::update() {
     switch (section_) {
     case Section::Delay:
     case Section::Finished:
-        atten_ = 1.0;
+        value_ = 0.0;
         return;
     case Section::Attack:
-        atten_ = 1.0 - sectionSteps_ / params_.at(i);
+        value_ = sectionSteps_ / params_.at(i);
         return;
     case Section::Hold:
-        atten_ = 0.0;
+        value_ = 1.0;
         return;
     case Section::Decay:
-        atten_ = sectionSteps_ / params_.at(i);
-        if (atten_ >= sustain) {
-            atten_ = sustain;
+        value_ = 1.0 - sectionSteps_ / params_.at(i);
+        if (value_ <= sustain) {
+            value_ = sustain;
             changeSection(Section::Sustain);
         }
         return;
     case Section::Sustain:
-        atten_ = sustain;
+        value_ = sustain;
         return;
     case Section::Release:
-        atten_ += 1.0 / params_.at(i);
-        if (atten_ >= 1.0) {
-            atten_ = 1.0;
+        value_ -= 1.0 / params_.at(i);
+        if (value_ <= 0.0) {
+            value_ = 0.0;
             changeSection(Section::Finished);
         }
         return;

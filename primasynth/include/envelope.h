@@ -9,9 +9,7 @@ public:
     Envelope(double outputRate, unsigned int interval);
 
     Section getSection() const;
-    double getAttenuation() const;
-    bool isFinished() const;
-    double calculateAmplitude() const;
+    double getValue() const;
 
     void setParameter(Section section, double param);
     void release();
@@ -22,7 +20,7 @@ private:
     std::array<double, 6> params_;
     Section section_;
     unsigned int sectionSteps_;
-    double atten_;
+    double value_;
 
     void changeSection(Section section);
 };
