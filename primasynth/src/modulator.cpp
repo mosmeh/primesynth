@@ -13,9 +13,9 @@ std::int16_t Modulator::getAmount() const {
     return param_.modAmount;
 }
 
-bool Modulator::isAlwaysNonNegative() const {
+bool Modulator::canBeNegative() const {
     if (param_.modTransOper == sf::Transform::AbsoluteValue || param_.modAmount == 0) {
-        return true;
+        return false;
     }
 
     if (param_.modAmount > 0) {
@@ -27,18 +27,18 @@ bool Modulator::isAlwaysNonNegative() const {
         const bool uniAmt = param_.modAmtSrcOper.polarity == sf::SourcePolarity::Unipolar;
 
         if ((uniSrc && uniAmt) || (uniSrc && noAmt) || (noSrc && uniAmt) || (noSrc && noAmt)) {
-            return true;
+            return false;
         }
     }
 
-    return false;
+    return true;
 }
 
 double Modulator::getValue() const {
     return value_;
 }
 
-double map(double value, sf::Modulator mod) {
+double map(double value, const sf::Modulator& mod) {
     if (mod.palette == sf::ControllerPalette::General && mod.index.general == sf::GeneralController::PitchWheel) {
         value /= 1 << 14;
     } else {

@@ -8,7 +8,7 @@ public:
 
     sf::Generator getDestination() const;
     std::int16_t getAmount() const;
-    bool isAlwaysNonNegative() const;
+    bool canBeNegative() const;
     double getValue() const;
 
     bool updateSFController(sf::GeneralController controller, std::int16_t value);

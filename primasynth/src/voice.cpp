@@ -58,8 +58,8 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
 
     double minActualAtten = ATTEN_FACTOR * generators_.getOrDefault(sf::Generator::InitialAttenuation);
     for (const auto& mod : modulators_) {
-        if (mod.getDestination() == sf::Generator::InitialAttenuation && !mod.isAlwaysNonNegative()) {
-            // !isAlywaysNonNegative() means mod may increase volume
+        if (mod.getDestination() == sf::Generator::InitialAttenuation && mod.canBeNegative()) {
+            // canBeNegative() means mod may increase volume
             minActualAtten -= std::abs(mod.getAmount());
         }
     }
