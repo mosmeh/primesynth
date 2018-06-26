@@ -35,52 +35,9 @@ void Synthesizer::setMIDIStandard(midi::Standard midiStandard, bool fixed) {
 
 void Synthesizer::processShortMessage(unsigned long param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
-    const std::uint8_t channelID = msg[0] & 0xf;
-    const auto& channel = channels_.at(channelID);
-    const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
-    switch (status) {
-    case midi::MessageStatus::NoteOff:
-        channel->noteOff(msg[1]);
-        break;
-    case midi::MessageStatus::NoteOn:
-        if (!channel->hasPreset()) {
-            channel->setPreset(channelID == midi::PERCUSSION_CHANNEL ? findPreset(PERCUSSION_BANK, 0)
-                                                                     : findPreset(0, 0));
-        }
-        channel->noteOn(msg[1], msg[2]);
-        break;
-    case midi::MessageStatus::KeyPressure:
-        channel->keyPressure(msg[1], msg[2]);
-        break;
-    case midi::MessageStatus::ControlChange:
-        channel->controlChange(msg[1], msg[2]);
-        break;
-    case midi::MessageStatus::ProgramChange: {
-        const auto midiBank = channel->getBank();
-        std::uint16_t sfBank = 0;
-        switch (midiStd_) {
-        case midi::Standard::GM:
-            break;
-        case midi::Standard::GS:
-            sfBank = midiBank.msb;
-            break;
-        case midi::Standard::XG:
-            // assuming no one uses XG voices bank MSBs of which overlap normal voices' bank LSBs
-            // e.g. SFX voice, MSB=64
-            sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
-            break;
-        default:
-            throw std::runtime_error("unknown MIDI standard");
-        }
-        channel->setPreset(findPreset(channelID == midi::PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
-        break;
-    }
-    case midi::MessageStatus::ChannelPressure:
-        channel->channelPressure(msg[1]);
-        break;
-    case midi::MessageStatus::PitchBend:
-        channel->pitchBend(conv::joinBytes(msg[2], msg[1]));
-        break;
+    const auto status = msg[0] & 0xf0;
+    if (status != 0xf0) {
+        processChannelMessage(param);
     }
 }
 
@@ -152,6 +109,62 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
     } else {
         // Piano not found, there is no more fallback
         throw std::runtime_error("failed to find preset 0:0 (GM Acoustic Grand Piano)");
+    }
+}
+
+void Synthesizer::processChannelMessage(unsigned long param) {
+    const auto msg = reinterpret_cast<std::uint8_t*>(&param);
+
+    const std::uint8_t channelID = msg[0] & 0xf;
+    if (channelID >= channels_.size()) {
+        return;
+    }
+    const auto& channel = channels_.at(channelID);
+
+    const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
+    switch (status) {
+    case midi::MessageStatus::NoteOff:
+        channel->noteOff(msg[1]);
+        break;
+    case midi::MessageStatus::NoteOn:
+        if (!channel->hasPreset()) {
+            channel->setPreset(channelID == midi::PERCUSSION_CHANNEL ? findPreset(PERCUSSION_BANK, 0)
+                                                                     : findPreset(0, 0));
+        }
+        channel->noteOn(msg[1], msg[2]);
+        break;
+    case midi::MessageStatus::KeyPressure:
+        channel->keyPressure(msg[1], msg[2]);
+        break;
+    case midi::MessageStatus::ControlChange:
+        channel->controlChange(msg[1], msg[2]);
+        break;
+    case midi::MessageStatus::ProgramChange: {
+        const auto midiBank = channel->getBank();
+        std::uint16_t sfBank = 0;
+        switch (midiStd_) {
+        case midi::Standard::GM:
+            break;
+        case midi::Standard::GS:
+            sfBank = midiBank.msb;
+            break;
+        case midi::Standard::XG:
+            // assuming no one uses XG voices bank MSBs of which overlap normal voices' bank LSBs
+            // e.g. SFX voice, MSB=64
+            sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
+            break;
+        default:
+            throw std::runtime_error("unknown MIDI standard");
+        }
+        channel->setPreset(findPreset(channelID == midi::PERCUSSION_CHANNEL ? PERCUSSION_BANK : sfBank, msg[1]));
+        break;
+    }
+    case midi::MessageStatus::ChannelPressure:
+        channel->channelPressure(msg[1]);
+        break;
+    case midi::MessageStatus::PitchBend:
+        channel->pitchBend(conv::joinBytes(msg[2], msg[1]));
+        break;
     }
 }
 }

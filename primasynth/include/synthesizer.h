@@ -22,5 +22,6 @@ private:
     double volume_;
 
     std::shared_ptr<const Preset> findPreset(std::uint16_t bank, std::uint16_t presetID) const;
+    void processChannelMessage(unsigned long param);
 };
 }
