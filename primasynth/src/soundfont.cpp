@@ -321,14 +321,14 @@ void ModulatorParameterSet::addOrAppend(const sf::ModList& param) {
 }
 
 void ModulatorParameterSet::merge(const ModulatorParameterSet& b) {
-    for (const auto& mp : b.params_) {
-        append(mp);
+    for (const auto& param : b.params_) {
+        append(param);
     }
 }
 
 void ModulatorParameterSet::mergeAndAdd(const ModulatorParameterSet& b) {
-    for (const auto& mp : b.params_) {
-        addOrAppend(mp);
+    for (const auto& param : b.params_) {
+        addOrAppend(param);
     }
 }
 
