@@ -17,7 +17,7 @@ public:
 
 private:
     const double effectiveOutputRate_;
-    std::array<double, 6> params_;
+    std::array<double, static_cast<std::size_t>(Phase::Finished)> params_;
     Phase phase_;
     unsigned int phaseSteps_;
     double value_;
