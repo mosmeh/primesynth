@@ -22,7 +22,6 @@ void initialize() {
 }
 
 double attenuationToAmplitude(double atten) {
-    atten *= 960.0;
     if (atten <= 0.0) {
         return 1.0;
     } else if (atten >= attenToAmpTable.size()) {
@@ -33,7 +32,7 @@ double attenuationToAmplitude(double atten) {
 }
 
 double amplitudeToAttenuation(double amp) {
-    return -20.0 / 96.0 * std::log10(amp);
+    return -200.0 * std::log10(amp);
 }
 
 double keyToHertz(double key) {
@@ -68,7 +67,7 @@ double concave(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return 2.0 * conv::amplitudeToAttenuation(1.0 - x);
+        return 2.0 * conv::amplitudeToAttenuation(1.0 - x) / 960.0;
     }
 }
 
@@ -78,7 +77,7 @@ double convex(double x) {
     } else if (x >= 1.0) {
         return 1.0;
     } else {
-        return 1.0 - 2.0 * conv::amplitudeToAttenuation(x);
+        return 1.0 - 2.0 * conv::amplitudeToAttenuation(x) / 960.0;
     }
 }
 
