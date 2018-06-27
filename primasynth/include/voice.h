@@ -48,11 +48,11 @@ private:
     std::array<double, NUM_GENERATORS> modulated_;
     bool percussion_;
     double fineTuning_, coarseTuning_;
-    double deltaPhaseFactor_;
+    double deltaIndexRatio_;
     unsigned int steps_;
     State status_;
     double voicePitch_;
-    FixedPoint phase_, deltaPhase_;
+    FixedPoint index_, deltaIndex_;
     StereoValue volume_;
     double amp_, deltaAmp_;
     Envelope volEnv_, modEnv_;

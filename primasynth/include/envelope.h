@@ -4,24 +4,24 @@
 namespace primasynth {
 class Envelope {
 public:
-    enum class Section { Delay, Attack, Hold, Decay, Sustain, Release, Finished };
+    enum class Phase { Delay, Attack, Hold, Decay, Sustain, Release, Finished };
 
     Envelope(double outputRate, unsigned int interval);
 
-    Section getSection() const;
+    Phase getPhase() const;
     double getValue() const;
 
-    void setParameter(Section section, double param);
+    void setParameter(Phase phase, double param);
     void release();
     void update();
 
 private:
     const double effectiveOutputRate_;
     std::array<double, 6> params_;
-    Section section_;
-    unsigned int sectionSteps_;
+    Phase phase_;
+    unsigned int phaseSteps_;
     double value_;
 
-    void changeSection(Section section);
+    void changePhase(Phase phase);
 };
 }

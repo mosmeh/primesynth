@@ -17,8 +17,8 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
       coarseTuning_(0.0),
       steps_(0),
       status_(State::Playing),
-      phase_(sample.start),
-      deltaPhase_(0u),
+      index_(sample.start),
+      deltaIndex_(0u),
       volume_({1.0, 1.0}),
       amp_(0.0),
       deltaAmp_(0.0),
@@ -42,7 +42,7 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
                         COARSE_UNIT * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset) +
                         generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
 
-    deltaPhaseFactor_ = 1.0 / conv::keyToHertz(rtSample_.pitch) * sample.sampleRate / outputRate;
+    deltaIndexRatio_ = 1.0 / conv::keyToHertz(rtSample_.pitch) * sample.sampleRate / outputRate;
 
     for (const auto& mp : modparams.getParameters()) {
         modulators_.emplace_back(mp);
@@ -97,8 +97,8 @@ const Voice::State& Voice::getStatus() const {
 }
 
 StereoValue Voice::render() const {
-    const std::uint32_t i = phase_.getIntegerPart();
-    const double r = phase_.getFractionalPart();
+    const std::uint32_t i = index_.getIntegerPart();
+    const double r = index_.getFractionalPart();
     const double interpolated = (1.0 - r) * sampleBuffer_.at(i) + r * sampleBuffer_.at(i + 1);
     return amp_ * volume_ * (interpolated / INT16_MAX);
 }
@@ -160,36 +160,36 @@ void Voice::update() {
 
     if (calc) {
         volEnv_.update();
-        if (volEnv_.getSection() == Envelope::Section::Finished ||
-            (volEnv_.getSection() > Envelope::Section::Attack && minAtten_ + (1.0 - volEnv_.getValue()) >= 1.0)) {
+        if (volEnv_.getPhase() == Envelope::Phase::Finished ||
+            (volEnv_.getPhase() > Envelope::Phase::Attack && minAtten_ + (1.0 - volEnv_.getValue()) >= 1.0)) {
             status_ = State::Finished;
             return;
         }
     }
 
-    phase_ += deltaPhase_;
+    index_ += deltaIndex_;
 
     switch (rtSample_.mode) {
     case SampleMode::UnLooped:
     case SampleMode::UnUsed:
-        if (phase_.getIntegerPart() >= rtSample_.end) {
+        if (index_.getIntegerPart() >= rtSample_.end) {
             status_ = State::Finished;
             return;
         }
         break;
     case SampleMode::Looped:
-        if (phase_.getIntegerPart() >= rtSample_.endLoop) {
-            phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
+        if (index_.getIntegerPart() >= rtSample_.endLoop) {
+            index_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
     case SampleMode::LoopedWithRemainder:
         if (status_ == State::Released) {
-            if (phase_.getIntegerPart() >= rtSample_.end) {
+            if (index_.getIntegerPart() >= rtSample_.end) {
                 status_ = State::Finished;
                 return;
             }
-        } else if (phase_.getIntegerPart() >= rtSample_.endLoop) {
-            phase_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
+        } else if (index_.getIntegerPart() >= rtSample_.endLoop) {
+            index_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
     default:
@@ -204,15 +204,15 @@ void Voice::update() {
         modLFO_.update();
 
         const double modEnvValue =
-            modEnv_.getSection() == Envelope::Section::Attack ? conv::convex(modEnv_.getValue()) : modEnv_.getValue();
+            modEnv_.getPhase() == Envelope::Phase::Attack ? conv::convex(modEnv_.getValue()) : modEnv_.getValue();
         const double pitch =
             voicePitch_ + 0.01 * (getModulatedGenerator(sf::Generator::ModEnvToPitch) * modEnvValue +
                                   getModulatedGenerator(sf::Generator::VibLfoToPitch) * vibLFO_.getValue() +
                                   getModulatedGenerator(sf::Generator::ModLfoToPitch) * modLFO_.getValue());
-        deltaPhase_ = FixedPoint(deltaPhaseFactor_ * conv::keyToHertz(pitch));
+        deltaIndex_ = FixedPoint(deltaIndexRatio_ * conv::keyToHertz(pitch));
 
         const double attenModLFO = getModulatedGenerator(sf::Generator::ModLfoToVolume) * modLFO_.getValue() / 960.0;
-        const double targetAmp = volEnv_.getSection() == Envelope::Section::Attack
+        const double targetAmp = volEnv_.getPhase() == Envelope::Phase::Attack
                                      ? volEnv_.getValue() * conv::attenuationToAmplitude(attenModLFO)
                                      : conv::attenuationToAmplitude((1.0 - volEnv_.getValue()) + attenModLFO);
         deltaAmp_ = (targetAmp - amp_) / CALC_INTERVAL;
@@ -265,52 +265,52 @@ void Voice::updateModulatedParams(sf::Generator destination) {
         vibLFO_.setFrequency(modulated);
         break;
     case sf::Generator::DelayModEnv:
-        modEnv_.setParameter(Envelope::Section::Delay, modulated);
+        modEnv_.setParameter(Envelope::Phase::Delay, modulated);
         break;
     case sf::Generator::AttackModEnv:
-        modEnv_.setParameter(Envelope::Section::Attack, modulated);
+        modEnv_.setParameter(Envelope::Phase::Attack, modulated);
         break;
     case sf::Generator::HoldModEnv:
     case sf::Generator::KeynumToModEnvHold:
-        modEnv_.setParameter(Envelope::Section::Hold,
+        modEnv_.setParameter(Envelope::Phase::Hold,
                              getModulatedGenerator(sf::Generator::HoldModEnv) +
                                  getModulatedGenerator(sf::Generator::KeynumToModEnvHold) * keyScaling_);
         break;
     case sf::Generator::DecayModEnv:
     case sf::Generator::KeynumToModEnvDecay:
-        modEnv_.setParameter(Envelope::Section::Decay,
+        modEnv_.setParameter(Envelope::Phase::Decay,
                              getModulatedGenerator(sf::Generator::DecayModEnv) +
                                  getModulatedGenerator(sf::Generator::KeynumToModEnvDecay) * keyScaling_);
         break;
     case sf::Generator::SustainModEnv:
-        modEnv_.setParameter(Envelope::Section::Sustain, modulated);
+        modEnv_.setParameter(Envelope::Phase::Sustain, modulated);
         break;
     case sf::Generator::ReleaseModEnv:
-        modEnv_.setParameter(Envelope::Section::Release, modulated);
+        modEnv_.setParameter(Envelope::Phase::Release, modulated);
         break;
     case sf::Generator::DelayVolEnv:
-        volEnv_.setParameter(Envelope::Section::Delay, modulated);
+        volEnv_.setParameter(Envelope::Phase::Delay, modulated);
         break;
     case sf::Generator::AttackVolEnv:
-        volEnv_.setParameter(Envelope::Section::Attack, modulated);
+        volEnv_.setParameter(Envelope::Phase::Attack, modulated);
         break;
     case sf::Generator::HoldVolEnv:
     case sf::Generator::KeynumToVolEnvHold:
-        volEnv_.setParameter(Envelope::Section::Hold,
+        volEnv_.setParameter(Envelope::Phase::Hold,
                              getModulatedGenerator(sf::Generator::HoldVolEnv) +
                                  getModulatedGenerator(sf::Generator::KeynumToVolEnvHold) * keyScaling_);
         break;
     case sf::Generator::DecayVolEnv:
     case sf::Generator::KeynumToVolEnvDecay:
-        volEnv_.setParameter(Envelope::Section::Decay,
+        volEnv_.setParameter(Envelope::Phase::Decay,
                              getModulatedGenerator(sf::Generator::DecayVolEnv) +
                                  getModulatedGenerator(sf::Generator::KeynumToVolEnvDecay) * keyScaling_);
         break;
     case sf::Generator::SustainVolEnv:
-        volEnv_.setParameter(Envelope::Section::Sustain, modulated);
+        volEnv_.setParameter(Envelope::Phase::Sustain, modulated);
         break;
     case sf::Generator::ReleaseVolEnv:
-        volEnv_.setParameter(Envelope::Section::Release, modulated);
+        volEnv_.setParameter(Envelope::Phase::Release, modulated);
         break;
     case sf::Generator::CoarseTune:
     case sf::Generator::FineTune:
