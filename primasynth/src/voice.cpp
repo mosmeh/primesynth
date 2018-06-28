@@ -46,7 +46,7 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
     const std::size_t bufferSize = sample.buffer.size();
     rtSample_.start = std::min(bufferSize - 1, rtSample_.start);
     rtSample_.end = std::max(rtSample_.start + 1, std::min(bufferSize, rtSample_.end));
-    rtSample_.startLoop = std::max(rtSample_.start, std::min(bufferSize - 1, rtSample_.startLoop));
+    rtSample_.startLoop = std::max(rtSample_.start, std::min(rtSample_.end - 1, rtSample_.startLoop));
     rtSample_.endLoop = std::max(rtSample_.startLoop + 1, std::min(rtSample_.end, rtSample_.endLoop));
 
     deltaIndexRatio_ = 1.0 / conv::keyToHertz(rtSample_.pitch) * sample.sampleRate / outputRate;
