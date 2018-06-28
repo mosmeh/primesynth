@@ -166,8 +166,6 @@ void Voice::update() {
     const bool calc = steps_++ % CALC_INTERVAL == 0;
 
     if (calc) {
-        volEnv_.update();
-
         // dynamic range of signed 16 bit samples in centibel
         static const double DYNAMIC_RANGE = 200.0 * std::log10(INT16_MAX + 1.0);
         if (volEnv_.getPhase() == Envelope::Phase::Finished ||
@@ -176,6 +174,8 @@ void Voice::update() {
             status_ = State::Finished;
             return;
         }
+
+        volEnv_.update();
     }
 
     index_ += deltaIndex_;
