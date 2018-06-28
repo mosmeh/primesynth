@@ -140,7 +140,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     case midi::ControlChange::ResetAllControllers:
         keyPressures_ = {};
 
-        // cf. General MIDI System Level 1 Developer Guidelines Second Revision p.5
+        // See General MIDI System Level 1 Developer Guidelines Second Revision p.5
         // Response to "Reset All Controllers" Message
         channelPressure_ = 0;
         pitchBend_ = 1 << 13;

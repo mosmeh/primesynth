@@ -49,7 +49,7 @@ bool matchSysEx(const char* data, std::size_t length, const std::array<unsigned 
 
     for (std::size_t i = 0; i < N; ++i) {
         if (i == 2) {
-            // respond to all device ID
+            // respond to all device IDs
             continue;
         } else if (data[i] != static_cast<char>(sysEx.at(i))) {
             return false;
@@ -95,6 +95,7 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
 
     // fallback
     if (bank == PERCUSSION_BANK) {
+        // fall back to GM percussion
         if (presetID != 0) {
             return findPreset(bank, 0);
         } else {

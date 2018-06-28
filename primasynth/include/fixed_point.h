@@ -2,7 +2,7 @@
 
 namespace primasynth {
 // 64 bit fixed-point number
-// 32 bit for each of integer and fractional part
+// higher 32 bit for integer part and lower 32 bit for fractional part
 class FixedPoint {
 public:
     FixedPoint() = delete;

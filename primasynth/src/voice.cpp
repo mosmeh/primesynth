@@ -66,7 +66,7 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
     double minModulatedAtten = ATTEN_FACTOR * generators_.getOrDefault(sf::Generator::InitialAttenuation);
     for (const auto& mod : modulators_) {
         if (mod.getDestination() == sf::Generator::InitialAttenuation && mod.canBeNegative()) {
-            // canBeNegative() means mod may increase volume
+            // mod may increase volume
             minModulatedAtten -= std::abs(mod.getAmount());
         }
     }
@@ -146,7 +146,7 @@ void Voice::release(bool sustained) {
     }
 
     if (percussion_) {
-        // cf. General MIDI System Level 1 Developer Guidelines Second Revision p.15
+        // See General MIDI System Level 1 Developer Guidelines Second Revision p.15
         // Response to Note-off on Channel 10 (Percussion)
 
         // Most of percussion presets sound naturally when they do not respond to note-offs
