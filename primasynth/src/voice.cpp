@@ -42,6 +42,13 @@ Voice::Voice(std::size_t noteID, double outputRate, const Sample& sample, const 
                         COARSE_UNIT * generators.getOrDefault(sf::Generator::EndloopAddrsCoarseOffset) +
                         generators.getOrDefault(sf::Generator::EndloopAddrsOffset);
 
+    // fix invalid sample range
+    const std::size_t bufferSize = sample.buffer.size();
+    rtSample_.start = std::min(bufferSize - 1, rtSample_.start);
+    rtSample_.end = std::max(rtSample_.start + 1, std::min(bufferSize, rtSample_.end));
+    rtSample_.startLoop = std::max(rtSample_.start, std::min(bufferSize - 1, rtSample_.startLoop));
+    rtSample_.endLoop = std::max(rtSample_.startLoop + 1, std::min(rtSample_.end, rtSample_.endLoop));
+
     deltaIndexRatio_ = 1.0 / conv::keyToHertz(rtSample_.pitch) * sample.sampleRate / outputRate;
 
     for (const auto& mp : modparams.getParameters()) {
