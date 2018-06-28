@@ -29,7 +29,7 @@ public:
     void update();
 
 private:
-    enum class SampleMode { UnLooped, Looped, UnUsed, LoopedWithRemainder };
+    enum class SampleMode { UnLooped, Looped, UnUsed, LoopedUntilRelease };
 
     struct RuntimeSample {
         SampleMode mode;

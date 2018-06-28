@@ -193,7 +193,7 @@ void Voice::update() {
             index_ -= FixedPoint(rtSample_.endLoop - rtSample_.startLoop);
         }
         break;
-    case SampleMode::LoopedWithRemainder:
+    case SampleMode::LoopedUntilRelease:
         if (status_ == State::Released) {
             if (index_.getIntegerPart() >= rtSample_.end) {
                 status_ = State::Finished;
