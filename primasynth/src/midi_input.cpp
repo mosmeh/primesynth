@@ -28,9 +28,9 @@ void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, D
         const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
         sp->synth.processSysEx(mh->lpData, mh->dwBytesRecorded);
 
-        // See https://msdn.microsoft.com/en-us/library/dd798460(v=vs.85).aspx
-        // "Applications should not call any multimedia functions from inside the callback function,
-        // as doing so can cause a deadlock"
+        // See "MidiInProc callback function" (https://msdn.microsoft.com/en-us/library/dd798460.aspx)
+        // "Applications should not call any multimedia functions from inside the callback function, as doing so can
+        // cause a deadlock"
         std::unique_lock<std::mutex> uniqueLock(sp->mutex);
         sp->addingBufferRequested = true;
         sp->cv.notify_one();

@@ -130,8 +130,10 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
     static bool initialized = false;
     if (!initialized) {
         initialized = true;
+
+        // See SoundFont 2.04 spec p.41 "8.4 Default Modulators"
         {
-            // MIDI Note-On Velocity to Initial Attenuation
+            // 8.4.1 MIDI Note-On Velocity to Initial Attenuation
             sf::ModList param;
             param.modSrcOper.index.general = sf::GeneralController::NoteOnVelocity;
             param.modSrcOper.palette = sf::ControllerPalette::General;
@@ -146,7 +148,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Note-On Velocity to Filter Cutoff
+            // 8.4.2 MIDI Note-On Velocity to Filter Cutoff
             sf::ModList param;
             param.modSrcOper.index.general = sf::GeneralController::NoteOnVelocity;
             param.modSrcOper.palette = sf::ControllerPalette::General;
@@ -161,7 +163,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Channel Pressure to Vibrato LFO Pitch Depth
+            // 8.4.3 MIDI Channel Pressure to Vibrato LFO Pitch Depth
             sf::ModList param;
             param.modSrcOper.index.midi = 13;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -176,7 +178,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Continuous Controller 1 to Vibrato LFO Pitch Depth
+            // 8.4.4 MIDI Continuous Controller 1 to Vibrato LFO Pitch Depth
             sf::ModList param;
             param.modSrcOper.index.midi = 1;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -191,7 +193,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Continuous Controller 7 to Initial Attenuation Source
+            // 8.4.5 MIDI Continuous Controller 7 to Initial Attenuation Source
             sf::ModList param;
             param.modSrcOper.index.midi = 7;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -206,7 +208,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Continuous Controller 10 to Pan Position
+            // 8.4.6 MIDI Continuous Controller 10 to Pan Position
             sf::ModList param;
             param.modSrcOper.index.midi = 10;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -221,7 +223,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Continuous Controller 11 to Initial Attenuation
+            // 8.4.7 MIDI Continuous Controller 11 to Initial Attenuation
             sf::ModList param;
             param.modSrcOper.index.midi = 11;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -236,7 +238,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Continuous Controller 91 to Reverb Effects Send
+            // 8.4.8 MIDI Continuous Controller 91 to Reverb Effects Send
             sf::ModList param;
             param.modSrcOper.index.midi = 91;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -251,7 +253,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Continuous Controller 93 to Reverb Effects Send
+            // 8.4.9 MIDI Continuous Controller 93 to Chorus Effects Send
             sf::ModList param;
             param.modSrcOper.index.midi = 93;
             param.modSrcOper.palette = sf::ControllerPalette::MIDI;
@@ -266,7 +268,7 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
             params.append(param);
         }
         {
-            // MIDI Pitch Wheel to Initial Pitch Controlled by MIDI Pitch Wheel Sensitivity
+            // 8.4.10 MIDI Pitch Wheel to Initial Pitch Controlled by MIDI Pitch Wheel Sensitivity
             sf::ModList param;
             param.modSrcOper.index.general = sf::GeneralController::PitchWheel;
             param.modSrcOper.palette = sf::ControllerPalette::General;

@@ -146,8 +146,8 @@ void Voice::release(bool sustained) {
     }
 
     if (percussion_) {
-        // See General MIDI System Level 1 Developer Guidelines Second Revision p.15
-        // Response to Note-off on Channel 10 (Percussion)
+        // See "General MIDI System Level 1 Developer Guidelines Second Revision"
+        // p.15 "Response to Note-off on Channel 10 (Percussion)"
 
         // Most of percussion presets sound naturally when they do not respond to note-offs
         return;
