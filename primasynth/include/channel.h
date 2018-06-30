@@ -30,7 +30,7 @@ private:
     std::uint8_t channelPressure_;
     std::uint16_t pitchBend_;
     DataEntryMode dataEntryMode_;
-    std::int16_t pitchBendSensitivity_;
+    double pitchBendSensitivity_;
     double fineTuning_, coarseTuning_;
     std::vector<std::unique_ptr<Voice>> voices_;
     std::size_t currentNoteID_;

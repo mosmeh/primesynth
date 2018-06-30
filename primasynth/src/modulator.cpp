@@ -75,7 +75,7 @@ double map(double value, const sf::Modulator& mod) {
     throw std::runtime_error("unknown modulator controller type");
 }
 
-bool Modulator::updateSFController(sf::GeneralController controller, std::int16_t value) {
+bool Modulator::updateSFController(sf::GeneralController controller, double value) {
     bool updated = false;
     if (param_.modSrcOper.palette == sf::ControllerPalette::General && controller == param_.modSrcOper.index.general) {
         source_ = map(value, param_.modSrcOper);

@@ -11,7 +11,7 @@ public:
     bool canBeNegative() const;
     double getValue() const;
 
-    bool updateSFController(sf::GeneralController controller, std::int16_t value);
+    bool updateSFController(sf::GeneralController controller, double value);
     bool updateMIDIController(std::uint8_t controller, std::uint8_t value);
 
 private:

@@ -21,7 +21,7 @@ public:
     StereoValue render() const;
 
     void setPercussion(bool percussion);
-    void updateSFController(sf::GeneralController controller, std::int16_t value);
+    void updateSFController(sf::GeneralController controller, double value);
     void updateMIDIController(std::uint8_t controller, std::uint8_t value);
     void updateFineTuning(double fineTuning);
     void updateCoarseTuning(double coarseTuning);

@@ -114,7 +114,7 @@ void Voice::setPercussion(bool percussion) {
     percussion_ = percussion;
 }
 
-void Voice::updateSFController(sf::GeneralController controller, std::int16_t value) {
+void Voice::updateSFController(sf::GeneralController controller, double value) {
     for (auto& mod : modulators_) {
         if (mod.updateSFController(controller, value)) {
             updateModulatedParams(mod.getDestination());

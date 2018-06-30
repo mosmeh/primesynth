@@ -8,7 +8,7 @@ Channel::Channel(double outputRate)
       channelPressure_(0),
       pitchBend_(1 << 13),
       dataEntryMode_(DataEntryMode::RPN),
-      pitchBendSensitivity_(2),
+      pitchBendSensitivity_(2.0),
       fineTuning_(0.0),
       coarseTuning_(0.0),
       currentNoteID_(0) {
@@ -90,20 +90,23 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
     std::lock_guard<std::mutex> lockGuard(mutex_);
     switch (static_cast<midi::ControlChange>(controller)) {
     case midi::ControlChange::DataEntryMSB:
+    case midi::ControlChange::DataEntryLSB:
         if (dataEntryMode_ == DataEntryMode::RPN) {
             const std::uint16_t rpn =
                 conv::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
                                 controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)));
+            const auto data = static_cast<std::int32_t>(
+                conv::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryMSB)),
+                                controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB))));
+
             switch (static_cast<midi::RPN>(rpn)) {
             case midi::RPN::PitchBendSensitivity:
-                pitchBendSensitivity_ = value;
+                pitchBendSensitivity_ = data / 128.0;
                 for (const auto& voice : voices_) {
-                    voice->updateSFController(sf::GeneralController::PitchWheelSensitivity, value);
+                    voice->updateSFController(sf::GeneralController::PitchWheelSensitivity, pitchBendSensitivity_);
                 }
                 break;
             case midi::RPN::FineTuning: {
-                const auto data = static_cast<std::int32_t>(conv::joinBytes(
-                    value, controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB))));
                 fineTuning_ = (data - 8192) / 81.92;
                 for (const auto& voice : voices_) {
                     voice->updateFineTuning(fineTuning_);
@@ -111,7 +114,7 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
                 break;
             }
             case midi::RPN::CoarseTuning: {
-                coarseTuning_ = static_cast<std::int16_t>(value) - 64;
+                coarseTuning_ = (data - 8192) / 128.0;
                 for (const auto& voice : voices_) {
                     voice->updateCoarseTuning(coarseTuning_);
                 }
