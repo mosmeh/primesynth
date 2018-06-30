@@ -30,10 +30,12 @@ bool Channel::hasPreset() const {
 }
 
 void Channel::noteOff(std::uint8_t key) {
+    const bool sustained = controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64;
+
     std::lock_guard<std::mutex> lockGuard(mutex_);
     for (const auto& voice : voices_) {
         if (voice->getActualKey() == key) {
-            voice->release(controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64);
+            voice->release(sustained);
         }
     }
 }
@@ -120,9 +122,11 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         }
         break;
     case midi::ControlChange::Sustain:
-        for (const auto& voice : voices_) {
-            if (voice->getStatus() == Voice::State::Sustained) {
-                voice->release(false);
+        if (value < 64) {
+            for (const auto& voice : voices_) {
+                if (voice->getStatus() == Voice::State::Sustained) {
+                    voice->release(false);
+                }
             }
         }
         break;
@@ -138,10 +142,9 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         voices_.clear();
         break;
     case midi::ControlChange::ResetAllControllers:
+        // See "General MIDI System Level 1 Developer Guidelines" Second Revision
+        // p.5 'Response to "Reset All Controllers" Message'
         keyPressures_ = {};
-
-        // See "General MIDI System Level 1 Developer Guidelines Second Revision"
-        // p.5 "Response to "Reset All Controllers" Message"
         channelPressure_ = 0;
         pitchBend_ = 1 << 13;
         for (const auto& voice : voices_) {
@@ -175,11 +178,17 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
             }
         }
         break;
-    case midi::ControlChange::AllNotesOff:
+    case midi::ControlChange::AllNotesOff: {
+        // See "The Complete MIDI 1.0 Detailed Specification" Rev. April 2006
+        // p.A-6 'The Relationship Between the Hold Pedal and "All Notes Off"'
+
+        // All Notes Off is affected by CC 64 (Sustain)
+        const bool sustained = controllers_.at(static_cast<std::size_t>(midi::ControlChange::Sustain)) >= 64;
         for (const auto& voice : voices_) {
-            voice->release(false);
+            voice->release(sustained);
         }
         break;
+    }
     default:
         for (const auto& voice : voices_) {
             voice->updateMIDIController(controller, value);
