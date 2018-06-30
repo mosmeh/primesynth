@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace primasynth {
-static constexpr std::size_t NUM_GENERATORS = static_cast<std::size_t>(sf::Generator::Pitch) + 1;
+static constexpr std::size_t NUM_GENERATORS = static_cast<std::size_t>(sf::Generator::Last);
 static constexpr std::uint16_t PERCUSSION_BANK = 128;
 
 struct Sample {
