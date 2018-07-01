@@ -80,9 +80,5 @@ double convex(double x) {
         return 1.0 - 2.0 * conv::amplitudeToAttenuation(x) / 960.0;
     }
 }
-
-std::uint16_t joinBytes(std::uint8_t msb, std::uint8_t lsb) {
-    return (static_cast<std::uint16_t>(msb) << 7) + static_cast<std::uint16_t>(lsb);
-}
 }
 }

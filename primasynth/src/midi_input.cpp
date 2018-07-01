@@ -74,7 +74,7 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
             std::cout << "Channel pressure: channel=" << channel << " value=" << static_cast<int>(msg[1]) << std::endl;
             break;
         case midi::MessageStatus::PitchBend:
-            std::cout << "Pitch bend: channel=" << channel << " value=" << conv::joinBytes(msg[2], msg[1]) << std::endl;
+            std::cout << "Pitch bend: channel=" << channel << " value=" << midi::joinBytes(msg[2], msg[1]) << std::endl;
             break;
         }
         break;

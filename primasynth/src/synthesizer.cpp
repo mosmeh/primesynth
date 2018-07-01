@@ -164,7 +164,7 @@ void Synthesizer::processChannelMessage(unsigned long param) {
         channel->channelPressure(msg[1]);
         break;
     case midi::MessageStatus::PitchBend:
-        channel->pitchBend(conv::joinBytes(msg[2], msg[1]));
+        channel->pitchBend(midi::joinBytes(msg[2], msg[1]));
         break;
     }
 }

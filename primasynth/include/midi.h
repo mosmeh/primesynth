@@ -1,6 +1,6 @@
 #pragma once
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 namespace primasynth {
 namespace midi {
@@ -48,5 +48,7 @@ enum class RPN { PitchBendSensitivity = 0, FineTuning = 1, CoarseTuning = 2, Las
 struct Bank {
     std::uint8_t msb, lsb;
 };
+
+std::uint16_t joinBytes(std::uint8_t msb, std::uint8_t lsb);
 }
 }

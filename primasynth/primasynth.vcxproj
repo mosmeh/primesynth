@@ -24,6 +24,7 @@
     <ClCompile Include="src\conversion.cpp" />
     <ClCompile Include="src\envelope.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\midi.cpp" />
     <ClCompile Include="src\midi_input.cpp" />
     <ClCompile Include="src\modulator.cpp" />
     <ClCompile Include="src\soundfont.cpp" />

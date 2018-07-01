@@ -94,8 +94,8 @@ void Channel::controlChange(std::uint8_t controller, std::uint8_t value) {
         if (dataEntryMode_ == DataEntryMode::RPN) {
             const std::uint16_t rpn = getSelectedRPN();
             if (rpn < static_cast<std::uint16_t>(midi::RPN::Last)) {
-                    conv::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryMSB)),
                 const std::uint16_t data =
+                    midi::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryMSB)),
                                     controllers_.at(static_cast<std::size_t>(midi::ControlChange::DataEntryLSB)));
                 rpns_.at(rpn) = data;
                 updateRPN();
@@ -234,7 +234,7 @@ StereoValue Channel::render() {
 }
 
 std::uint16_t Channel::getSelectedRPN() const {
-    return conv::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
+    return midi::joinBytes(controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNMSB)),
                            controllers_.at(static_cast<std::size_t>(midi::ControlChange::RPNLSB)));
 }
 
