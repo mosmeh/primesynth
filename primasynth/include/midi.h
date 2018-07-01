@@ -31,6 +31,8 @@ enum class ControlChange {
     BankSelectLSB = 32,
     DataEntryLSB = 38,
     Sustain = 64,
+    DataIncrement = 96,
+    DataDecrement = 97,
     NRPNLSB = 98,
     NRPNMSB = 99,
     RPNLSB = 100,
@@ -41,7 +43,7 @@ enum class ControlChange {
 };
 
 // GM RPNs
-enum class RPN { PitchBendSensitivity = 0, FineTuning = 1, CoarseTuning = 2 };
+enum class RPN { PitchBendSensitivity = 0, FineTuning = 1, CoarseTuning = 2, Last };
 
 struct Bank {
     std::uint8_t msb, lsb;
