@@ -14,7 +14,7 @@ void checkMMResult(MMRESULT result) {
     }
 }
 
-void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD) {
+void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD) {
     const auto sp = reinterpret_cast<MIDIInput::SharedParam*>(dwInstance);
     if (!sp->running) {
         return;
@@ -22,7 +22,7 @@ void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, D
 
     switch (wMsg) {
     case MIM_DATA:
-        sp->synth.processShortMessage(dwParam1);
+        sp->synth.processShortMessage(static_cast<std::uint32_t>(dwParam1));
         break;
     case MIM_LONGDATA: {
         const auto mh = reinterpret_cast<LPMIDIHDR>(dwParam1);
@@ -40,7 +40,7 @@ void CALLBACK MidiInProc(HMIDIIN, UINT wMsg, DWORD dwInstance, DWORD dwParam1, D
     }
 }
 
-void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD dwParam1, DWORD dwParam2) {
+void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD dwParam2) {
     const auto sp = reinterpret_cast<MIDIInput::SharedParam*>(dwInstance);
     if (!sp->running) {
         return;
@@ -48,7 +48,8 @@ void CALLBACK verboseMidiInProc(HMIDIIN hmi, UINT wMsg, DWORD dwInstance, DWORD 
 
     switch (wMsg) {
     case MIM_DATA: {
-        const auto msg = reinterpret_cast<std::uint8_t*>(&dwParam1);
+        const auto param = static_cast<std::uint32_t>(dwParam1);
+        const auto msg = reinterpret_cast<const std::uint8_t*>(&param);
         const auto status = static_cast<midi::MessageStatus>(msg[0] & 0xf0);
         const auto channel = msg[0] & 0xf;
         switch (status) {
@@ -105,7 +106,7 @@ MIDIInput::MIDIInput(Synthesizer& synth, UINT deviceID, bool verbose)
                              reinterpret_cast<DWORD_PTR>(&sharedParam_), CALLBACK_FUNCTION));
 
     mh_.lpData = sysExBuffer_.data();
-    mh_.dwBufferLength = sysExBuffer_.size();
+    mh_.dwBufferLength = static_cast<DWORD>(sysExBuffer_.size());
 
     checkMMResult(midiInPrepareHeader(hmi_, &mh_, sizeof(mh_)));
     checkMMResult(midiInAddBuffer(hmi_, &mh_, sizeof(mh_)));

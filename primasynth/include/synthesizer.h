@@ -11,7 +11,7 @@ public:
     void loadSoundFont(const std::string& filename);
     void setVolume(double volume);
     void setMIDIStandard(midi::Standard midiStandard, bool fixed = false);
-    void processShortMessage(unsigned long param);
+    void processShortMessage(std::uint32_t param);
     void processSysEx(const char* data, std::size_t length);
 
 private:

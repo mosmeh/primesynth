@@ -33,7 +33,7 @@ void Synthesizer::setMIDIStandard(midi::Standard midiStandard, bool fixed) {
     stdFixed_ = fixed;
 }
 
-void Synthesizer::processShortMessage(unsigned long param) {
+void Synthesizer::processShortMessage(std::uint32_t param) {
     const auto msg = reinterpret_cast<std::uint8_t*>(&param);
     const auto status = msg[0] & 0xf0;
     if (status != 0xf0) {
