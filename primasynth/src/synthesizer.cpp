@@ -95,8 +95,8 @@ std::shared_ptr<const Preset> Synthesizer::findPreset(std::uint16_t bank, std::u
 
     // fallback
     if (bank == PERCUSSION_BANK) {
-        // fall back to GM percussion
         if (presetID != 0) {
+            // fall back to GM percussion
             return findPreset(bank, 0);
         } else {
             throw std::runtime_error("failed to find preset 128:0 (GM Percussion)");
@@ -151,7 +151,7 @@ void Synthesizer::processChannelMessage(unsigned long param) {
             break;
         case midi::Standard::XG:
             // assuming no one uses XG voices bank MSBs of which overlap normal voices' bank LSBs
-            // e.g. SFX voice, MSB=64
+            // e.g. SFX voice (MSB=64)
             sfBank = midiBank.msb == 127 ? PERCUSSION_BANK : midiBank.lsb;
             break;
         default:

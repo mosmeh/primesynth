@@ -19,7 +19,7 @@ Sample::Sample(const sf::Sample& sample, const std::vector<std::int16_t>& sample
       buffer(sampleBuffer) {
     if (start < end) {
         int sampleMax = 0;
-        // if SoundFont file is comformant to spec, sample range will not be extended beyond start and end by generators
+        // if SoundFont file is comformant to specification, generators do not extend sample range beyond start and end
         for (std::size_t i = start; i < end; ++i) {
             sampleMax = std::max(sampleMax, std::abs(sampleBuffer.at(i)));
         }
@@ -131,7 +131,8 @@ const ModulatorParameterSet& ModulatorParameterSet::getDefaultParameters() {
     if (!initialized) {
         initialized = true;
 
-        // See SoundFont 2.04 spec p.41 "8.4 Default Modulators"
+        // See "SoundFont Technical Specification" Version 2.04
+        // p.41 "8.4 Default Modulators"
         {
             // 8.4.1 MIDI Note-On Velocity to Initial Attenuation
             sf::ModList param;
