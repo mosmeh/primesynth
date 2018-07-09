@@ -4,6 +4,7 @@ namespace primasynth {
 Channel::Channel(double outputRate)
     : outputRate_(outputRate),
       controllers_(),
+      rpns_(),
       keyPressures_(),
       channelPressure_(0),
       pitchBend_(1 << 13),
