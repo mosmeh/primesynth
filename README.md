@@ -1,10 +1,10 @@
-# primasynth
+# primesynth
 SoundFont-powered MIDI synthesizer
 
 ## Usage
 ```
-$ primasynth --help
-usage: primasynth [options] ... [soundfonts] ...
+$ primesynth --help
+usage: primesynth [options] ... [soundfonts] ...
 options:
   -i, --in            input MIDI device ID (unsigned int [=0])
   -o, --out           output audio device ID (unsigned int [=0])
@@ -19,6 +19,6 @@ options:
 ```
 
 ## Installation
-Currently primasynth is only for Windows.
+Currently primesynth is only for Windows.
 
 Visual Studio supporting C++14 or later is required.
