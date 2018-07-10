@@ -542,7 +542,7 @@ public:
   void parse_check(const std::vector<std::string> &args){
     if (!options.count("help"))
       add("help", '?', "print this message");
-    check(args.size(), parse(args));
+    check(static_cast<int>(args.size()), parse(args));
   }
 
   void parse_check(int argc, char *argv[]){
@@ -655,42 +655,42 @@ private:
     }
     ~option_without_value(){}
 
-    bool has_value() const { return false; }
+    bool has_value() const override { return false; }
 
-    bool set(){
+    bool set() override {
       has=true;
       return true;
     }
 
-    bool set(const std::string &){
+    bool set(const std::string &) override {
       return false;
     }
 
-    bool has_set() const {
+    bool has_set() const override {
       return has;
     }
 
-    bool valid() const{
+    bool valid() const override {
       return true;
     }
 
-    bool must() const{
+    bool must() const override {
       return false;
     }
 
-    const std::string &name() const{
+    const std::string &name() const override {
       return nam;
     }
 
-    char short_name() const{
+    char short_name() const override {
       return snam;
     }
 
-    const std::string &description() const {
+    const std::string &description() const override {
       return desc;
     }
 
-    std::string short_description() const{
+    std::string short_description() const override {
       return "--"+nam;
     }
 
@@ -719,13 +719,13 @@ private:
       return actual;
     }
 
-    bool has_value() const { return true; }
+    bool has_value() const override { return true; }
 
-    bool set(){
+    bool set() override {
       return false;
     }
 
-    bool set(const std::string &value){
+    bool set(const std::string &value) override {
       try{
         actual=read(value);
         has=true;
@@ -736,32 +736,32 @@ private:
       return true;
     }
 
-    bool has_set() const{
+    bool has_set() const override {
       return has;
     }
 
-    bool valid() const{
+    bool valid() const override {
       if (need && !has) return false;
       return true;
     }
 
-    bool must() const{
+    bool must() const override {
       return need;
     }
 
-    const std::string &name() const{
+    const std::string &name() const override {
       return nam;
     }
 
-    char short_name() const{
+    char short_name() const override {
       return snam;
     }
 
-    const std::string &description() const {
+    const std::string &description() const override {
       return desc;
     }
 
-    std::string short_description() const{
+    std::string short_description() const override {
       return "--"+nam+"="+detail::readable_typename<T>();
     }
 
@@ -798,7 +798,7 @@ private:
     }
 
   private:
-    T read(const std::string &s){
+    T read(const std::string &s) override {
       return reader(s);
     }
 
